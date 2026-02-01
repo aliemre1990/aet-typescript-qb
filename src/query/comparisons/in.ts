@@ -1,9 +1,7 @@
-import type { DbType, PgDbType } from "../../db.js";
-import type { GetArrayEquivalentPgValueType } from "../../table/columnTypes.js";
-import { isNullOrUndefined } from "../../utility/guards.js";
+import type { DbType } from "../../db.js";
 import ColumnComparisonOperation, { comparisonOperations, type InferValueTypeFromComparable } from "./_comparisonOperations.js";
 import type { IComparable } from "../_interfaces/IComparable.js";
-import type { IsAny, LiteralToBase, NullableArray } from "../../utility/common.js";
+import type { IsAny, LiteralToBase } from "../../utility/common.js";
 import QueryParam from "../param.js";
 import QueryBuilder from "../queryBuilder.js";
 import type { DbValueTypes } from "../../table/column.js";

@@ -1,11 +1,11 @@
 import { dbTypes } from "../db.js";
-import generateSumFn from "../query/aggregation/sum.js";
 import { generateArithmeticAddition } from "../query/arithmetic/addition.js";
 import { generateSQLCaseFn } from "../query/caseExpression.js";
 import { jsonBuildObjectFn } from "../query/functions/jsonFunctions/jsonBuildObject.js";
 import generateRoundFn from "../query/functions/round.js";
 import { generateLiteralValueFn } from "../query/literalValue.js";
 import { generateParamFn } from "../query/param.js";
+import generateSumFn from "../query/aggregation/sum.js";//Keep this below, it causes circullar reference issues.
 
 const paramTester = generateParamFn(dbTypes.postgresql);
 const literalTester = generateLiteralValueFn(dbTypes.postgresql);

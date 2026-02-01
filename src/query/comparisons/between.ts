@@ -1,6 +1,5 @@
 import type { DbType } from "../../db.js";
 import ColumnComparisonOperation, { comparisonOperations, type InferValueTypeFromComparable } from "./_comparisonOperations.js";
-
 import type { IComparable } from "../_interfaces/IComparable.js";
 import type { IsAny, LiteralToBase } from "../../utility/common.js";
 import QueryParam from "../param.js";

@@ -18,7 +18,6 @@ import type { AccumulateOrderByParams } from "./_types/paramAccumulationOrderBy.
 import type { AccumulateColumnParams } from "./_types/paramAccumulationSelect.js";
 import type ColumnsSelection from "./ColumnsSelection.js";
 import { columnsSelectionFactory, ColumnsSelectionQueryTableObjectSymbol } from "./ColumnsSelection.js";
-import { mysqlDbOperators, mysqlFunctions, pgDbOperators, pgFunctions } from "./dbOperations.js";
 import { IComparableFinalValueDummySymbol, IComparableValueDummySymbol, queryBuilderContextFactory, type DetermineFinalValueType, type DetermineValueType, type IComparable, type QueryBuilderContext } from "./_interfaces/IComparable.js";
 import SubQueryObject from "./subQueryObject.js";
 import eq from "./comparisons/eq.js";
@@ -32,6 +31,7 @@ import gte from "./comparisons/gte.js";
 import lt from "./comparisons/lt.js";
 import lte from "./comparisons/lte.js";
 import type { PgColumnType } from "../table/columnTypes.js";
+import { getDbFunctions, getDbOperations } from "./uitlity/dbOperations.js";
 
 
 type ResultShapeItem<TDbType extends DbType> = IComparable<TDbType, any, any, any, any, any, any>;
@@ -256,15 +256,6 @@ class QueryBuilder<
                 combineSpecs: this.combineSpecs
             });
     }
-
-    #getDbFunctions(): DbFunctions<TDbType> {
-        return (this.dbType === dbTypes.postgresql ? pgFunctions : this.dbType === dbTypes.mysql ? mysqlFunctions : undefined) as DbFunctions<TDbType>;
-    }
-
-    #getDbOperators() {
-        return (this.dbType === dbTypes.postgresql ? pgDbOperators : this.dbType === dbTypes.mysql ? mysqlDbOperators : undefined) as DbOperators<TDbType>;
-    }
-
     #getColumnsSelection() {
         let columnsSelection: ColumnsSelectionListType<TDbType> = {};
         if (this.fromSpecs !== undefined) {
@@ -484,7 +475,7 @@ class QueryBuilder<
         let selectRes: readonly (ColumnsSelection<TDbType, any, any> | IComparable<TDbType, any, any, any, any, any, any>)[] = [];
         if (!isNullOrUndefined(cb)) {
             const columnsSelection = this.#getColumnsSelection() as TableToColumnsMap<TDbType, TablesToObject<TDbType, TFrom, TJoinSpecs>>;
-            const functions = this.#getDbFunctions();
+            const functions = getDbFunctions(this.dbType);
             selectRes = cb(columnsSelection, functions);
         }
 
@@ -683,7 +674,7 @@ class QueryBuilder<
             throw Error('Invalid table type.');
         }
 
-        const dbOperators = this.#getDbOperators();
+        const dbOperators = getDbOperations(this.dbType);
 
         const comparison = comparisonCb(
             columnsSelection as TableToColumnsMap<TDbType, TablesToObject<TDbType, TFrom, TJoinAccumulated>>,
@@ -737,7 +728,7 @@ class QueryBuilder<
             TCastType
         > {
         const columnsSelection = this.#getColumnsSelection() as TableToColumnsMap<TDbType, TablesToObject<TDbType, TFrom, TJoinSpecs>>;
-        const ops = this.#getDbOperators();
+        const ops = getDbOperations(this.dbType);
 
         const comparison = cb(columnsSelection, ops as DbOperators<TDbType>)
 
@@ -787,7 +778,7 @@ class QueryBuilder<
         > {
 
         const columnsSelection = this.#getColumnsSelection() as TableToColumnsMap<TDbType, TablesToObject<TDbType, TFrom, TJoinSpecs, TCTESpecs>>;
-        const functions = this.#getDbFunctions();
+        const functions = getDbFunctions(this.dbType);
         const res = cb(columnsSelection, functions);
 
         return new QueryBuilder<
@@ -836,7 +827,7 @@ class QueryBuilder<
         TCastType
     > {
         const columnsSelection = this.#getColumnsSelection() as TableToColumnsMap<TDbType, TablesToObject<TDbType, TFrom, TJoinSpecs, TCTESpecs>>;
-        const operators = this.#getDbOperators();
+        const operators = getDbOperations(this.dbType);
         const res = cb(columnsSelection, operators)
 
         return new QueryBuilder<
@@ -886,7 +877,7 @@ class QueryBuilder<
             TCastType
         > {
         const columnsSelection = this.#getColumnsSelection() as TableToColumnsMap<TDbType, TablesToObject<TDbType, TFrom, TJoinSpecs, TCTESpecs>>;
-        const functions = this.#getDbFunctions();
+        const functions = getDbFunctions(this.dbType);
         const res = cb(columnsSelection, functions);
 
         return new QueryBuilder<

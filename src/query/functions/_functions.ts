@@ -11,7 +11,6 @@ import gt from "../comparisons/gt.js";
 import gte from "../comparisons/gte.js";
 import lt from "../comparisons/lt.js";
 import lte from "../comparisons/lte.js";
-import QueryBuilder from "../queryBuilder.js";
 import { convertArgsToQueryString } from "../uitlity/common.js";
 import type { PgColumnType } from "../../table/columnTypes.js";
 
