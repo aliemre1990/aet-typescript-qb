@@ -50,6 +50,14 @@ type IsUnion<T, U extends T = T> =
         : never) extends false ? false : true
 
 type IsAny<T> = 0 extends 1 & T ? true : false;
+type IsExact<T, U> =
+    IsAny<T> extends true ? IsAny<U> extends true ? true : false :
+    IsAny<U> extends true ? false :
+    (<G>() => G extends T ? 1 : 2) extends (<G>() => G extends U ? 1 : 2) ? true : false;
+type IsExactAlt<T, U> =
+    IsAny<T> extends true ? IsAny<U> extends true ? true : false :
+    IsAny<U> extends true ? false :
+    [T] extends [U] ? [U] extends [T] ? true : false : false;
 
 type NullableArray<T> = T extends Array<infer TItem> ? (TItem | null)[] : never;
 
@@ -92,6 +100,8 @@ export type {
     SingleKeyObject,
     IsUnion,
     IsAny,
+    IsExact,
+    IsExactAlt,
     NullableArray,
     NonNullableArray,
     JoinTuple,
