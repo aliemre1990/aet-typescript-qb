@@ -4,7 +4,7 @@ import type ColumnSQLFunction from "../../../query/functions/_functions.js";
 import type LiteralValue from "../../../query/literalValue.js";
 import type QueryParam from "../../../query/param.js";
 import type { DbValueTypes } from "../../../table/column.js";
-import { caseTester } from "../../_functions.js";
+import { caseTester, literalTester, paramTester, roundTester } from "../../_functions.js";
 import { customersTable } from "../../_tables.js";
 import type { AssertEqual, AssertExtends, AssertTrue } from "../_typeTestingUtilities.js";
 
@@ -36,28 +36,28 @@ type caseMainExpressionOneWhenWithLiteralsResultTypeTest = AssertTrue<AssertEqua
 type caseMainExpressionOneWhenWithLiteralsWhenExpressionsTypeTest = AssertTrue<AssertEqual<caseMainExpressionOneWhenWithLiteralsWhenExpressionsType, [[1, 2]]>>;
 
 const caseMainExpressionOneWhenWithComparableOverload1 = caseTester(customersTable.select((tables) => [tables.customers.id]).where((tables, { param }) => tables.customers.id.eq(param("idParam"))))
-    .when(1, ({ literal }) => literal(1));
+    .when(1, literalTester(1));
 type caseMainExpressionOneWhenWithComparableOverload1ResultType = typeof caseMainExpressionOneWhenWithComparableOverload1 extends SQLCaseExpression<any, infer TResultType, any, any, any, any, any, any> ? TResultType : never;
 type caseMainExpressionOneWhenWithComparableOverload1ExpressionType = typeof caseMainExpressionOneWhenWithComparableOverload1 extends SQLCaseExpression<any, any, any, any, infer TWhenExps, any, any, any> ? TWhenExps : never;
 type caseMainExpressionOneWhenWithComparableOverload1ResultTypeTest = AssertTrue<AssertEqual<caseMainExpressionOneWhenWithComparableOverload1ResultType, 1 | null>>;
 type caseMainExpressionOneWhenWithComparableOverload1ExpressionTypeTest = AssertTrue<AssertExtends<caseMainExpressionOneWhenWithComparableOverload1ExpressionType, [[number, LiteralValue<any, any, any, any>]]>>;
 
 const caseMainExpressionOneWhenWithComparableOverload2 = caseTester(customersTable.select((tables) => [tables.customers.id]).where((tables, { param }) => tables.customers.id.eq(param("idParam"))))
-    .when(({ literal }) => literal(1), 1);
+    .when(literalTester(1), 1);
 type caseMainExpressionOneWhenWithComparableOverload2ResultType = typeof caseMainExpressionOneWhenWithComparableOverload2 extends SQLCaseExpression<any, infer TResultType, any, any, any, any, any, any> ? TResultType : never;
 type caseMainExpressionOneWhenWithComparableOverload2ExpressionType = typeof caseMainExpressionOneWhenWithComparableOverload2 extends SQLCaseExpression<any, any, any, any, infer TWhenExps, any, any, any> ? TWhenExps : never;
 type caseMainExpressionOneWhenWithComparableOverload2ResultTypeTest = AssertTrue<AssertEqual<caseMainExpressionOneWhenWithComparableOverload2ResultType, 1 | null>>
 type caseMainExpressionOneWhenWithComparableOverload2ExpressionTypeTest = AssertTrue<AssertExtends<caseMainExpressionOneWhenWithComparableOverload2ExpressionType, [[LiteralValue<any, any, any, any>, number]]>>;
 
 const caseMainExpressionOneWhenWithComparables = caseTester(customersTable.select((tables) => [tables.customers.id]).where((tables, { param }) => tables.customers.id.eq(param("idParam"))))
-    .when(({ literal }) => literal(null), ({ round }) => round(2, 1));
+    .when(literalTester(null), roundTester(2, 1));
 type caseMainExpressionOneWhenWithComparablesResultType = typeof caseMainExpressionOneWhenWithComparables extends SQLCaseExpression<any, infer TResultType, any, any, any, any, any, any> ? TResultType : never;
 type caseMainExpressionOneWhenWithComparablesExpressionType = typeof caseMainExpressionOneWhenWithComparables extends SQLCaseExpression<any, any, any, any, infer TWhenExps, any, any, any> ? TWhenExps : never;
 type caseMainExpressionOneWhenWithComparablesResultTypeTest = AssertTrue<AssertEqual<caseMainExpressionOneWhenWithComparablesResultType, number | null>>;
 type caseMainExpressionOneWhenWithComparablesExpressionTypeTest = AssertTrue<AssertExtends<caseMainExpressionOneWhenWithComparablesExpressionType, [[LiteralValue<any, any, any, any>, ColumnSQLFunction<any, any, any, any, any, any, any, any>]]>>;
 
 const caseMainExpressionOneWhenWithComparablesParamed = caseTester(customersTable.select((tables) => [tables.customers.id]).where((tables, { param }) => tables.customers.id.eq(param("idParam"))))
-    .when(({ param }) => param("when"), ({ round, param }) => round(param("exp"), 1));
+    .when(paramTester("when"), roundTester(paramTester("exp"), 1));
 type caseMainExpressionOneWhenWithComparablesParamedParams = typeof caseMainExpressionOneWhenWithComparablesParamed extends SQLCaseExpression<any, any, any, any, any, infer TParams, any, any> ? TParams : never;
 type caseMainExpressionOneWhenWithComparablesParamedParamsLength = AssertTrue<AssertEqual<caseMainExpressionOneWhenWithComparablesParamedParams["length"], 3>>;
 type caseMainExpressionOneWhenWithComparablesParamedParam1Type = caseMainExpressionOneWhenWithComparablesParamedParams[0] extends QueryParam<any, any, infer TValueType, any, any, any> ? TValueType : never;
@@ -72,7 +72,7 @@ type caseNoBranchElseReturnType = typeof caseNoBranchElse extends SQLCaseExpress
 type caseNoBranchElseReturnTypeTest = AssertTrue<AssertEqual<caseNoBranchElseReturnType, "ali">>;
 
 
-const caseNoBranchElseWithComparable = caseTester().else(({ literal }) => literal(null));
+const caseNoBranchElseWithComparable = caseTester().else(literalTester(null));
 type caseNoBranchElseWithComparableResultType = typeof caseNoBranchElseWithComparable extends SQLCaseExpression<any, infer TResultType, any, any, any, any, any, any> ? TResultType : never;
 type caseNoBranchElseWithComparableElseExpression = typeof caseNoBranchElseWithComparable extends SQLCaseExpression<any, any, any, infer TElse, any, any, any, any> ? TElse : never;
 type caseNoBranchElseWithComparableElseExpressionValueType = caseNoBranchElseWithComparableElseExpression extends LiteralValue<any, infer TValue, any, any> ? TValue : never;
@@ -81,8 +81,8 @@ type caseNoBranchElseWithComparableElseExpressionTest = AssertTrue<AssertExtends
 type caseNoBranchElseWithComparableElseExpressionValueTypeTest = AssertTrue<AssertEqual<caseNoBranchElseWithComparableElseExpressionValueType, null>>;
 
 const caseWithParams = caseTester(customersTable.select((tables) => [tables.customers.id]).where((tables, { param }) => tables.customers.id.eq(param("where"))))
-    .when(({ param }) => param("when"), ({ round, param }) => round(param("then"), 2))
-    .else(({ param, literal }) => param("else"));
+    .when(paramTester("when"), roundTester(paramTester("then"), 2))
+    .else(paramTester("else"));
 type typeofCaseWithParamsResultType = typeof caseWithParams extends SQLCaseExpression<any, infer TResultType, any, any, any, any, any, any> ? TResultType : never;
 type typeofCaseWithParamsElseExpression = typeof caseWithParams extends SQLCaseExpression<any, any, any, infer TElse, any, any, any, any> ? TElse : never;
 type typeofCaseWithParamsElseExpressionParamName = typeofCaseWithParamsElseExpression extends QueryParam<any, infer TName, any, any, any, any> ? TName : never;
@@ -107,15 +107,15 @@ type caseWithParamsElseParamFromParamsParamNameTest = AssertTrue<AssertEqual<typ
 type caseWithParamsElseParamFromParamsParamTypeTest = AssertTrue<AssertEqual<typeofCaseWithParamsElseParamFromParamsParamType, number | null>>;
 
 const caseWithParamsParamAfter = caseTester(customersTable.select((tables) => [tables.customers.id]).where((tables, { param }) => tables.customers.id.eq(param("where"))))
-    .when(1, ({ round }) => round(1, 1))
-    .when(({ param }) => param("when"), ({ param }) => param("then"));
+    .when(1, roundTester(1, 1))
+    .when(paramTester("when"), paramTester("then"));
 type typeofCaseWithParamsParamAfterResultType = typeof caseWithParamsParamAfter extends SQLCaseExpression<any, infer TResultType, any, any, any, any, any, any> ? TResultType : never;
 type typeofCaseWithParamsParamAfterWhenExpressions = typeof caseWithParamsParamAfter extends SQLCaseExpression<any, any, any, any, infer TWhenExps, any, any, any> ? TWhenExps : never;
 
 
 const caseWithParamsParamBefore = caseTester(customersTable.select((tables) => [tables.customers.id]).where((tables, { param }) => tables.customers.id.eq(param("where"))))
-    .when(({ param }) => param("when"), ({ param }) => param("then"))
-    .when(1, ({ round }) => round(1, 1))
+    .when(paramTester("when"), paramTester("then"))
+    .when(1, roundTester(1, 1))
 type typeofCaseWithParamsParamBeforeResultType = typeof caseWithParamsParamBefore extends SQLCaseExpression<any, infer TResultType, any, any, any, any, any, any> ? TResultType : never;
 type typeofCaseWithParamsParamBeforeWhenExpressions = typeof caseWithParamsParamBefore extends SQLCaseExpression<any, any, any, any, infer TWhenExps, any, any, any> ? TWhenExps : never;
 type typeofCaseWithParamsParamBeforeParams = typeof caseWithParamsParamBefore extends SQLCaseExpression<any, any, any, any, any, infer TParams, any, any> ? TParams : never;
@@ -126,9 +126,9 @@ type caseWithParamsParamBeforeThenParamEquityTest = AssertTrue<AssertEqual<typeo
 type caseWithParamsParamBeforeThenParamTypeTest = AssertTrue<AssertEqual<typeofCaseWithParamsParamBeforeThenParamType, number>>;
 
 const caseWithParams_OnlyParamsNoElse = caseTester(customersTable.select((tables) => [tables.customers.id]).where((tables, { param }) => tables.customers.id.eq(param("where"))))
-    .when(({ param }) => param("when1"), ({ param }) => param("then1"))
-    .when(({ param }) => param("when2"), ({ param }) => param("then2"))
-    .when(({ param }) => param("when3"), ({ param }) => param("then3"));
+    .when(paramTester("when1"), paramTester("then1"))
+    .when(paramTester("when2"), paramTester("then2"))
+    .when(paramTester("when3"), paramTester("then3"));
 type typeofCaseWithParams_OnlyParamsNoElseResultType = typeof caseWithParams_OnlyParamsNoElse extends SQLCaseExpression<any, infer TResultType, any, any, any, any, any, any> ? TResultType : never;
 type typeofCaseWithParams_OnlyParamsNoElseParams = typeof caseWithParams_OnlyParamsNoElse extends SQLCaseExpression<any, any, any, any, any, infer TParams, any, any> ? TParams : never;
 type typeofCaseWithParams_OnlyParamsNoElse_ParamMain = typeofCaseWithParams_OnlyParamsNoElseParams[0] extends QueryParam<any, any, infer TValueType, any, any, any> ? TValueType : never;
@@ -147,10 +147,10 @@ const caseValid1 = caseTester(customersTable.select((tables) => [tables.customer
     .when(1, 2);
 const caseValid2 = caseTester(customersTable.select((tables) => [tables.customers.id]))
     .when(1, 1)
-    .when(1, ({ round }) => round(2, 1));
+    .when(1, roundTester(2, 1));
 const caseValid3 = caseTester(customersTable.select((tables) => [tables.customers.id]))
     .when(1, 1)
-    .when(1, ({ round }) => round(2, 1))
+    .when(1, roundTester(2, 1))
     .else(1);
 
 const caseInvalid1 = caseTester(customersTable.select((tables) => [tables.customers.id]))
@@ -162,14 +162,14 @@ const caseInvalid2 = caseTester(customersTable.select((tables) => [tables.custom
     // @ts-expect-error
     .when(1, ({ round }) => round(2, 1));
 const caseInvalid3 = caseTester(customersTable.select((tables) => [tables.customers.id]).where((tables, { param }) => tables.customers.id.eq(param("where"))))
-    .when(({ param }) => param("when"), ({ param }) => param("then"))
-    .when(1, ({ round }) => round(1, 1))
+    .when(paramTester("when"), paramTester("then"))
+    .when(1, roundTester(1, 1))
     // @ts-expect-error
     .when(1, ({ round }) => "str")
 const caseInvalid4 = caseTester(customersTable.select((tables) => [tables.customers.id]).where((tables, { param }) => tables.customers.id.eq(param("where"))))
-    .when(({ param }) => param("when"), ({ param }) => param("then"))
-    .when(({ param }) => param("when2"), ({ param }) => param("then2"))
-    .when(1, ({ round }) => round(1, 1))
+    .when(paramTester("when"), paramTester("then"))
+    .when(paramTester("when2"), paramTester("then2"))
+    .when(1, roundTester(1, 1))
     // @ts-expect-error
     .when(({ param }) => param("when2"), ({ param }) => param("then3").type<string>())
 const caseInvalid5 = caseTester(customersTable.select((tables) => [tables.customers.id]).where((tables, { param }) => tables.customers.id.eq(param("where"))))
