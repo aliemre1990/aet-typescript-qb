@@ -8,139 +8,162 @@ import { caseTester, literalTester, paramTester, roundTester } from "../../_func
 import { customersTable } from "../../_tables.js";
 import type { AssertEqual, AssertExtends, AssertTrue } from "../_typeTestingUtilities.js";
 
-const caseNoBranch = caseTester();
-type caseNoBranchResultType = typeof caseNoBranch extends SQLCaseExpression<any, infer TResultType, any, any, any, any, any, any> ? TResultType : any;
-type caseNoBranchParams = typeof caseNoBranch extends SQLCaseExpression<any, never, any, any, any, infer TParams, any, any> ? TParams : never;
-type caseNoBranchResultTypeTest = AssertTrue<AssertEqual<caseNoBranchResultType, never>>;
-type caseNoBranchParamsTest = AssertTrue<AssertEqual<caseNoBranchParams, undefined>>;
+const caseWithNoBranch = caseTester();
+type typeof_CaseWithNoBranch_ResultType = typeof caseWithNoBranch extends SQLCaseExpression<any, infer TResultType, any, any, any, any, any, any> ? TResultType : any;
+type typeof_CaseWithNoBranch_Params = typeof caseWithNoBranch extends SQLCaseExpression<any, never, any, any, any, infer TParams, any, any> ? TParams : never;
+type caseWithNoBranch_ResultTypeTest = AssertTrue<AssertEqual<typeof_CaseWithNoBranch_ResultType, never>>;
+type caseWithNoBranch_ParamsTest = AssertTrue<AssertEqual<typeof_CaseWithNoBranch_Params, undefined>>;
 
-const caseNoBranchMainExpression = caseTester(customersTable.select((tables) => [tables.customers.id]));
-type caseNoBranchMainExpressionResultType = typeof caseNoBranchMainExpression extends SQLCaseExpression<any, infer TResultType, any, any, any, any, any, any> ? TResultType : any;
-type caseNoBranchMainExpressionParams = typeof caseNoBranchMainExpression extends SQLCaseExpression<any, never, any, any, any, infer TParams, any, any> ? TParams : never;
-type caseNoBranchMainExpressionResultTypeTest = AssertTrue<AssertEqual<caseNoBranchMainExpressionResultType, never>>;
-type caseNoBranchMainExpressionParamsTest = AssertTrue<AssertEqual<caseNoBranchMainExpressionParams, undefined>>;
+const caseWithNoBranch_WithMainExpression = caseTester(customersTable.select((tables) => [tables.customers.id]));
+type typeof_CaseWithNoBranch_WithMainExpression_ResultType = typeof caseWithNoBranch_WithMainExpression extends SQLCaseExpression<any, infer TResultType, any, any, any, any, any, any> ? TResultType : any;
+type typeof_CaseWithNoBranch_WithMainExpression_Params = typeof caseWithNoBranch_WithMainExpression extends SQLCaseExpression<any, never, any, any, any, infer TParams, any, any> ? TParams : never;
+type caseWithNoBranch_WithMainExpression_ResultTypeTest = AssertTrue<AssertEqual<typeof_CaseWithNoBranch_WithMainExpression_ResultType, never>>;
+type caseWithNoBranch_WithMainExpression_ParamsTest = AssertTrue<AssertEqual<typeof_CaseWithNoBranch_WithMainExpression_Params, undefined>>;
 
-const caseNoBranchMainExpressionWithParams = caseTester(customersTable.select((tables) => [tables.customers.id]).where((tables, { param }) => tables.customers.id.eq(param("idParam"))));
-type caseNoBranchMainExpressionWithParamsParams = typeof caseNoBranchMainExpressionWithParams extends SQLCaseExpression<any, never, any, any, any, infer TParams, any, any> ? TParams : never;
-type caseNoBranchMainExpressionWithParamsParamType = caseNoBranchMainExpressionWithParamsParams[0] extends QueryParam<any, any, infer TValueType, any, any, any> ? TValueType : never;
-type caseNoBranchMainExpressionWithParamsParamTypeTest = AssertTrue<AssertEqual<caseNoBranchMainExpressionWithParamsParamType, number | null>>;
+const caseWithNoBranch_WithMainExpressionWithParams = caseTester(customersTable.select((tables) => [tables.customers.id]).where((tables, { param }) => tables.customers.id.eq(param("idParam"))));
+type typeof_CaseWithNoBranch_WithMainExpressionWithParams_Params = typeof caseWithNoBranch_WithMainExpressionWithParams extends SQLCaseExpression<any, never, any, any, any, infer TParams, any, any> ? TParams : never;
+type typeof_CaseWithNoBranch_WithMainExpressionWithParams_MainParamType = typeof_CaseWithNoBranch_WithMainExpressionWithParams_Params[0] extends QueryParam<any, any, infer TValueType, any, any, any> ? TValueType : never;
+type caseWithNoBranch_WithMainExpression_WithParams_MainParamTypeTest = AssertTrue<AssertEqual<typeof_CaseWithNoBranch_WithMainExpressionWithParams_MainParamType, number | null>>;
 
-/**
- * Only one when branch with literal value
- */
-const caseMainExpressionOneWhenWithLiterals = caseTester(customersTable.select((tables) => [tables.customers.id]).where((tables, { param }) => tables.customers.id.eq(param("idParam"))))
+const caseWithMainExpression_OneWhenWithLiterals = caseTester(customersTable.select((tables) => [tables.customers.id]).where((tables, { param }) => tables.customers.id.eq(param("idParam"))))
     .when(1, 2);
-type caseMainExpressionOneWhenWithLiteralsResultType = typeof caseMainExpressionOneWhenWithLiterals extends SQLCaseExpression<any, infer TResultType, any, any, any, any, any, any> ? TResultType : never;
-type caseMainExpressionOneWhenWithLiteralsWhenExpressionsType = typeof caseMainExpressionOneWhenWithLiterals extends SQLCaseExpression<any, any, any, any, infer TWhenExps, any, any, any> ? TWhenExps : never;
-type caseMainExpressionOneWhenWithLiteralsResultTypeTest = AssertTrue<AssertEqual<caseMainExpressionOneWhenWithLiteralsResultType, 2 | null>>;
-type caseMainExpressionOneWhenWithLiteralsWhenExpressionsTypeTest = AssertTrue<AssertEqual<caseMainExpressionOneWhenWithLiteralsWhenExpressionsType, [[1, 2]]>>;
+type typeof_CaseWithMainExpression_OneWhenWithLiterals_ResultType = typeof caseWithMainExpression_OneWhenWithLiterals extends SQLCaseExpression<any, infer TResultType, any, any, any, any, any, any> ? TResultType : never;
+type typeof_CaseWithMainExpression_OneWhenWithLiterals_WhenExpressionsType = typeof caseWithMainExpression_OneWhenWithLiterals extends SQLCaseExpression<any, any, any, any, infer TWhenExps, any, any, any> ? TWhenExps : never;
+type caseWithMainExpression_OneWhenWithLiterals_ResultTypeTest = AssertTrue<AssertEqual<typeof_CaseWithMainExpression_OneWhenWithLiterals_ResultType, 2 | null>>;
+type caseWithMainExpression_OneWhenWithLiterals_WhenExpressionsTypeTest = AssertTrue<AssertEqual<typeof_CaseWithMainExpression_OneWhenWithLiterals_WhenExpressionsType, [[1, 2]]>>;
 
-const caseMainExpressionOneWhenWithComparableOverload1 = caseTester(customersTable.select((tables) => [tables.customers.id]).where((tables, { param }) => tables.customers.id.eq(param("idParam"))))
+const caseWithMainExpression_OneWhen_WithWhenComparable = caseTester(customersTable.select((tables) => [tables.customers.id]).where((tables, { param }) => tables.customers.id.eq(param("idParam"))))
     .when(1, literalTester(1));
-type caseMainExpressionOneWhenWithComparableOverload1ResultType = typeof caseMainExpressionOneWhenWithComparableOverload1 extends SQLCaseExpression<any, infer TResultType, any, any, any, any, any, any> ? TResultType : never;
-type caseMainExpressionOneWhenWithComparableOverload1ExpressionType = typeof caseMainExpressionOneWhenWithComparableOverload1 extends SQLCaseExpression<any, any, any, any, infer TWhenExps, any, any, any> ? TWhenExps : never;
-type caseMainExpressionOneWhenWithComparableOverload1ResultTypeTest = AssertTrue<AssertEqual<caseMainExpressionOneWhenWithComparableOverload1ResultType, 1 | null>>;
-type caseMainExpressionOneWhenWithComparableOverload1ExpressionTypeTest = AssertTrue<AssertExtends<caseMainExpressionOneWhenWithComparableOverload1ExpressionType, [[number, LiteralValue<any, any, any, any>]]>>;
+type typeof_CaseWithMainExpression_OneWhen_WithWhenComparable_ResultType = typeof caseWithMainExpression_OneWhen_WithWhenComparable extends SQLCaseExpression<any, infer TResultType, any, any, any, any, any, any> ? TResultType : never;
+type typeof_CaseWithMainExpression_OneWhen_WithWhenComparable_ExpresisonType = typeof caseWithMainExpression_OneWhen_WithWhenComparable extends SQLCaseExpression<any, any, any, any, infer TWhenExps, any, any, any> ? TWhenExps : never;
+type caseWithMainExpression_OneWhen_WithWhenComparable_ResultTypeTest = AssertTrue<AssertEqual<typeof_CaseWithMainExpression_OneWhen_WithWhenComparable_ResultType, 1 | null>>;
+type caseWithMainExpression_OneWhen_WithWhenComparable_ExpressionTypeTest = AssertTrue<AssertExtends<typeof_CaseWithMainExpression_OneWhen_WithWhenComparable_ExpresisonType, [[number, LiteralValue<any, any, any, any>]]>>;
 
-const caseMainExpressionOneWhenWithComparableOverload2 = caseTester(customersTable.select((tables) => [tables.customers.id]).where((tables, { param }) => tables.customers.id.eq(param("idParam"))))
+const caseWithMainExpression_OneWhen_WithThenComparable = caseTester(customersTable.select((tables) => [tables.customers.id]).where((tables, { param }) => tables.customers.id.eq(param("idParam"))))
     .when(literalTester(1), 1);
-type caseMainExpressionOneWhenWithComparableOverload2ResultType = typeof caseMainExpressionOneWhenWithComparableOverload2 extends SQLCaseExpression<any, infer TResultType, any, any, any, any, any, any> ? TResultType : never;
-type caseMainExpressionOneWhenWithComparableOverload2ExpressionType = typeof caseMainExpressionOneWhenWithComparableOverload2 extends SQLCaseExpression<any, any, any, any, infer TWhenExps, any, any, any> ? TWhenExps : never;
-type caseMainExpressionOneWhenWithComparableOverload2ResultTypeTest = AssertTrue<AssertEqual<caseMainExpressionOneWhenWithComparableOverload2ResultType, 1 | null>>
-type caseMainExpressionOneWhenWithComparableOverload2ExpressionTypeTest = AssertTrue<AssertExtends<caseMainExpressionOneWhenWithComparableOverload2ExpressionType, [[LiteralValue<any, any, any, any>, number]]>>;
+type typeof_CaseWithMainExpression_OneWhen_WithThenComparable_ResultType = typeof caseWithMainExpression_OneWhen_WithThenComparable extends SQLCaseExpression<any, infer TResultType, any, any, any, any, any, any> ? TResultType : never;
+type typeof_CaseWithMainExpression_OneWhen_WithThenComparable_ExpressionType = typeof caseWithMainExpression_OneWhen_WithThenComparable extends SQLCaseExpression<any, any, any, any, infer TWhenExps, any, any, any> ? TWhenExps : never;
+type caseWithMainExpression_OneWhen_WithThenComparable_ResultTypeTest = AssertTrue<AssertEqual<typeof_CaseWithMainExpression_OneWhen_WithThenComparable_ResultType, 1 | null>>
+type caseWithMainExpression_OneWhen_WithThenComparable_ExpressionTypeTest = AssertTrue<AssertExtends<typeof_CaseWithMainExpression_OneWhen_WithThenComparable_ExpressionType, [[LiteralValue<any, any, any, any>, number]]>>;
 
-const caseMainExpressionOneWhenWithComparables = caseTester(customersTable.select((tables) => [tables.customers.id]).where((tables, { param }) => tables.customers.id.eq(param("idParam"))))
+const caseWithMainExpression_OneWhenWithComparables = caseTester(customersTable.select((tables) => [tables.customers.id]).where((tables, { param }) => tables.customers.id.eq(param("idParam"))))
     .when(literalTester(null), roundTester(2, 1));
-type caseMainExpressionOneWhenWithComparablesResultType = typeof caseMainExpressionOneWhenWithComparables extends SQLCaseExpression<any, infer TResultType, any, any, any, any, any, any> ? TResultType : never;
-type caseMainExpressionOneWhenWithComparablesExpressionType = typeof caseMainExpressionOneWhenWithComparables extends SQLCaseExpression<any, any, any, any, infer TWhenExps, any, any, any> ? TWhenExps : never;
-type caseMainExpressionOneWhenWithComparablesResultTypeTest = AssertTrue<AssertEqual<caseMainExpressionOneWhenWithComparablesResultType, number | null>>;
-type caseMainExpressionOneWhenWithComparablesExpressionTypeTest = AssertTrue<AssertExtends<caseMainExpressionOneWhenWithComparablesExpressionType, [[LiteralValue<any, any, any, any>, ColumnSQLFunction<any, any, any, any, any, any, any, any>]]>>;
+type typeof_CaseWithMainExpression_OneWhenWithComparables_ResultType = typeof caseWithMainExpression_OneWhenWithComparables extends SQLCaseExpression<any, infer TResultType, any, any, any, any, any, any> ? TResultType : never;
+type typeof_CaseWithMainExpression_OneWhenWithComparables_ExpressionType = typeof caseWithMainExpression_OneWhenWithComparables extends SQLCaseExpression<any, any, any, any, infer TWhenExps, any, any, any> ? TWhenExps : never;
+type caseWithMainExpression_OneWhenWithComparables_ResultTypeTest = AssertTrue<AssertEqual<typeof_CaseWithMainExpression_OneWhenWithComparables_ResultType, number | null>>;
+type caseWithMainExpression_OneWhenWithComparables_ExpressionTypeTest = AssertTrue<AssertExtends<typeof_CaseWithMainExpression_OneWhenWithComparables_ExpressionType, [[LiteralValue<any, any, any, any>, ColumnSQLFunction<any, any, any, any, any, any, any, any>]]>>;
 
-const caseMainExpressionOneWhenWithComparablesParamed = caseTester(customersTable.select((tables) => [tables.customers.id]).where((tables, { param }) => tables.customers.id.eq(param("idParam"))))
-    .when(paramTester("when"), roundTester(paramTester("exp"), 1));
-type caseMainExpressionOneWhenWithComparablesParamedParams = typeof caseMainExpressionOneWhenWithComparablesParamed extends SQLCaseExpression<any, any, any, any, any, infer TParams, any, any> ? TParams : never;
-type caseMainExpressionOneWhenWithComparablesParamedParamsLength = AssertTrue<AssertEqual<caseMainExpressionOneWhenWithComparablesParamedParams["length"], 3>>;
-type caseMainExpressionOneWhenWithComparablesParamedParam1Type = caseMainExpressionOneWhenWithComparablesParamedParams[0] extends QueryParam<any, any, infer TValueType, any, any, any> ? TValueType : never;
-type caseMainExpressionOneWhenWithComparablesParamedParam2Type = caseMainExpressionOneWhenWithComparablesParamedParams[1] extends QueryParam<any, any, infer TValueType, any, any, any> ? TValueType : never;
-type caseMainExpressionOneWhenWithComparablesParamedParam3Type = caseMainExpressionOneWhenWithComparablesParamedParams[2] extends QueryParam<any, any, infer TValueType, any, any, any> ? TValueType : never;
-type caseMainExpressionOneWhenWithComparablesParamedParam1TypeTest = AssertTrue<AssertEqual<caseMainExpressionOneWhenWithComparablesParamedParam1Type, number | null>>;
-type caseMainExpressionOneWhenWithComparablesParamedParam2TypeTest = AssertTrue<AssertEqual<caseMainExpressionOneWhenWithComparablesParamedParam2Type, number | null>>;
-type caseMainExpressionOneWhenWithComparablesParamedParam3TypeTest = AssertTrue<AssertEqual<caseMainExpressionOneWhenWithComparablesParamedParam3Type, number | null>>;
+const caseWithMainExpression_OneWhenWithComparables_ThenParamed = caseTester(customersTable.select((tables) => [tables.customers.id]).where((tables, { param }) => tables.customers.id.eq(param("idParam"))))
+    .when(paramTester("when"), roundTester(paramTester("then"), 1));
+type typeof_CaseWithMainExpression_OneWhenWithComparables_ThenParamed_Params = typeof caseWithMainExpression_OneWhenWithComparables_ThenParamed extends SQLCaseExpression<any, any, any, any, any, infer TParams, any, any> ? TParams : never;
+type typeof_CaseWithMainExpression_OneWhenWithComparables_ThenParamed_MainParamName = typeof_CaseWithMainExpression_OneWhenWithComparables_ThenParamed_Params[0] extends QueryParam<any, infer TName, any, any, any, any> ? TName : never;
+type typeof_CaseWithMainExpression_OneWhenWithComparables_ThenParamed_MainParamType = typeof_CaseWithMainExpression_OneWhenWithComparables_ThenParamed_Params[0] extends QueryParam<any, any, infer TValueType, any, any, any> ? TValueType : never;
+type typeof_CaseWithMainExpression_OneWhenWithComparables_ThenParamed_WhenParamName = typeof_CaseWithMainExpression_OneWhenWithComparables_ThenParamed_Params[1] extends QueryParam<any, infer TName, any, any, any, any> ? TName : never;
+type typeof_CaseWithMainExpression_OneWhenWithComparables_ThenParamed_WhenParamType = typeof_CaseWithMainExpression_OneWhenWithComparables_ThenParamed_Params[1] extends QueryParam<any, any, infer TValueType, any, any, any> ? TValueType : never;
+type typeof_CaseWithMainExpression_OneWhenWithComparables_ThenParamed_ThenParamType = typeof_CaseWithMainExpression_OneWhenWithComparables_ThenParamed_Params[2] extends QueryParam<any, any, infer TValueType, any, any, any> ? TValueType : never;
+type typeof_CaseWithMainExpression_OneWhenWithComparables_ThenParamed_ThenParamName = typeof_CaseWithMainExpression_OneWhenWithComparables_ThenParamed_Params[2] extends QueryParam<any, infer TName, any, any, any, any> ? TName : never;
+type caseWithMainExpression_OneWhenWithComparables_ThenParamed_ParamsLengthTest = AssertTrue<AssertEqual<typeof_CaseWithMainExpression_OneWhenWithComparables_ThenParamed_Params["length"], 3>>;
+type caseWithMainExpression_OneWhenWithComparables_ThenParamed_MainParamNameTest = AssertTrue<AssertEqual<typeof_CaseWithMainExpression_OneWhenWithComparables_ThenParamed_MainParamName, "idParam">>;
+type caseWithMainExpression_OneWhenWithComparables_ThenParamed_MainParamTypeTest = AssertTrue<AssertEqual<typeof_CaseWithMainExpression_OneWhenWithComparables_ThenParamed_MainParamType, number | null>>;
+type caseWithMainExpression_OneWhenWithComparables_ThenParamed_WhenParamTypeTest = AssertTrue<AssertEqual<typeof_CaseWithMainExpression_OneWhenWithComparables_ThenParamed_WhenParamType, number | null>>;
+type caseWithMainExpression_OneWhenWithComparables_ThenParamed_WhenParamNameTest = AssertTrue<AssertEqual<typeof_CaseWithMainExpression_OneWhenWithComparables_ThenParamed_WhenParamName, "when">>;
+type caseWithMainExpression_OneWhenWithComparables_ThenParamed_ThenParamTypeTest = AssertTrue<AssertEqual<typeof_CaseWithMainExpression_OneWhenWithComparables_ThenParamed_ThenParamType, number | null>>;
+type caseWithMainExpression_OneWhenWithComparables_ThenParamed_ThenParamNameTest = AssertTrue<AssertEqual<typeof_CaseWithMainExpression_OneWhenWithComparables_ThenParamed_ThenParamName, "then">>;
 
-const caseNoBranchElse = caseTester().else("ali");
-type caseNoBranchElseReturnType = typeof caseNoBranchElse extends SQLCaseExpression<any, infer TResultType, any, any, any, any, any, any> ? TResultType : never;
-type caseNoBranchElseReturnTypeTest = AssertTrue<AssertEqual<caseNoBranchElseReturnType, "ali">>;
+const caseWithNoBranch_WithElse = caseTester().else("ali");
+type typeof_CaseWithNoBranch_WithElse_ResultType = typeof caseWithNoBranch_WithElse extends SQLCaseExpression<any, infer TResultType, any, any, any, any, any, any> ? TResultType : never;
+type caseWithNoBranch_WithElse_ResultTypeTest = AssertTrue<AssertEqual<typeof_CaseWithNoBranch_WithElse_ResultType, "ali">>;
 
-
-const caseNoBranchElseWithComparable = caseTester().else(literalTester(null));
-type caseNoBranchElseWithComparableResultType = typeof caseNoBranchElseWithComparable extends SQLCaseExpression<any, infer TResultType, any, any, any, any, any, any> ? TResultType : never;
-type caseNoBranchElseWithComparableElseExpression = typeof caseNoBranchElseWithComparable extends SQLCaseExpression<any, any, any, infer TElse, any, any, any, any> ? TElse : never;
-type caseNoBranchElseWithComparableElseExpressionValueType = caseNoBranchElseWithComparableElseExpression extends LiteralValue<any, infer TValue, any, any> ? TValue : never;
-type caseNoBranchElseWithComparableReturnTypeTest = AssertTrue<AssertEqual<caseNoBranchElseWithComparableResultType, null>>;
-type caseNoBranchElseWithComparableElseExpressionTest = AssertTrue<AssertExtends<caseNoBranchElseWithComparableElseExpression, LiteralValue<any, any, any, any>>>;
-type caseNoBranchElseWithComparableElseExpressionValueTypeTest = AssertTrue<AssertEqual<caseNoBranchElseWithComparableElseExpressionValueType, null>>;
+const caseWithNoBranch_ElseWithComparable = caseTester().else(literalTester(null));
+type typeof_CaseWithNoBranch_ElseWithComparable_ResultType = typeof caseWithNoBranch_ElseWithComparable extends SQLCaseExpression<any, infer TResultType, any, any, any, any, any, any> ? TResultType : never;
+type typeof_CaseWithNoBranch_ElseWithComparable_ElseExpression = typeof caseWithNoBranch_ElseWithComparable extends SQLCaseExpression<any, any, any, infer TElse, any, any, any, any> ? TElse : never;
+type typeof_CaseWithNoBranch_ElseWithComparable_ElseExpressionValueType = typeof_CaseWithNoBranch_ElseWithComparable_ElseExpression extends LiteralValue<any, infer TValue, any, any> ? TValue : never;
+type caseWithNoBranch_ElseWithComparable_ResultTypeTest = AssertTrue<AssertEqual<typeof_CaseWithNoBranch_ElseWithComparable_ResultType, null>>;
+type caseWithNoBranch_ElseWithComparable_ElseExpressionTest = AssertTrue<AssertExtends<typeof_CaseWithNoBranch_ElseWithComparable_ElseExpression, LiteralValue<any, any, any, any>>>;
+type caseWithNoBranch_ElseWithComparable_ElseExpressionValueTypeTest = AssertTrue<AssertEqual<typeof_CaseWithNoBranch_ElseWithComparable_ElseExpressionValueType, null>>;
 
 const caseWithParams = caseTester(customersTable.select((tables) => [tables.customers.id]).where((tables, { param }) => tables.customers.id.eq(param("where"))))
     .when(paramTester("when"), roundTester(paramTester("then"), 2))
     .else(paramTester("else"));
-type typeofCaseWithParamsResultType = typeof caseWithParams extends SQLCaseExpression<any, infer TResultType, any, any, any, any, any, any> ? TResultType : never;
-type typeofCaseWithParamsElseExpression = typeof caseWithParams extends SQLCaseExpression<any, any, any, infer TElse, any, any, any, any> ? TElse : never;
-type typeofCaseWithParamsElseExpressionParamName = typeofCaseWithParamsElseExpression extends QueryParam<any, infer TName, any, any, any, any> ? TName : never;
-type typeofCaseWithParamsElseExpressionParamType = typeofCaseWithParamsElseExpression extends QueryParam<any, any, infer TValueType, any, any, any> ? TValueType : never;
-type typeofCaseWithParamsParamsType = typeof caseWithParams extends SQLCaseExpression<any, any, any, any, any, infer TParams, any, any> ? TParams : never;
-type typeofCaseWithParamsWhenParamName = typeofCaseWithParamsParamsType[1] extends QueryParam<any, infer TName, any, any, any, any> ? TName : never;
-type typeofCaseWithParamsWhenParamType = typeofCaseWithParamsParamsType[1] extends QueryParam<any, any, infer TValueType, any, any, any> ? TValueType : never;
-type typeofCaseWithParamsThenParamName = typeofCaseWithParamsParamsType[2] extends QueryParam<any, infer TName, any, any, any, any> ? TName : never;
-type typeofCaseWithParamsThenParamType = typeofCaseWithParamsParamsType[2] extends QueryParam<any, any, infer TValueType, any, any, any> ? TValueType : never;
-type typeofCaseWithParamsElseParamFromParamsParamName = typeofCaseWithParamsParamsType[3] extends QueryParam<any, infer TName, any, any, any, any> ? TName : never;
-type typeofCaseWithParamsElseParamFromParamsParamType = typeofCaseWithParamsParamsType[3] extends QueryParam<any, any, infer TValueType, any, any, any> ? TValueType : never;
-type caseWithParamsResultTypeTest = AssertTrue<AssertEqual<typeofCaseWithParamsResultType, number | null>>;
-type caseWithParamsElseExpressionParamTest = AssertTrue<AssertExtends<typeofCaseWithParamsElseExpression, QueryParam<any, any, any, any, any, any>>>;
-type caseWithParamsElseExpressionParamNameTest = AssertTrue<AssertEqual<typeofCaseWithParamsElseExpressionParamName, "else">>;
-type caseWithParamsElseExpressionParamTypeTest = AssertTrue<AssertEqual<typeofCaseWithParamsElseExpressionParamType, number | null>>;
-type caseWithParamsParamsLengthTest = AssertTrue<AssertEqual<typeofCaseWithParamsParamsType["length"], 4>>;
-type caseWithParamsWhenParamNameTest = AssertTrue<AssertEqual<typeofCaseWithParamsWhenParamName, "when">>;
-type caseWithParamsWhenParamTypeTest = AssertTrue<AssertEqual<typeofCaseWithParamsWhenParamType, number | null>>;
-type caseWithParamsThenParamNameTest = AssertTrue<AssertEqual<typeofCaseWithParamsThenParamName, "then">>;
-type caseWithParamsThenParamTypeTest = AssertTrue<AssertEqual<typeofCaseWithParamsThenParamType, number | null>>;
-type caseWithParamsElseParamFromParamsParamNameTest = AssertTrue<AssertEqual<typeofCaseWithParamsElseParamFromParamsParamName, "else">>;
-type caseWithParamsElseParamFromParamsParamTypeTest = AssertTrue<AssertEqual<typeofCaseWithParamsElseParamFromParamsParamType, number | null>>;
+type typeof_CaseWithParams_ResultType = typeof caseWithParams extends SQLCaseExpression<any, infer TResultType, any, any, any, any, any, any> ? TResultType : never;
+type typeof_CaseWithParams_ElseExpression = typeof caseWithParams extends SQLCaseExpression<any, any, any, infer TElse, any, any, any, any> ? TElse : never;
+type typeof_CaseWithParams_ElseExpressionParamName = typeof_CaseWithParams_ElseExpression extends QueryParam<any, infer TName, any, any, any, any> ? TName : never;
+type typeof_CaseWithParams_ElseExpressionParamType = typeof_CaseWithParams_ElseExpression extends QueryParam<any, any, infer TValueType, any, any, any> ? TValueType : never;
+type typeof_CaseWithParams_ParamsType = typeof caseWithParams extends SQLCaseExpression<any, any, any, any, any, infer TParams, any, any> ? TParams : never;
+type typeof_CaseWithParams_WhenParamName = typeof_CaseWithParams_ParamsType[1] extends QueryParam<any, infer TName, any, any, any, any> ? TName : never;
+type typeof_CaseWithParams_WhenParamType = typeof_CaseWithParams_ParamsType[1] extends QueryParam<any, any, infer TValueType, any, any, any> ? TValueType : never;
+type typeof_CaseWithParams_ThenParamName = typeof_CaseWithParams_ParamsType[2] extends QueryParam<any, infer TName, any, any, any, any> ? TName : never;
+type typeof_CaseWithParams_ThenParamType = typeof_CaseWithParams_ParamsType[2] extends QueryParam<any, any, infer TValueType, any, any, any> ? TValueType : never;
+type typeof_CaseWithParams_ElseParamFromParamsParamName = typeof_CaseWithParams_ParamsType[3] extends QueryParam<any, infer TName, any, any, any, any> ? TName : never;
+type typeof_CaseWithParams_ElseParamFromParamsParamType = typeof_CaseWithParams_ParamsType[3] extends QueryParam<any, any, infer TValueType, any, any, any> ? TValueType : never;
+type caseWithParams_ResultTypeTest = AssertTrue<AssertEqual<typeof_CaseWithParams_ResultType, number | null>>;
+type caseWithParams_ElseExpressionParamTest = AssertTrue<AssertExtends<typeof_CaseWithParams_ElseExpression, QueryParam<any, any, any, any, any, any>>>;
+type caseWithParams_ElseExpressionParamNameTest = AssertTrue<AssertEqual<typeof_CaseWithParams_ElseExpressionParamName, "else">>;
+type caseWithParams_ElseExpressionParamTypeTest = AssertTrue<AssertEqual<typeof_CaseWithParams_ElseExpressionParamType, number | null>>;
+type caseWithParams_ParamsLengthTest = AssertTrue<AssertEqual<typeof_CaseWithParams_ParamsType["length"], 4>>;
+type caseWithParams_WhenParamNameTest = AssertTrue<AssertEqual<typeof_CaseWithParams_WhenParamName, "when">>;
+type caseWithParams_WhenParamTypeTest = AssertTrue<AssertEqual<typeof_CaseWithParams_WhenParamType, number | null>>;
+type caseWithParams_ThenParamNameTest = AssertTrue<AssertEqual<typeof_CaseWithParams_ThenParamName, "then">>;
+type caseWithParams_ThenParamTypeTest = AssertTrue<AssertEqual<typeof_CaseWithParams_ThenParamType, number | null>>;
+type caseWithParams_ElseParamFromParamsParamNameTest = AssertTrue<AssertEqual<typeof_CaseWithParams_ElseParamFromParamsParamName, "else">>;
+type caseWithParams_ElseParamFromParamsParamTypeTest = AssertTrue<AssertEqual<typeof_CaseWithParams_ElseParamFromParamsParamType, number | null>>;
 
-const caseWithParamsParamAfter = caseTester(customersTable.select((tables) => [tables.customers.id]).where((tables, { param }) => tables.customers.id.eq(param("where"))))
+const caseWithParams_ParamAfter = caseTester(customersTable.select((tables) => [tables.customers.id]).where((tables, { param }) => tables.customers.id.eq(param("where"))))
     .when(1, roundTester(1, 1))
     .when(paramTester("when"), paramTester("then"));
-type typeofCaseWithParamsParamAfterResultType = typeof caseWithParamsParamAfter extends SQLCaseExpression<any, infer TResultType, any, any, any, any, any, any> ? TResultType : never;
-type typeofCaseWithParamsParamAfterWhenExpressions = typeof caseWithParamsParamAfter extends SQLCaseExpression<any, any, any, any, infer TWhenExps, any, any, any> ? TWhenExps : never;
+type typeof_CaseWithParams_ParamAfter_ResultType = typeof caseWithParams_ParamAfter extends SQLCaseExpression<any, infer TResultType, any, any, any, any, any, any> ? TResultType : never;
+type typeofCaseWithParamsParamAfterParams = typeof caseWithParams_ParamAfter extends SQLCaseExpression<any, any, any, any, any, infer TParams, any, any> ? TParams : never;
+type typeof_CaseWithParams_ParamAfter_ThenParamType = typeofCaseWithParamsParamAfterParams[2] extends QueryParam<any, any, infer TValueType, any, any, any> ? TValueType : never;
+type typeof_CaseWithParams_ParamAfter_ThenParamName = typeofCaseWithParamsParamAfterParams[2] extends QueryParam<any, infer TName, any, any, any, any> ? TName : never;
+type caseWithParams_ParamAfter_ThenParamName_Test = AssertTrue<AssertEqual<typeof_CaseWithParams_ParamAfter_ThenParamName, "then">>;
+type caseWithParams_ParamAfter_ThenParamType_Test = AssertTrue<AssertEqual<typeof_CaseWithParams_ParamAfter_ThenParamType, number | null>>;
+type caseWithParams_ParamAfter_ResultTypeTest = AssertTrue<AssertEqual<typeof_CaseWithParams_ParamAfter_ResultType, number | null>>;
 
-
-const caseWithParamsParamBefore = caseTester(customersTable.select((tables) => [tables.customers.id]).where((tables, { param }) => tables.customers.id.eq(param("where"))))
+const caseWithParams_ParamBefore = caseTester(customersTable.select((tables) => [tables.customers.id]).where((tables, { param }) => tables.customers.id.eq(param("where"))))
     .when(paramTester("when"), paramTester("then"))
     .when(1, roundTester(1, 1))
-type typeofCaseWithParamsParamBeforeResultType = typeof caseWithParamsParamBefore extends SQLCaseExpression<any, infer TResultType, any, any, any, any, any, any> ? TResultType : never;
-type typeofCaseWithParamsParamBeforeWhenExpressions = typeof caseWithParamsParamBefore extends SQLCaseExpression<any, any, any, any, infer TWhenExps, any, any, any> ? TWhenExps : never;
-type typeofCaseWithParamsParamBeforeParams = typeof caseWithParamsParamBefore extends SQLCaseExpression<any, any, any, any, any, infer TParams, any, any> ? TParams : never;
-type typeofCaseWithParamsParamBeforeThenParamType = typeofCaseWithParamsParamBeforeParams[2] extends QueryParam<any, any, infer TValueType, any, any, any> ? TValueType : never;
-type caseWithParamsParamBeforeResultTypeTest = AssertTrue<AssertEqual<typeofCaseWithParamsParamBeforeResultType, number | null>>;
-type caseWithParamsParamBeforeParamsLengthTest = AssertTrue<AssertEqual<typeofCaseWithParamsParamBeforeParams["length"], 3>>;
-type caseWithParamsParamBeforeThenParamEquityTest = AssertTrue<AssertEqual<typeofCaseWithParamsParamBeforeWhenExpressions[0][1], typeofCaseWithParamsParamBeforeParams[2]>>;
-type caseWithParamsParamBeforeThenParamTypeTest = AssertTrue<AssertEqual<typeofCaseWithParamsParamBeforeThenParamType, number>>;
+type typeof_CaseWithParams_ParamBefore_ResultType = typeof caseWithParams_ParamBefore extends SQLCaseExpression<any, infer TResultType, any, any, any, any, any, any> ? TResultType : never;
+type typeof_CaseWithParams_ParamBefore_WhenExpressions = typeof caseWithParams_ParamBefore extends SQLCaseExpression<any, any, any, any, infer TWhenExps, any, any, any> ? TWhenExps : never;
+type typeof_CaseWithParams_ParamBefore_Params = typeof caseWithParams_ParamBefore extends SQLCaseExpression<any, any, any, any, any, infer TParams, any, any> ? TParams : never;
+type typeof_CaseWithParams_ParamBefore_ThenParamType = typeof_CaseWithParams_ParamBefore_Params[2] extends QueryParam<any, any, infer TValueType, any, any, any> ? TValueType : never;
+type caseWithParams_ParamBefore_ResultTypeTest = AssertTrue<AssertEqual<typeof_CaseWithParams_ParamBefore_ResultType, number | null>>;
+type caseWithParams_ParamBefore_ParamsLengthTest = AssertTrue<AssertEqual<typeof_CaseWithParams_ParamBefore_Params["length"], 3>>;
+type caseWithParams_ParamBefore_ThenParamEquityTest = AssertTrue<AssertEqual<typeof_CaseWithParams_ParamBefore_WhenExpressions[0][1], typeof_CaseWithParams_ParamBefore_Params[2]>>;
+type caseWithParams_ParamBefore_ThenParamTypeTest = AssertTrue<AssertEqual<typeof_CaseWithParams_ParamBefore_ThenParamType, number | null>>;
 
 const caseWithParams_OnlyParamsNoElse = caseTester(customersTable.select((tables) => [tables.customers.id]).where((tables, { param }) => tables.customers.id.eq(param("where"))))
     .when(paramTester("when1"), paramTester("then1"))
     .when(paramTester("when2"), paramTester("then2"))
     .when(paramTester("when3"), paramTester("then3"));
-type typeofCaseWithParams_OnlyParamsNoElseResultType = typeof caseWithParams_OnlyParamsNoElse extends SQLCaseExpression<any, infer TResultType, any, any, any, any, any, any> ? TResultType : never;
-type typeofCaseWithParams_OnlyParamsNoElseParams = typeof caseWithParams_OnlyParamsNoElse extends SQLCaseExpression<any, any, any, any, any, infer TParams, any, any> ? TParams : never;
-type typeofCaseWithParams_OnlyParamsNoElse_ParamMain = typeofCaseWithParams_OnlyParamsNoElseParams[0] extends QueryParam<any, any, infer TValueType, any, any, any> ? TValueType : never;
-type typeofCaseWithParams_OnlyParamsNoElse_ParamWhen1 = typeofCaseWithParams_OnlyParamsNoElseParams[1] extends QueryParam<any, any, infer TValueType, any, any, any> ? TValueType : never;
-type typeofCaseWithParams_OnlyParamsNoElse_ParamWhen2 = typeofCaseWithParams_OnlyParamsNoElseParams[3] extends QueryParam<any, any, infer TValueType, any, any, any> ? TValueType : never;
-type typeofCaseWithParams_OnlyParamsNoElse_ParamWhen3 = typeofCaseWithParams_OnlyParamsNoElseParams[5] extends QueryParam<any, any, infer TValueType, any, any, any> ? TValueType : never;
-type caseWithParams_OnlyParamsNoElse_ResultTypeTest = AssertTrue<AssertEqual<typeofCaseWithParams_OnlyParamsNoElseResultType, DbValueTypes | null>>;
-type caseWithParams_OnlyParamsNoElse_ParamsLengthTest = AssertTrue<AssertEqual<typeofCaseWithParams_OnlyParamsNoElseParams["length"], 7>>;
-type caseWithParams_OnlyParamsNoElse_ParamMainTypeTest = AssertTrue<AssertEqual<typeofCaseWithParams_OnlyParamsNoElse_ParamMain, number | null>>;
-type caseWithParams_OnlyParamsNoElse_ParamWhen1TypeTest = AssertTrue<AssertEqual<typeofCaseWithParams_OnlyParamsNoElse_ParamWhen1, number | null>>;
-type caseWithParams_OnlyParamsNoElse_ParamWhen2TypeTest = AssertTrue<AssertEqual<typeofCaseWithParams_OnlyParamsNoElse_ParamWhen2, number | null>>;
-type caseWithParams_OnlyParamsNoElse_ParamWhen3TypeTest = AssertTrue<AssertEqual<typeofCaseWithParams_OnlyParamsNoElse_ParamWhen3, number | null>>;
+type typeof_CaseWithParams_OnlyParamsNoElse_ResultType = typeof caseWithParams_OnlyParamsNoElse extends SQLCaseExpression<any, infer TResultType, any, any, any, any, any, any> ? TResultType : never;
+type typeof_CaseWithParams_OnlyParamsNoElse_Params = typeof caseWithParams_OnlyParamsNoElse extends SQLCaseExpression<any, any, any, any, any, infer TParams, any, any> ? TParams : never;
+type typeof_CaseWithParams_OnlyParamsNoElse_ParamMain = typeof_CaseWithParams_OnlyParamsNoElse_Params[0] extends QueryParam<any, any, infer TValueType, any, any, any> ? TValueType : never;
+type typeof_CaseWithParams_OnlyParamsNoElse_ParamWhen1 = typeof_CaseWithParams_OnlyParamsNoElse_Params[1] extends QueryParam<any, any, infer TValueType, any, any, any> ? TValueType : never;
+type typeof_CaseWithParams_OnlyParamsNoElse_ParamWhen2 = typeof_CaseWithParams_OnlyParamsNoElse_Params[3] extends QueryParam<any, any, infer TValueType, any, any, any> ? TValueType : never;
+type typeof_CaseWithParams_OnlyParamsNoElse_ParamWhen3 = typeof_CaseWithParams_OnlyParamsNoElse_Params[5] extends QueryParam<any, any, infer TValueType, any, any, any> ? TValueType : never;
+type caseWithParams_OnlyParamsNoElse_ResultTypeTest = AssertTrue<AssertEqual<typeof_CaseWithParams_OnlyParamsNoElse_ResultType, DbValueTypes | null>>;
+type caseWithParams_OnlyParamsNoElse_ParamsLengthTest = AssertTrue<AssertEqual<typeof_CaseWithParams_OnlyParamsNoElse_Params["length"], 7>>;
+type caseWithParams_OnlyParamsNoElse_ParamMainTypeTest = AssertTrue<AssertEqual<typeof_CaseWithParams_OnlyParamsNoElse_ParamMain, number | null>>;
+type caseWithParams_OnlyParamsNoElse_ParamWhen1TypeTest = AssertTrue<AssertEqual<typeof_CaseWithParams_OnlyParamsNoElse_ParamWhen1, number | null>>;
+type caseWithParams_OnlyParamsNoElse_ParamWhen2TypeTest = AssertTrue<AssertEqual<typeof_CaseWithParams_OnlyParamsNoElse_ParamWhen2, number | null>>;
+type caseWithParams_OnlyParamsNoElse_ParamWhen3TypeTest = AssertTrue<AssertEqual<typeof_CaseWithParams_OnlyParamsNoElse_ParamWhen3, number | null>>;
+
+const caseWithParams_NonNullResultType = caseTester(customersTable.select((tables) => [tables.customers.id]).where((tables, { param }) => tables.customers.id.eq(param("where"))))
+    .when(paramTester("when"), paramTester("then").type<number>())
+    .when(1, roundTester(1, 1))
+    .else(1);
+type typeof_CaseWithParams_NonNullResultType_ResultType = typeof caseWithParams_NonNullResultType extends SQLCaseExpression<any, infer TResultType, any, any, any, any, any, any> ? TResultType : never;
+type typeof_CaseWithParams_NonNullResultType_WhenExps = typeof caseWithParams_NonNullResultType extends SQLCaseExpression<any, any, any, any, infer TWhenExps, any, any, any> ? TWhenExps : never;
+type typeof_CaseWithParams_NonNullResultType_ElseExp = typeof caseWithParams_NonNullResultType extends SQLCaseExpression<any, any, any, infer TElse, any, any, any, any> ? TElse : never;
+type caseWithParams_NonNullResultType_ResultTypeTest = AssertTrue<AssertEqual<typeof_CaseWithParams_NonNullResultType_ResultType, number>>;
+
+const caseWithParams_NullResultType = caseTester(customersTable.select((tables) => [tables.customers.id]).where((tables, { param }) => tables.customers.id.eq(param("where"))))
+    .when(paramTester("when"), paramTester("then"))
+    .when(1, roundTester(1, 1))
+    .else(1);
+type typeof_CaseWithParams_NullResultType_ResultType = typeof caseWithParams_NullResultType extends SQLCaseExpression<any, infer TResultType, any, any, any, any, any, any> ? TResultType : never;
+type typeof_CaseWithParams_NullResultType_WhenExpressions = typeof caseWithParams_NullResultType extends SQLCaseExpression<any, any, any, any, infer TWhen, any, any, any> ? TWhen : never;
+type caseWithParams_NullResultType_ResultTypeTest = AssertTrue<AssertEqual<typeof_CaseWithParams_NullResultType_ResultType, number | null>>;
 
 const caseValid1 = caseTester(customersTable.select((tables) => [tables.customers.id]))
     .when(1, 1)

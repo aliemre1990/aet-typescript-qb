@@ -77,7 +77,8 @@ type InferExpressionType<
     TElseExpression extends undefined ? DbValueTypes | null :
     TElseExpression extends null ? DbValueTypes | null :
     TElseExpression extends DbValueTypes | null ? TElseExpression :
-    TElseExpression extends IComparable<any, any, infer TValueType, any, any, any, any> ? TValueType extends null ? DbValueTypes | null : LiteralToBase<TValueType> :
+    TElseExpression extends IComparable<any, any, infer TValueType, any, any, any, any> ? TValueType extends null ?
+    DbValueTypes | null : LiteralToBase<TValueType> :
     any;
 
 
@@ -128,7 +129,39 @@ type InferMainExpressionType<TMainExpression> =
     IsExactAlt<TValueType, DbValueTypes | null> extends true ?
     never :
     TValueType | null :
-    never
+    never;
+
+type InferResultType<
+    TWhenExpressions extends readonly [any, IComparable<any, any, any, any, any, any, any> | DbValueTypes | null][] | undefined = undefined,
+    TElseExpression extends IComparable<any, any, any, any, any, any, any> | DbValueTypes | null | undefined = undefined
+> = InferWhenExressionsResult<TWhenExpressions> | InferElseExpressionResult<TElseExpression>;
+
+type InferElseExpressionResult<
+    TElseExpression extends IComparable<any, any, any, any, any, any, any> | DbValueTypes | null | undefined = undefined
+> =
+    TElseExpression extends undefined ?
+    null :
+    TElseExpression extends IComparable<any, any, any, infer TFinalType, any, any, any> ?
+    TFinalType :
+    TElseExpression extends DbValueTypes | null ?
+    TElseExpression :
+    never;
+
+type InferWhenExressionsResult<
+    TWhenExpressions extends readonly [any, IComparable<any, any, any, any, any, any, any> | DbValueTypes | null][] | undefined = undefined
+> = TWhenExpressions extends [infer First, ...infer Rest] ?
+    First extends [any, infer TExp] ?
+    TExp extends IComparable<any, any, any, infer TFinalType, any, any, any> ?
+    Rest extends readonly [any, ...any] ?
+    TFinalType | InferWhenExressionsResult<Rest> :
+    TFinalType :
+    Rest extends readonly [any, ...any] ?
+    TExp | InferWhenExressionsResult<Rest> :
+    TExp :
+    Rest extends readonly [any, ...any] ?
+    InferWhenExressionsResult<TWhenExpressions> :
+    never :
+    never;
 
 const defaultCaseExpressionFieldName = 'case';
 type defaultCaseExpressionFieldNameType = typeof defaultCaseExpressionFieldName;
@@ -229,18 +262,14 @@ class SQLCaseExpression<
             > extends true ?
             TExpressionResult extends IComparable<TDbType, any, infer TValType, any, any, any, any> ?
             IsAny<TValType> extends true ? DbValueTypes | null :
-            TValType :
-            TExpressionResult :
+            TValType | null :
+            TExpressionResult | null :
             InferExpressionType<TElseExpression, TWhenExpressions>
         >,
         TFinalWhenResult extends TMainExpression extends undefined ? (ColumnComparisonOperation<TDbType, any, any, any> | ColumnLogicalOperation<TDbType, any>) : IComparable<TDbType, any, InferMainExpressionType<TMainExpression>, any, any, any, any> | InferMainExpressionType<TMainExpression> = TWhenResult extends QueryParam<any, any, infer TValueType, any, any, any> ? IsAny<TValueType> extends true ? MapAnyTypedQueryParamToTyped<TWhenResult, InferMainExpressionType<TMainExpression>> : TWhenResult : TWhenResult
     >(check: TWhenResult, expression: TExpressionResult): SQLCaseExpression<
         TDbType,
-
-        (IsAny<TResult> extends true ? never : IsExactAlt<DbValueTypes | null, TResult> extends true ? never : TResult) |
-        (TElseExpression extends undefined ? null : TElseExpression extends IComparable<TDbType, any, any, infer TFinalValueType, any, any, any> ? TFinalValueType : TElseExpression) |
-        (TExpressionResult extends QueryParam<any, any, infer TValueType, any, any, any> ? IsAny<TValueType> extends true ? InferExpressionType<undefined, TWhenExpressions> : TValueType : TExpressionResult extends IComparable<TDbType, any, any, infer TFinalValueType, any, any, any> ? TFinalValueType : TExpressionResult),
-
+        InferResultType<[...(TFinalWhenExpressions extends undefined ? [] : TFinalWhenExpressions), [TFinalWhenResult, TExpressionResult extends QueryParam<any, any, any, any, any, any> ? MapAnyTypedQueryParamToTyped<TExpressionResult, InferExpressionType<TElseExpression, TWhenExpressions>> : TExpressionResult]], TElseExpression>,
         TMainExpression,
         TElseExpression,
         [...(TFinalWhenExpressions extends undefined ? [] : TFinalWhenExpressions), [TFinalWhenResult, TExpressionResult extends QueryParam<any, any, any, any, any, any> ? MapAnyTypedQueryParamToTyped<TExpressionResult, InferExpressionType<TElseExpression, TWhenExpressions>> : TExpressionResult]],
@@ -272,9 +301,7 @@ class SQLCaseExpression<
         elseExpression: TElseExpressionResult
     ): SQLCaseExpression<
         TDbType,
-
-        (TResult extends never ? {} : TResult) |
-        (TElseExpressionResult extends QueryParam<any, any, infer TValueType, any, any, any> ? IsAny<TValueType> extends true ? InferExpressionType<undefined, TWhenExpressions> : TValueType : TElseExpressionResult extends IComparable<TDbType, any, any, infer TFinalValueType, any, any, any> ? TFinalValueType : TElseExpressionResult),
+        InferResultType<TWhenExpressions, TFinalElseExpression>,
         TMainExpression,
         TFinalElseExpression,
         TWhenExpressions,
