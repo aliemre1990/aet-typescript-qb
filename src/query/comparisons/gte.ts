@@ -44,10 +44,10 @@ function gte<
     TParamMedian extends QueryParam<TDbType, string, any, any, any, any> | undefined,
     TParamName extends (TParamMedian extends QueryParam<any, infer U, any, any, any, any> ? U : never) | undefined,
     TParamValue extends TParamMedian extends QueryParam<any, any, infer TVal, any, any, any> ? TVal : never,
-    TApplied extends IComparable<TDbType, any, LiteralToBase<TValueType>, any, any, any, any>,
+    TApplied extends IComparable<TDbType, any, TValueType extends null ? any : LiteralToBase<TValueType>, any, any, any, any>,
     TDbType extends DbType = TComparing extends IComparable<infer DbType, any, any, any, any, any, any> ? DbType : never,
 >
-    (this: TComparing, value: LiteralToBase<TValueType> | TParamMedian | TApplied | null) {
+    (this: TComparing, value: LiteralToBase<TValueType> | null | TParamMedian | TApplied) {
 
     const dbType = this.dbType;
 

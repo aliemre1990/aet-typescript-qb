@@ -1,10 +1,41 @@
 import type { DbType } from "../../db.js";
 import ColumnComparisonOperation, { comparisonOperations, type InferValueTypeFromComparable } from "./_comparisonOperations.js";
 import type { IComparable } from "../_interfaces/IComparable.js";
-import type { IsAny, LiteralToBase } from "../../utility/common.js";
+import type { IsAny, IsExactAlt, LiteralToBase } from "../../utility/common.js";
 import QueryParam from "../param.js";
 import QueryBuilder from "../queryBuilder.js";
 import type { DbValueTypes } from "../../table/column.js";
+
+type InferFirstValidType<
+    TArgs extends readonly (DbValueTypes | null | IComparable<any, any, any, any, any, any, any>)[]
+> = TArgs extends readonly [infer First, ...infer Rest] ?
+
+    First extends IComparable<any, any, infer TValueType, any, any, any, any> ?
+
+    IsExactAlt<TValueType, null> extends true ?
+
+    Rest extends readonly [any, ...any] ?
+    InferFirstValidType<Rest> :
+    never :
+
+    IsAny<TValueType> extends true ?
+
+    Rest extends readonly [any, ...any] ?
+    InferFirstValidType<Rest> :
+    never :
+    TValueType :
+
+    First extends DbValueTypes | null ?
+
+    First extends null ?
+
+    Rest extends readonly [any, ...any] ?
+    InferFirstValidType<Rest> :
+    never :
+
+    First :
+    never :
+    never;
 
 // Helper type to extract only QueryColumns from the mixed tuple
 type ExtractComparables<T extends readonly unknown[]> =
@@ -37,11 +68,11 @@ type MapParamsToTypeRecursively<
 function sqlIn<
     TComparing extends IComparable<TDbType, any, any, any, any, any, any>,
     TValueType extends InferValueTypeFromComparable<TDbType, TComparing>,
-    TQb extends QueryBuilder<TDbType, any, any, any, any, any, any, any> & IComparable<TDbType, any, LiteralToBase<TValueType>, any, any, any, any>,
+    TQb extends QueryBuilder<TDbType, any, any, any, any, any, any, any>,
     TDbType extends DbType = TComparing extends IComparable<infer DbType, any, any, any, any, any, any> ? DbType : never
 >(
     this: TComparing,
-    val: TQb
+    val: TQb & IComparable<TDbType, any, LiteralToBase<TValueType>, any, any, any, any>
 ): ColumnComparisonOperation<
     TDbType,
     TComparing,
@@ -59,7 +90,7 @@ function sqlIn<
 ): ColumnComparisonOperation<
     TDbType,
     TComparing,
-    [...TFinalValues] // Helper type to extract only the columns as tuple
+    [...TFinalValues]
 >
 
 
