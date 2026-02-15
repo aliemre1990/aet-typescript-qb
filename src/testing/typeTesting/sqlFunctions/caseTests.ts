@@ -4,7 +4,8 @@ import type ColumnSQLFunction from "../../../query/functions/_functions.js";
 import type LiteralValue from "../../../query/literalValue.js";
 import type QueryParam from "../../../query/param.js";
 import type { DbValueTypes } from "../../../table/column.js";
-import { caseTester, literalTester, paramTester, roundTester } from "../../_functions.js";
+import { customerIdQC } from "../../_columns.js";
+import { caseTester, jsonBuildObjectTester, literalTester, paramTester, roundTester } from "../../_functions.js";
 import { customersTable } from "../../_tables.js";
 import type { AssertEqual, AssertExtends, AssertTrue } from "../_typeTestingUtilities.js";
 
@@ -197,7 +198,19 @@ const caseInvalid4 = caseTester(customersTable.select((tables) => [tables.custom
     .when(paramTester("when2"), paramTester("then3").type<string>())
 const caseInvalid5 = caseTester(customersTable.select((tables) => [tables.customers.id]).where((tables, { param }) => tables.customers.id.eq(param("where"))))
     // @ts-expect-error
-    .when(paramTester("when").type<string>(), paramTester("then"))
+    .when(paramTester("when").type<string>(), paramTester("then"));
+
+const caseDiscriminatedUnion = caseTester(customerIdQC)
+    .when(1, jsonBuildObjectTester({ id: customerIdQC, type: literalTester("corporate"), corporationInformation: literalTester("info") }))
+    .when(2, jsonBuildObjectTester({ id: customerIdQC, type: literalTester("personal"), personalCustomerInformation: literalTester("info") }));
+type typeof_CaseDiscriminatedUnion = typeof caseDiscriminatedUnion;
+type typeof_CaseDiscriminatedUnion_ResultType = typeof_CaseDiscriminatedUnion extends SQLCaseExpression<any, any, any, any, infer TResult, any, any, any> ? TResult : never;
+const val: typeof_CaseDiscriminatedUnion_ResultType = {} as any;
+if (val?.type === "personal") {
+    type caseDiscriminatedUnion_Personal_Test = AssertTrue<AssertEqual<typeof val.personalCustomerInformation, "info">>;
+} else if (val?.type === "corporate") {
+    type caseDiscriminatedUnion_Corporate_Test = AssertTrue<AssertEqual<typeof val.corporationInformation, "info">>;
+}
 
 
 // const caseWithParamOnMainExpression = caseTester(customersTable.select().where((tables, { param }) => tables.customers.id.eq(param("eq")))).when(1, roundTester(1, 2)).when(2, 2);
