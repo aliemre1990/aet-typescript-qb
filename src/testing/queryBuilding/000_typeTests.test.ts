@@ -1,1 +1,1 @@
-import '../typeTesting/sqlFunctions/case.js'
+import '../typeTesting/sqlFunctions/caseTests.js'
