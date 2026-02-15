@@ -12,19 +12,19 @@ const inInvalidVal = customerIdQC.sqlIn("ali", 1);
 //
 const inQb = customerIdQC.sqlIn(customersTable.select((tables) => [tables.customers.id]));
 //
-const InNonNullableQb = customerIdQC.sqlIn(employeesTable.select((tables) => [tables.employees.salary]));
+const InNullableQb = customerIdQC.sqlIn(employeesTable.select((tables) => [tables.employees.salary]));
 // @ts-expect-error
 const inInvalidQb = customerIdQC.sqlIn(customersTable.select((tables) => [tables.customers.name]));
 //
 const inParam = customerIdQC.sqlIn(paramTester("num1"), paramTester("num2").type<number>(), paramTester("num3").type<number | null>());
-type typeofInParam = typeof inParam;
-type typeofInParamApplied = typeofInParam extends ColumnComparisonOperation<any, any, infer TApplied, any> ? TApplied : never;
-type typeofInParamParam1 = typeofInParamApplied[0] extends QueryParam<any, any, infer TVal, any, any> ? TVal : never;
-type typeofInParamParam2 = typeofInParamApplied[1] extends QueryParam<any, any, infer TVal, any, any> ? TVal : never;
-type typeofInParamParam3 = typeofInParamApplied[2] extends QueryParam<any, any, infer TVal, any, any> ? TVal : never;
-type InParamParam1Test = AssertTrue<AssertEqual<typeofInParamParam1, number | null>>;
-type InParamParam2Test = AssertTrue<AssertEqual<typeofInParamParam2, number>>;
-type InParamParam3Test = AssertTrue<AssertEqual<typeofInParamParam3, number | null>>;
+type typeof_InParam = typeof inParam;
+type typeof_InParam_Applied = typeof_InParam extends ColumnComparisonOperation<any, any, infer TApplied, any> ? TApplied : never;
+type typeof_InParam_Param1 = typeof_InParam_Applied[0] extends QueryParam<any, any, infer TVal, any, any> ? TVal : never;
+type typeof_InParam_Param2 = typeof_InParam_Applied[1] extends QueryParam<any, any, infer TVal, any, any> ? TVal : never;
+type typeof_InParam_Param3 = typeof_InParam_Applied[2] extends QueryParam<any, any, infer TVal, any, any> ? TVal : never;
+type inParam_Param1Test = AssertTrue<AssertEqual<typeof_InParam_Param1, number | null>>;
+type inParam_Param2Test = AssertTrue<AssertEqual<typeof_InParam_Param2, number>>;
+type inParam_Param3Test = AssertTrue<AssertEqual<typeof_InParam_Param3, number | null>>;
 // @ts-expect-error
 const inInvalidParam = customerIdQC.sqlIn(paramTester("num").type<string>());
 

@@ -1,9 +1,9 @@
 import type ColumnComparisonOperation from "../../../query/comparisons/_comparisonOperations.js";
 import type QueryParam from "../../../query/param.js";
 import { customerIdQC, empSalaryQC } from "../../_columns.js";
-import { literalTester, paramTester } from "../../_functions.js";
-import { customersTable, employeesTable } from "../../_tables.js";
+import { customersTable } from "../../_tables.js";
 import type { AssertEqual, AssertTrue } from "../_typeTestingUtilities.js";
+import { paramTester } from "../../_functions.js";
 
 //
 const betweenVal = customerIdQC.between(1, 2);
@@ -15,32 +15,32 @@ const betweenInvalidVal2 = customerIdQC.between("ali", 1);
 const betweenInvalidVal3 = customerIdQC.between("ali", "veli");
 //
 const betweenLRParam = customerIdQC.between(paramTester("left"), paramTester("right"));
-type typeofBetweenLRParam = typeof betweenLRParam;
-type typeofBetweenLRParamApplied = typeofBetweenLRParam extends ColumnComparisonOperation<any, any, infer TApplied, any> ? TApplied : never;
-type betweenLRParamLParamType = typeofBetweenLRParamApplied[0] extends QueryParam<any, any, infer TVal, any, any> ? TVal : never;
-type betweenLRParamRParamType = typeofBetweenLRParamApplied[1] extends QueryParam<any, any, infer TVal, any, any> ? TVal : never;
-type betweenLRParamLParamTest = AssertTrue<AssertEqual<betweenLRParamLParamType, number | null>>;
-type betweenLRParamRParamTest = AssertTrue<AssertEqual<betweenLRParamRParamType, number | null>>;
+type typeof_BetweenLRParam = typeof betweenLRParam;
+type typeof_BetweenLRParam_Applied = typeof_BetweenLRParam extends ColumnComparisonOperation<any, any, infer TApplied, any> ? TApplied : never;
+type typeof_BetweenLRParam_LParamType = typeof_BetweenLRParam_Applied[0] extends QueryParam<any, any, infer TVal, any, any> ? TVal : never;
+type typeof_BetweenLRParam_RParamType = typeof_BetweenLRParam_Applied[1] extends QueryParam<any, any, infer TVal, any, any> ? TVal : never;
+type betweenLRParam_LParamTest = AssertTrue<AssertEqual<typeof_BetweenLRParam_LParamType, number | null>>;
+type betweenLRParam_RParamTest = AssertTrue<AssertEqual<typeof_BetweenLRParam_RParamType, number | null>>;
 // @ts-expect-error
-const betweenInvalidLRParam = customerIdQC.between(paramTester("left").type<string>(), paramTester("right"));
+const betweenInvalidLRParamLTyped = customerIdQC.between(paramTester("left").type<string>(), paramTester("right"));
 // @ts-expect-error
-const betweenInvalidLRParam = customerIdQC.between(paramTester("left")(), paramTester("right").type<string>());
+const betweenInvalidLRParamRTyped = customerIdQC.between(paramTester("left"), paramTester("right").type<string>());
 //
 const betweenLRParamLTyped = customerIdQC.between(paramTester("left").type<number>(), paramTester("right"));
-type typeofBetweenLRParamLTyped = typeof betweenLRParamLTyped;
-type typeofBetweenLRParamLTypedApplied = typeofBetweenLRParamLTyped extends ColumnComparisonOperation<any, any, infer TApplied, any> ? TApplied : never;
-type betweenLRParamLTypedLParamType = typeofBetweenLRParamLTypedApplied[0] extends QueryParam<any, any, infer TVal, any, any> ? TVal : never;
-type betweenLRParamLTypedRParamType = typeofBetweenLRParamLTypedApplied[1] extends QueryParam<any, any, infer TVal, any, any> ? TVal : never;
-type betweenLRParamLTypedLParamTest = AssertTrue<AssertEqual<betweenLRParamLTypedLParamType, number>>;
-type betweenLRParamLTypedRParamTest = AssertTrue<AssertEqual<betweenLRParamLTypedRParamType, number | null>>;
+type typeof_BetweenLRParamLTyped = typeof betweenLRParamLTyped;
+type typeof_BetweenLRParamLTyped_Applied = typeof_BetweenLRParamLTyped extends ColumnComparisonOperation<any, any, infer TApplied, any> ? TApplied : never;
+type typeof_BetweenLRParamLTyped_LParamType = typeof_BetweenLRParamLTyped_Applied[0] extends QueryParam<any, any, infer TVal, any, any> ? TVal : never;
+type typeof_BetweenLRParamLTyped_RParamType = typeof_BetweenLRParamLTyped_Applied[1] extends QueryParam<any, any, infer TVal, any, any> ? TVal : never;
+type betweenLRParamLTyped_LParamTest = AssertTrue<AssertEqual<typeof_BetweenLRParamLTyped_LParamType, number>>;
+type betweenLRParamLTyped_RParamTest = AssertTrue<AssertEqual<typeof_BetweenLRParamLTyped_RParamType, number | null>>;
 //
 const betweenLRParamRTyped = customerIdQC.between(paramTester("left"), paramTester("right").type<number>());
-type typeofBetweenLRParamRTyped = typeof betweenLRParamRTyped;
-type typeofBetweenLRParamRTypedApplied = typeofBetweenLRParamRTyped extends ColumnComparisonOperation<any, any, infer TApplied, any> ? TApplied : never;
-type betweenLRParamRTypedLParamType = typeofBetweenLRParamRTypedApplied[0] extends QueryParam<any, any, infer TVal, any, any> ? TVal : never;
-type betweenLRParamRTypedRParamType = typeofBetweenLRParamRTypedApplied[1] extends QueryParam<any, any, infer TVal, any, any> ? TVal : never;
-type betweenLRParamRTypedLParamTest = AssertTrue<AssertEqual<betweenLRParamRTypedLParamType, number | null>>;
-type betweenLRParamRTypedRParamTest = AssertTrue<AssertEqual<betweenLRParamRTypedRParamType, number>>;
+type typeof_BetweenLRParamRTyped = typeof betweenLRParamRTyped;
+type typeof_BetweenLRParamRTyped_Applied = typeof_BetweenLRParamRTyped extends ColumnComparisonOperation<any, any, infer TApplied, any> ? TApplied : never;
+type typeof_BetweenLRParamRTyped_LParamType = typeof_BetweenLRParamRTyped_Applied[0] extends QueryParam<any, any, infer TVal, any, any> ? TVal : never;
+type typeof_BetweenLRParamRTyped_RParamType = typeof_BetweenLRParamRTyped_Applied[1] extends QueryParam<any, any, infer TVal, any, any> ? TVal : never;
+type betweenLRParamRTyped_LParamTest = AssertTrue<AssertEqual<typeof_BetweenLRParamRTyped_LParamType, number | null>>;
+type betweenLRParamRTyped_RParamTest = AssertTrue<AssertEqual<typeof_BetweenLRParamRTyped_RParamType, number>>;
 // @ts-expect-error
 const betweenLRParamInvalidL = customerIdQC.between(paramTester("left").type<string>(), 1);
 // @ts-expect-error
@@ -51,52 +51,52 @@ const betweenLInvalidParamRCol = customerIdQC.between(paramTester("left").type<s
 const betweenLColRInvalidParam = customerIdQC.between(empSalaryQC, paramTester("left").type<string>());
 //
 const betweenLColRParam = customerIdQC.between(empSalaryQC, paramTester("right"));
-type typeofBetweenLColRParam = typeof betweenLColRParam;
-type typeofBetweenLColRParamApplied = typeofBetweenLColRParam extends ColumnComparisonOperation<any, any, infer TApplied, any> ? TApplied : never;
-type betweenLColRParamParamType = typeofBetweenLColRParamApplied[1] extends QueryParam<any, any, infer TVal, any, any> ? TVal : never;
-type betweenLColRParamTest = AssertTrue<AssertEqual<betweenLColRParamParamType, number | null>>;
+type typeof_BetweenLColRParam = typeof betweenLColRParam;
+type typeof_BetweenLColRParam_Applied = typeof_BetweenLColRParam extends ColumnComparisonOperation<any, any, infer TApplied, any> ? TApplied : never;
+type typeof_BetweenLColRParam_ParamType = typeof_BetweenLColRParam_Applied[1] extends QueryParam<any, any, infer TVal, any, any> ? TVal : never;
+type betweenLColRParam_Test = AssertTrue<AssertEqual<typeof_BetweenLColRParam_ParamType, number | null>>;
 //
 const betweenLColRParamTyped = customerIdQC.between(empSalaryQC, paramTester("right").type<number>());
-type typeofBetweenLColRParamTyped = typeof betweenLColRParamTyped;
-type typeofBetweenLColRParamTypedApplied = typeofBetweenLColRParamTyped extends ColumnComparisonOperation<any, any, infer TApplied, any> ? TApplied : never;
-type betweenLColRParamTypedParamType = typeofBetweenLColRParamTypedApplied[1] extends QueryParam<any, any, infer TVal, any, any> ? TVal : never;
-type betweenLColRParamTypedTest = AssertTrue<AssertEqual<betweenLColRParamTypedParamType, number>>;
+type typeof_BetweenLColRParamTyped = typeof betweenLColRParamTyped;
+type typeof_BetweenLColRParamTypedApplied = typeof_BetweenLColRParamTyped extends ColumnComparisonOperation<any, any, infer TApplied, any> ? TApplied : never;
+type typeof_BetweenLColRParamTyped_ParamType = typeof_BetweenLColRParamTypedApplied[1] extends QueryParam<any, any, infer TVal, any, any> ? TVal : never;
+type betweenLColRParamTyped_Test = AssertTrue<AssertEqual<typeof_BetweenLColRParamTyped_ParamType, number>>;
 //
 const betweenLParamRCol = customerIdQC.between(paramTester("num"), empSalaryQC);
-type typeofBetweenLParamRCol = typeof betweenLParamRCol;
-type typeofBetweenLParamRColApplied = typeofBetweenLParamRCol extends ColumnComparisonOperation<any, any, infer TApplied, any> ? TApplied : never;
-type betweenLParamRColParamType = typeofBetweenLParamRColApplied[0] extends QueryParam<any, any, infer TVal, any, any> ? TVal : never;
-type betweenLParamRColTest = AssertTrue<AssertEqual<betweenLParamRColParamType, number | null>>;
+type typeof_BetweenLParamRCol = typeof betweenLParamRCol;
+type typeof_BetweenLParamRCol_Applied = typeof_BetweenLParamRCol extends ColumnComparisonOperation<any, any, infer TApplied, any> ? TApplied : never;
+type typeof_BetweenLParamRCol_ParamType = typeof_BetweenLParamRCol_Applied[0] extends QueryParam<any, any, infer TVal, any, any> ? TVal : never;
+type betweenLParamRCol_Test = AssertTrue<AssertEqual<typeof_BetweenLParamRCol_ParamType, number | null>>;
 //
 const betweenLParamTypedRCol = customerIdQC.between(paramTester("num").type<number>(), empSalaryQC);
-type typeofBetweenLParamTypedRCol = typeof betweenLParamTypedRCol;
-type typeofBetweenLParamTypedRColApplied = typeofBetweenLParamTypedRCol extends ColumnComparisonOperation<any, any, infer TApplied, any> ? TApplied : never;
-type betweenLParamTypedRColParamType = typeofBetweenLParamTypedRColApplied[0] extends QueryParam<any, any, infer TVal, any, any> ? TVal : never;
-type betweenLParamTypedRColTest = AssertTrue<AssertEqual<betweenLParamTypedRColParamType, number>>;
+type typeof_BetweenLParamTypedRCol = typeof betweenLParamTypedRCol;
+type typeofBetweenLParamTypedRCol_Applied = typeof_BetweenLParamTypedRCol extends ColumnComparisonOperation<any, any, infer TApplied, any> ? TApplied : never;
+type typeof_BetweenLParamTypedRCol_ParamType = typeofBetweenLParamTypedRCol_Applied[0] extends QueryParam<any, any, infer TVal, any, any> ? TVal : never;
+type betweenLParamTypedRCol_Test = AssertTrue<AssertEqual<typeof_BetweenLParamTypedRCol_ParamType, number>>;
 //
 const betweenLParamRVal = customerIdQC.between(paramTester("left"), 1);
-type typeofBetweenLParamRVal = typeof betweenLParamRVal;
-type typeofBetweenLParamRValApplied = typeofBetweenLParamRVal extends ColumnComparisonOperation<any, any, infer TApplied, any> ? TApplied : never;
-type betweenLParamRValParamType = typeofBetweenLParamRValApplied[0] extends QueryParam<any, any, infer TVal, any, any> ? TVal : never;
-type betweenLParamRValTest = AssertTrue<AssertEqual<betweenLParamRValParamType, number | null>>;
+type typeof_BetweenLParamRVal = typeof betweenLParamRVal;
+type typeof_BetweenLParamRVal_Applied = typeof_BetweenLParamRVal extends ColumnComparisonOperation<any, any, infer TApplied, any> ? TApplied : never;
+type typeof_BetweenLParamRVal_ParamType = typeof_BetweenLParamRVal_Applied[0] extends QueryParam<any, any, infer TVal, any, any> ? TVal : never;
+type betweenLParamRVal_Test = AssertTrue<AssertEqual<typeof_BetweenLParamRVal_ParamType, number | null>>;
 //
 const betweenLParamTypedRVal = customerIdQC.between(paramTester("left").type<number>(), 1);
-type typeofBetweenLParamTypedRVal = typeof betweenLParamTypedRVal;
-type typeofBetweenLParamTypedRValApplied = typeofBetweenLParamTypedRVal extends ColumnComparisonOperation<any, any, infer TApplied, any> ? TApplied : never;
-type betweenLParamTypedRValParamType = typeofBetweenLParamTypedRValApplied[0] extends QueryParam<any, any, infer TVal, any, any> ? TVal : never;
-type betweenLParamTypedRValTest = AssertTrue<AssertEqual<betweenLParamTypedRValParamType, number>>;
+type typeof_BetweenLParamTypedRVal = typeof betweenLParamTypedRVal;
+type typeof_BetweenLParamTypedRVal_Applied = typeof_BetweenLParamTypedRVal extends ColumnComparisonOperation<any, any, infer TApplied, any> ? TApplied : never;
+type typeof_BetweenLParamTypedRVal_ParamType = typeof_BetweenLParamTypedRVal_Applied[0] extends QueryParam<any, any, infer TVal, any, any> ? TVal : never;
+type betweenLParamTypedRVal_Test = AssertTrue<AssertEqual<typeof_BetweenLParamTypedRVal_ParamType, number>>;
 //
 const betweenLValRParam = customerIdQC.between(1, paramTester("right"));
-type typeofBetweenLValRParam = typeof betweenLValRParam;
-type typeofBetweenLValRParamApplied = typeofBetweenLValRParam extends ColumnComparisonOperation<any, any, infer TApplied, any> ? TApplied : never;
-type betweenLValRParamParamType = typeofBetweenLValRParamApplied[1] extends QueryParam<any, any, infer TVal, any, any> ? TVal : never;
-type betweenLValRParamTest = AssertTrue<AssertEqual<betweenLValRParamParamType, number | null>>;
+type typeof_BetweenLValRParam = typeof betweenLValRParam;
+type typeof_BetweenLValRParam_Applied = typeof_BetweenLValRParam extends ColumnComparisonOperation<any, any, infer TApplied, any> ? TApplied : never;
+type typeof_BetweenLValRParam_ParamType = typeof_BetweenLValRParam_Applied[1] extends QueryParam<any, any, infer TVal, any, any> ? TVal : never;
+type betweenLValRParam_Test = AssertTrue<AssertEqual<typeof_BetweenLValRParam_ParamType, number | null>>;
 //
 const betweenLValRParamTyped = customerIdQC.between(1, paramTester("right").type<number>());
-type typeofBetweenLValRParamTyped = typeof betweenLValRParamTyped;
-type typeofBetweenLValRParamTypedApplied = typeofBetweenLValRParamTyped extends ColumnComparisonOperation<any, any, infer TApplied, any> ? TApplied : never;
-type betweenLValRParamTypedParamType = typeofBetweenLValRParamTypedApplied[1] extends QueryParam<any, any, infer TVal, any, any> ? TVal : never;
-type betweenLValRParamTypedTest = AssertTrue<AssertEqual<betweenLValRParamTypedParamType, number>>;
+type typeof_BetweenLValRParamTyped = typeof betweenLValRParamTyped;
+type typeof_BetweenLValRParamTyped_Applied = typeof_BetweenLValRParamTyped extends ColumnComparisonOperation<any, any, infer TApplied, any> ? TApplied : never;
+type typeof_BetweenLValRParamTyped_ParamType = typeof_BetweenLValRParamTyped_Applied[1] extends QueryParam<any, any, infer TVal, any, any> ? TVal : never;
+type betweenLValRParamTyped_Test = AssertTrue<AssertEqual<typeof_BetweenLValRParamTyped_ParamType, number>>;
 //
 const betweenLQueryRQuery = customerIdQC.between(customersTable.select((tables) => [tables.customers.id]), customersTable.select((tables) => [tables.customers.id]));
 // 
