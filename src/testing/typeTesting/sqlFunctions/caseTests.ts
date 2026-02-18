@@ -6,7 +6,7 @@ import type QueryParam from "../../../query/param.js";
 import type { DbValueTypes } from "../../../table/column.js";
 import { customerIdQC } from "../../_columns.js";
 import { caseTester, jsonBuildObjectTester, literalTester, paramTester, roundTester } from "../../_functions.js";
-import { customersTable } from "../../_tables.js";
+import { corporateCustomersTable, customersTable, customerTypesTable, individualCustomersTable } from "../../_tables.js";
 import type { AssertEqual, AssertExtends, AssertTrue } from "../_typeTestingUtilities.js";
 
 const caseWithNoBranch = caseTester();
@@ -202,15 +202,51 @@ const caseInvalid5 = caseTester(customersTable.select((tables) => [tables.custom
 
 const caseDiscriminatedUnion = caseTester(customerIdQC)
     .when(1, jsonBuildObjectTester({ id: customerIdQC, type: literalTester("corporate"), corporationInformation: literalTester("info") }))
-    .when(2, jsonBuildObjectTester({ id: customerIdQC, type: literalTester("personal"), personalCustomerInformation: literalTester("info") }));
+    .when(2, jsonBuildObjectTester({ id: customerIdQC, type: literalTester("individual"), individualCustomerInformation: literalTester("info") }));
 type typeof_CaseDiscriminatedUnion = typeof caseDiscriminatedUnion;
 type typeof_CaseDiscriminatedUnion_ResultType = typeof_CaseDiscriminatedUnion extends SQLCaseExpression<any, any, any, any, infer TResult, any, any, any> ? TResult : never;
 const val: typeof_CaseDiscriminatedUnion_ResultType = {} as any;
-if (val?.type === "personal") {
-    type caseDiscriminatedUnion_Personal_Test = AssertTrue<AssertEqual<typeof val.personalCustomerInformation, "info">>;
+if (val?.type === "individual") {
+    type caseDiscriminatedUnion_Personal_Test = AssertTrue<AssertEqual<typeof val.individualCustomerInformation, "info">>;
 } else if (val?.type === "corporate") {
     type caseDiscriminatedUnion_Corporate_Test = AssertTrue<AssertEqual<typeof val.corporationInformation, "info">>;
 }
+
+const caseDiscriminatedUnionQuery = customersTable
+    .join('INNER', customerTypesTable, (tables) => tables.customers.customerTypeId.eq(tables.customerTypes.id))
+    .join('LEFT', individualCustomersTable, (tables) => tables.customers.id.eq(tables.individualCustomers.customerId))
+    .join('LEFT', corporateCustomersTable, (tables) => tables.customers.id.eq(tables.corporateCustomers.customerId))
+    .select((tables, { sqlCase, jsonbBuildObject, literal }) => [
+        tables.customers.id,
+        tables.customers.name,
+        tables.customers.customerTypeId,
+        jsonbBuildObject({ id: tables.customerTypes.id, name: tables.customerTypes.name }).as("customerType"),
+        sqlCase(tables.customerTypes.name)
+            .when('INDIVIDUAL', jsonbBuildObject({ customerType: literal('INDIVIDUAL'), firstName: tables.individualCustomers.firstName }))
+            .when('CORPORATE', jsonbBuildObject({ customerType: literal('CORPORATE'), taxId: tables.corporateCustomers.taxId }))
+            .as("customerInformation")
+    ]);
+type typeof_CaseDiscriminatedUnionQuery_Exec = typeof caseDiscriminatedUnionQuery.exec;
+type typeof_CaseDiscriminatedUnionQuery_Exec_ReturnType = typeof_CaseDiscriminatedUnionQuery_Exec extends (...args: any) => infer TReturn ? TReturn : never;
+type typeof_CaseDiscriminatedUnionQuery_Exec_ReturnType_Single = typeof_CaseDiscriminatedUnionQuery_Exec_ReturnType extends Array<infer TItem> ? TItem : never;
+type Expected_CaseDiscriminatedUnionQuery_Exec_ReturnType_Single = {
+    id: number;
+    customerTypeId: number;
+    name: string;
+    customerType: {
+        id: number;
+        name: string;
+    };
+    customerInformation: {
+        customerType: "INDIVIDUAL";
+        firstName: string;
+    } | {
+        customerType: "CORPORATE";
+        taxId: string | null;
+    } | null;
+};
+type caseDiscriminatedUnionQuery_Test = AssertTrue<AssertEqual<Expected_CaseDiscriminatedUnionQuery_Exec_ReturnType_Single, typeof_CaseDiscriminatedUnionQuery_Exec_ReturnType_Single>>;
+
 
 
 // const caseWithParamOnMainExpression = caseTester(customersTable.select().where((tables, { param }) => tables.customers.id.eq(param("eq")))).when(1, roundTester(1, 2)).when(2, 2);

@@ -26,13 +26,63 @@ const customersTable = pgTable(
     'customers',
     [
         pgColumn('id', pgColumnTypes.serial, false),
+        pgColumn('customerTypeId', pgColumnTypes.serial, false),
         pgColumn('name', pgColumnTypes.varchar, false),
-        pgColumn('createdBy', pgColumnTypes.int, false)
+        pgColumn('createdBy', pgColumnTypes.int, false),
     ],
     undefined,
     undefined,
     [
-        new ForeignKey('createdBy', { table: 'users', column: 'id' })
+        new ForeignKey('createdBy', { table: 'users', column: 'id' }),
+        new ForeignKey('customerTypeId', { table: 'customerTypes', column: 'id' })
+    ]
+);
+
+const customerTypesTable = pgTable(
+    'customerTypes',
+    [
+        pgColumn('id', pgColumnTypes.serial, false),
+        pgColumn('name', pgColumnTypes.varchar, false)
+    ]
+);
+
+const corporateCustomersTable = pgTable(
+    'corporateCustomers',
+    [
+        pgColumn('id', pgColumnTypes.serial, false),
+        pgColumn('customerId', pgColumnTypes.int, false),
+        pgColumn('companyName', pgColumnTypes.varchar, false),
+        pgColumn('registrationNumber', pgColumnTypes.varchar, false),
+        pgColumn('taxId', pgColumnTypes.varchar, true)
+    ],
+    undefined,
+    undefined,
+    [
+        new ForeignKey('customerId', { table: 'customers', column: 'id' })
+    ]
+);
+
+const individualCustomersTable = pgTable(
+    'individualCustomers',
+    [
+        pgColumn('id', pgColumnTypes.serial, false),
+        pgColumn('customerId', pgColumnTypes.int, false),
+        pgColumn('firstName', pgColumnTypes.varchar, false),
+        pgColumn('lastName', pgColumnTypes.varchar, false),
+        pgColumn('dateOfBirth', pgColumnTypes.date, false),
+        pgColumn('nationalId', pgColumnTypes.varchar, true),
+        pgColumn('driverLicenseNumber', pgColumnTypes.varchar, false),
+        pgColumn('driverLicenseExpiry', pgColumnTypes.date, false),
+        pgColumn('driverLicenseCountry', pgColumnTypes.varchar, false),
+        pgColumn('phoneNumber', pgColumnTypes.varchar, true),
+        pgColumn('email', pgColumnTypes.varchar, true),
+        pgColumn('emergencyContactName', pgColumnTypes.varchar, true),
+        pgColumn('emergencyContactPhone', pgColumnTypes.varchar, true),
+    ],
+    undefined,
+    undefined,
+    [
+        new ForeignKey('customerId', { table: 'customers', column: 'id' })
     ]
 );
 
@@ -87,6 +137,9 @@ const shipmentsTable = pgTable(
 
 export {
     customersTable,
+    customerTypesTable,
+    corporateCustomersTable,
+    individualCustomersTable,
     usersTable,
     ordersTable,
     orderDetailsTable,

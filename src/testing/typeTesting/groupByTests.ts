@@ -58,7 +58,7 @@ type MultiTableGroupByQueryResult = {
     sumNull: number | null,
     sumNotNull: number,
     jsonAggResult2: number[],
-    jsonAggResult3: { id: number, name: string, createdBy: number }[]
+    jsonAggResult3: { id: number, name: string, customerTypeId: number, createdBy: number }[]
 }[]
 type MultiTableGroupByQueryReturnType = ReturnType<typeof MultiTableGroupByQuery>;
 

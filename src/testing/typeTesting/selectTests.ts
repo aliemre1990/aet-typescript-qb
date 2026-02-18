@@ -228,6 +228,7 @@ type multiLevelSelectWithJoinsExpectedResult = {
         parentUserId: number,
         customers: {
             id: number,
+            customerTypeId: number,
             name: string,
             createdBy: number
         }
