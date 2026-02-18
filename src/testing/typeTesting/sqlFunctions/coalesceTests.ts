@@ -21,141 +21,82 @@ type typeof_Coalesce_Null_FinalValueType = typeof_Coalesce_Null extends ICompara
 type coalesce_Null_ValueType_Test = AssertTrue<AssertEqual<typeof_Coalesce_Null_ValueType, number>>;
 type coalesce_Null_FinalValueType_Test = AssertTrue<AssertEqual<typeof_Coalesce_Null_FinalValueType, number | null>>;
 
-const coalesce_WithParams_NullableNumberParamBefore = coalesceTester(paramTester("param1").type<number | null>(), paramTester("param2"));
+const coalesce_WithParams_NullableNumberParamBefore = coalesceTester(paramTester("before").type<number | null>(), paramTester("after"));
 type typeof_Coalesce_WithParams_NullableNumberParamBefore = typeof coalesce_WithParams_NullableNumberParamBefore;
+type typeof_Coalesce_WithParams_NullableNumberParamBefore_ReturnType = typeof_Coalesce_WithParams_NullableNumberParamBefore extends ColumnSQLFunction<any, any, any, infer TReturnType, any, any, any, any> ? TReturnType : never;
+type typeof_Coalesce_WithParams_NullableNumberParamBefore_Params = typeof_Coalesce_WithParams_NullableNumberParamBefore extends ColumnSQLFunction<any, any, any, any, infer TParams, any, any, any> ? TParams : never;
+type typeof_Coalesce_WithParams_NullableNumberParamBefore_Params_PreviousParamName = typeof_Coalesce_WithParams_NullableNumberParamBefore_Params[0] extends QueryParam<any, infer TName, any, any, any, any> ? TName : never;
+type typeof_Coalesce_WithParams_NullableNumberParamBefore_Params_PreviousParamType = typeof_Coalesce_WithParams_NullableNumberParamBefore_Params[0] extends QueryParam<any, any, infer TValueType, any, any, any> ? TValueType : never;
+type typeof_Coalesce_WithParams_NullableNumberParamBefore_Params_SubsequentParamName = typeof_Coalesce_WithParams_NullableNumberParamBefore_Params[1] extends QueryParam<any, infer TName, any, any, any, any> ? TName : never;
+type typeof_Coalesce_WithParams_NullableNumberParamBefore_Params_SubsequentParamType = typeof_Coalesce_WithParams_NullableNumberParamBefore_Params[1] extends QueryParam<any, any, infer TValueType, any, any, any> ? TValueType : never;
+type coalesce_WithParams_NullableNumberParamBefore_Params_PreviousParamName_Test = AssertTrue<AssertEqual<typeof_Coalesce_WithParams_NullableNumberParamBefore_Params_PreviousParamName, 'before'>>;
+type coalesce_WithParams_NullableNumberParamBefore_Params_PreviousParamType_Test = AssertTrue<AssertEqual<typeof_Coalesce_WithParams_NullableNumberParamBefore_Params_PreviousParamType, number | null>>;
+type coalesce_WithParams_NullableNumberParamBefore_Params_SubsequentParamName_Test = AssertTrue<AssertEqual<typeof_Coalesce_WithParams_NullableNumberParamBefore_Params_SubsequentParamName, 'after'>>;
+type coalesce_WithParams_NullableNumberParamBefore_Params_SubsequentParamType_Test = AssertTrue<AssertEqual<typeof_Coalesce_WithParams_NullableNumberParamBefore_Params_SubsequentParamType, number | null>>;
+type coalesce_WithParams_NullableNumberParamBefore_ReturnType_Test = AssertTrue<AssertEqual<typeof_Coalesce_WithParams_NullableNumberParamBefore_ReturnType, number | null>>;
 
-
-/**
- * Coalesce with params tests
- */
-coalesceTester(paramTester("param1").type<number | null>(), paramTester("param2"));
-coalesceTester(paramTester("param1").type<number | null>(), paramTester("param2").type<number>());
-// @ts-expect-error
-coalesceTester(paramTester("param1").type<number | null>(), paramTester("param2").type<string>());
-// @ts-expect-error
-coalesceTester(customerIdQC, paramTester("param1").type<string>());
-
-
-const CoalesceWithTypedParams = customersTable
-    .select((cols, { coalesce, param }) => {
-
-        return [
-            coalesce(param("param1").type<number>(), param("param2").type<number | null>(), param("param3")).as("coalesceResult")
-        ]
-    }
-    ).exec;
-type CoalesceWithTypedParamsReturnType = ReturnType<typeof CoalesceWithTypedParams>;
-type CoalesceWithTypedParamsResult = { coalesceResult: number }[];
-type CoalesceWithTypedParamsTest = AssertTrue<AssertEqual<CoalesceWithTypedParamsResult, CoalesceWithTypedParamsReturnType>>;
-
-type CoalesceWithTypedParamsParams = typeof CoalesceWithTypedParams extends (param: infer TParam) => any ? TParam : never;
-type CoalesceWithTypeParamsParamsResult = { param1: number, param2: number | null, param3: number | null };
-type CoalesceWithTypedParamsParamsTest = AssertTrue<AssertEqual<CoalesceWithTypedParamsParams, CoalesceWithTypeParamsParamsResult>>
-
-
-/**
- * 
- */
-const pgCoalescePlainWithParam = coalesceTester(1, 2, paramTester("param"));
-
-type pgCoalescePlainWithParamType = typeof pgCoalescePlainWithParam;
-type pgCoalescePlainWithParamArgs = pgCoalescePlainWithParamType extends ColumnSQLFunction<any, any, infer TArgs, any, any, any, any, any> ? TArgs : never;
-type pgCoalescePlainWithParamArg0 = pgCoalescePlainWithParamArgs[0];
-type pgCoalescePlainWithParamArg1 = pgCoalescePlainWithParamArgs[1];
-type pgCoalescePlainWithParamArg2 = pgCoalescePlainWithParamArgs[2];
-type pgCoalescePlainWithParamReturnType = pgCoalescePlainWithParamType extends ColumnSQLFunction<any, any, any, infer TRet, any, any, any, any> ? TRet : never;
-
-type pgCoalescePlainWithParamLengthTest = AssertTrue<AssertEqual<3, pgCoalescePlainWithParamArgs["length"]>>;
-type pgCoalescePlainWithParamReturnTypeTest = AssertTrue<AssertEqual<number, pgCoalescePlainWithParamReturnType>>
-type pgCoalescePlainWithParamArg0Test = AssertTrue<AssertEqual<number, pgCoalescePlainWithParamArg0>>;
-type pgCoalescePlainWithParamArg1Test = AssertTrue<AssertEqual<number, pgCoalescePlainWithParamArg1>>;
-type pgCoalescePlainWithParamArg2Test = AssertTrue<AssertEqual<QueryParam<PgDbType, "param", number | null, any, any>, pgCoalescePlainWithParamArg2>>;
-
-/**
- * Misc
- */
-// @ts-expect-error
-coalesceTester(customerIdQC, customerNameQC);
+const coalesce_WithParams_NullableNumberParamBefore_NonNullParamAfter = coalesceTester(paramTester("param1").type<number | null>(), paramTester("param2").type<number>());
+type typeof_Coalesce_WithParams_NullableNumberParamBefore_NonNullParamAfter = typeof coalesce_WithParams_NullableNumberParamBefore_NonNullParamAfter;
+type typeof_Coalesce_WithParams_NullableNumberParamBefore_NonNullParamAfter_ReturnType = typeof_Coalesce_WithParams_NullableNumberParamBefore_NonNullParamAfter extends ColumnSQLFunction<any, any, any, infer TReturnType, any, any, any, any> ? TReturnType : never;
+type coalesce_WithParams_NullableNumberParamBefore_NonNullParamAfter_ReturnType_Test = AssertTrue<AssertEqual<typeof_Coalesce_WithParams_NullableNumberParamBefore_NonNullParamAfter_ReturnType, number>>;
 
 // @ts-expect-error
-coalesceTester(customerIdQC, "error");
+const coalesce_InvalidType_Param1 = coalesceTester(paramTester("param1").type<number | null>(), paramTester("param2").type<string>());
+// @ts-expect-error
+const coalesce_InvalidType_Param2 = coalesceTester(customerIdQC, paramTester("param1").type<string>());
 
-const nonNullCoalesce = coalesceTester(customerIdQC, 2);
+const coalesce_With3Params_LastParamAny = coalesceTester(
+    paramTester("param1").type<number>(),
+    paramTester("param2").type<number | null>(),
+    paramTester("param3")
+);
+type typeof_Coalesce_With3Params_LastParamAny = typeof coalesce_With3Params_LastParamAny;
+type typeof_Coalesce_With3Params_LastParamAny_Params = typeof_Coalesce_With3Params_LastParamAny extends ColumnSQLFunction<any, any, any, any, infer TParams, any, any, any> ? TParams : never;
+type typeof_Coalesce_With3Params_LastParamAny_LastParamType = typeof_Coalesce_With3Params_LastParamAny_Params[2] extends QueryParam<any, any, infer TValueType, any, any, any> ? TValueType : never;
+type coalesce_With3Params_LastParamAny_LastParamType_Test = AssertTrue<AssertEqual<typeof_Coalesce_With3Params_LastParamAny_LastParamType, number | null>>;
 
-const nullCoalesce = coalesceTester(empSalaryQC);
-type NullCoalesce = typeof nullCoalesce;
-type NullCoalesceRetType = NullCoalesce extends ColumnSQLFunction<any, any, any, infer TRet, any, any, any, any> ? TRet : never;
-type NullCoalesceTest = AssertTrue<AssertEqual<number | null, NullCoalesceRetType>>
+const coalesce_ParamInferredFromValue = coalesceTester(1, 2, paramTester("param"));
+type typeof_Coalesce_ParamInferredFromValue = typeof coalesce_ParamInferredFromValue;
+type typeof_Coalesce_ParamInferredFromValue_Args = typeof_Coalesce_ParamInferredFromValue extends ColumnSQLFunction<any, any, infer TArgs, any, any, any, any, any> ? TArgs : never;
+type typeof_Coalesce_ParamInferredFromValue_ReturnType = typeof_Coalesce_ParamInferredFromValue extends ColumnSQLFunction<any, any, any, infer TReturnType, any, any, any, any> ? TReturnType : never;
+type typeof_Coalesce_ParamInferredFromValue_Params = typeof_Coalesce_ParamInferredFromValue extends ColumnSQLFunction<any, any, any, any, infer TParams, any, any, any> ? TParams : never;
+type typeof_Coalesce_ParamInferredFromValue_ParamType = typeof_Coalesce_ParamInferredFromValue_Params[0] extends QueryParam<any, any, infer TValueType, any, any, any> ? TValueType : never;
+type coalesce_ParamInferredFromValue_Arg1Type_Test = AssertTrue<AssertEqual<typeof_Coalesce_ParamInferredFromValue_Args[0], number>>
+type coalesce_ParamInferredFromValue_Arg2Type_Test = AssertTrue<AssertEqual<typeof_Coalesce_ParamInferredFromValue_Args[1], number>>
+type coalesce_ParamInferredFromValue_ReturnType_Test = AssertTrue<AssertEqual<typeof_Coalesce_ParamInferredFromValue_ReturnType, number>>
+type typeof_Coalesce_ParamInferredFromValue_ParamType_Test = AssertTrue<AssertEqual<typeof_Coalesce_ParamInferredFromValue_ParamType, number | null>>;
 
 // @ts-expect-error
-coalesceTester(customerNameQC).eq(1);
+const coalesce_InvalidTypedColumn = coalesceTester(customerIdQC, customerNameQC);
 
-coalesceTester(customerIdQC).eq(1);
-
-coalesceTester(customerIdQC).eq(customerCreatedByQC);
-
-/**
- * 
- */
-const InferParamsFromCoalesce = customersTable
-    .join('INNER', () => usersTable, (cols, { coalesce, param }) => {
-
-        const res1 = coalesce(
-            1, 2, param("param1"), coalesce(1, 2, 3, param("param2"), coalesce(1, 2, 3, 4, param("param3")))
-        ).eq(param("param4"));
-
-        type tp = typeof res1;
-        type tp1 = tp extends ColumnComparisonOperation<any, any, any, infer TP> ? TP : never;
-
-        return res1;
-    })
-    .join('INNER', () => usersTable.as('parentUsers'), (cols, { and, coalesce, param }) => {
-        const res = and(
-            coalesce("asdf", param("coalesceAnd1")).eq("sadf"),
-            coalesce(new Date(), param("coalesceAnd2")).eq(new Date())
-        );
-
-        return res;
-    })
-    .join('INNER', () => ordersTable, (cols) => cols.users.userName.eq(cols.customers.name))
-    .select(cols => [cols.customers.id])
-    .exec;
-
-type InferParamsFromCoalesceResult = typeof InferParamsFromCoalesce;
-type InferParamsFromCoalesceParams = InferParamsFromCoalesceResult extends (params: infer TParam) => any ? TParam : never;
-type InferParamsFromCoalesceParamsResult = {
-    param3: number | null;
-    param2: number | null;
-    param1: number | null;
-    param4: number | null;
-    coalesceAnd1: string | null;
-    coalesceAnd2: Date | null;
-};
-type InferParamsFromCoalesceTest = AssertTrue<AssertEqual<InferParamsFromCoalesceParamsResult, InferParamsFromCoalesceParams>>;
-
-/**
- * 
- */
-coalesceTester(empSalaryQC, 100).between(100, 200);
-coalesceTester(empSalaryQC, 100).between(100, null);
-coalesceTester(empSalaryQC, null).between(500, null);
 // @ts-expect-error
-coalesceTester(customerNameQC, "ali").between(100, 500);
-coalesceTester(customerNameQC, "ali").between(coalesceTester("adsf"), coalesceTester("asdfxcv", null));
+const coalesce_InvalidTypedValue = coalesceTester(customerIdQC, "error");
 
-/**
- * 
- */
-const betweenCoalesceParamed = coalesceTester(customerNameQC, "ali").between(paramTester("betLeft"), coalesceTester("asdf", paramTester("betRight")));
+// @ts-expect-error
+const coalesce_InvalidComparison = coalesceTester(customerNameQC).eq(1);
 
-type typeofBetweenCoalesceParamed = typeof betweenCoalesceParamed;
-type betweenCoalesceParamedParams = InferParamsFromOps<typeofBetweenCoalesceParamed>;
+const coalesce_ValidComparison1 = coalesceTester(customerIdQC).eq(1);
 
-type betweenCoalesceParamedParamLengthTest = AssertTrue<AssertEqual<2, betweenCoalesceParamedParams["length"]>>;
+const coalesceValidComparison2 = coalesceTester(customerIdQC).eq(customerCreatedByQC);
 
-type betweenCoalesceParamedFirstParamRes = QueryParam<PgDbType, "betLeft", string | null, any, any>;
-type betweenCoalesceParamedFirstParamTest = AssertTrue<AssertEqual<betweenCoalesceParamedFirstParamRes, betweenCoalesceParamedParams[0]>>;
-
-type betweenCoalesceParamedSecondParamRes = QueryParam<PgDbType, "betRight", string | null, any, any>;
-type betweenCoalesceParamedSecondParamTest = AssertTrue<AssertEqual<betweenCoalesceParamedSecondParamRes, betweenCoalesceParamedParams[1]>>;
-
+const coalesce_WithNestedFunction = coalesceTester(
+    1,
+    2,
+    paramTester("level1"),
+    coalesceTester(
+        1,
+        2,
+        3,
+        paramTester("level2"),
+        coalesceTester(
+            1,
+            2,
+            3,
+            4,
+            paramTester("leve3")
+        )
+    )
+);
+type typeof_Coalesce_WithNestedFunction = typeof coalesce_WithNestedFunction;
+type typeof_Coalesce_WithNestedFunction_Params = typeof_Coalesce_WithNestedFunction extends ColumnSQLFunction<any, any, any, any, infer TParams, any, any, any> ? TParams : never;
+type coalesce_WithNestedFunction_Params_Length_Test = AssertTrue<AssertEqual<typeof_Coalesce_WithNestedFunction_Params["length"], 3>>;
