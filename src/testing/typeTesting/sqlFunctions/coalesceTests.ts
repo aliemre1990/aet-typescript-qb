@@ -1,27 +1,39 @@
-import { dbTypes, type PgDbType } from "../../../db.js";
+import { type PgDbType } from "../../../db.js";
 import type { IComparable } from "../../../query/_interfaces/IComparable.js";
 import type { InferParamsFromOps } from "../../../query/_types/paramAccumulationComparison.js";
 import type ColumnComparisonOperation from "../../../query/comparisons/_comparisonOperations.js";
 import type ColumnSQLFunction from "../../../query/functions/_functions.js";
-import { generateCoalesceFn } from "../../../query/functions/coalesce.js";
-import QueryParam, { generateParamFn } from "../../../query/param.js";
-import QueryColumn from "../../../query/queryColumn.js";
+import QueryParam from "../../../query/param.js";
 import { customerCreatedByQC, customerIdQC, customerNameQC, empSalaryQC } from "../../_columns.js";
+import { coalesceTester, paramTester } from "../../_functions.js";
 import { customersTable, employeesTable, ordersTable, usersTable } from "../../_tables.js";
 import type { AssertEqual, AssertTrue } from "../_typeTestingUtilities.js";
 
-const coalesce = generateCoalesceFn("postgresql");
-const param = generateParamFn("postgresql");
+const coalesce_NonNull = coalesceTester(empSalaryQC, 2000);
+type typeof_Coalesce_NonNull = typeof coalesce_NonNull;
+type typeof_Coalesce_NonNull_FinalValueType = typeof_Coalesce_NonNull extends IComparable<any, any, any, infer TFinalValueType, any, any, any> ? TFinalValueType : never;
+type coalesce_NonNull_FinalValueType_Test = AssertTrue<AssertEqual<typeof_Coalesce_NonNull_FinalValueType, number>>;
+
+const coalesce_Null = coalesceTester(empSalaryQC, null);
+type typeof_Coalesce_Null = typeof coalesce_Null;
+type typeof_Coalesce_Null_ValueType = typeof_Coalesce_Null extends IComparable<any, any, infer TValueType, any, any, any, any> ? TValueType : never;
+type typeof_Coalesce_Null_FinalValueType = typeof_Coalesce_Null extends IComparable<any, any, any, infer TFinalValueType, any, any, any> ? TFinalValueType : never;
+type coalesce_Null_ValueType_Test = AssertTrue<AssertEqual<typeof_Coalesce_Null_ValueType, number>>;
+type coalesce_Null_FinalValueType_Test = AssertTrue<AssertEqual<typeof_Coalesce_Null_FinalValueType, number | null>>;
+
+const coalesce_WithParams_NullableNumberParamBefore = coalesceTester(paramTester("param1").type<number | null>(), paramTester("param2"));
+type typeof_Coalesce_WithParams_NullableNumberParamBefore = typeof coalesce_WithParams_NullableNumberParamBefore;
+
 
 /**
  * Coalesce with params tests
  */
-coalesce(param("param1").type<number | null>(), param("param2"));
-coalesce(param("param1").type<number | null>(), param("param2").type<number>());
+coalesceTester(paramTester("param1").type<number | null>(), paramTester("param2"));
+coalesceTester(paramTester("param1").type<number | null>(), paramTester("param2").type<number>());
 // @ts-expect-error
-coalesce(param("param1").type<number | null>(), param("param2").type<string>());
+coalesceTester(paramTester("param1").type<number | null>(), paramTester("param2").type<string>());
 // @ts-expect-error
-coalesce(customerIdQC, param("param1").type<string>());
+coalesceTester(customerIdQC, paramTester("param1").type<string>());
 
 
 const CoalesceWithTypedParams = customersTable
@@ -44,7 +56,7 @@ type CoalesceWithTypedParamsParamsTest = AssertTrue<AssertEqual<CoalesceWithType
 /**
  * 
  */
-const pgCoalescePlainWithParam = coalesce(1, 2, param("param"));
+const pgCoalescePlainWithParam = coalesceTester(1, 2, paramTester("param"));
 
 type pgCoalescePlainWithParamType = typeof pgCoalescePlainWithParam;
 type pgCoalescePlainWithParamArgs = pgCoalescePlainWithParamType extends ColumnSQLFunction<any, any, infer TArgs, any, any, any, any, any> ? TArgs : never;
@@ -63,30 +75,30 @@ type pgCoalescePlainWithParamArg2Test = AssertTrue<AssertEqual<QueryParam<PgDbTy
  * Misc
  */
 // @ts-expect-error
-coalesce(customerIdQC, customerNameQC);
+coalesceTester(customerIdQC, customerNameQC);
 
 // @ts-expect-error
-coalesce(customerIdQC, "error");
+coalesceTester(customerIdQC, "error");
 
-const nonNullCoalesce = coalesce(customerIdQC, 2);
+const nonNullCoalesce = coalesceTester(customerIdQC, 2);
 
-const nullCoalesce = coalesce(empSalaryQC);
+const nullCoalesce = coalesceTester(empSalaryQC);
 type NullCoalesce = typeof nullCoalesce;
 type NullCoalesceRetType = NullCoalesce extends ColumnSQLFunction<any, any, any, infer TRet, any, any, any, any> ? TRet : never;
 type NullCoalesceTest = AssertTrue<AssertEqual<number | null, NullCoalesceRetType>>
 
 // @ts-expect-error
-coalesce(customerNameQC).eq(1);
+coalesceTester(customerNameQC).eq(1);
 
-coalesce(customerIdQC).eq(1);
+coalesceTester(customerIdQC).eq(1);
 
-coalesce(customerIdQC).eq(customerCreatedByQC);
+coalesceTester(customerIdQC).eq(customerCreatedByQC);
 
 /**
  * 
  */
 const InferParamsFromCoalesce = customersTable
-    .join('INNER', () => usersTable, (cols, { coalesce }) => {
+    .join('INNER', () => usersTable, (cols, { coalesce, param }) => {
 
         const res1 = coalesce(
             1, 2, param("param1"), coalesce(1, 2, 3, param("param2"), coalesce(1, 2, 3, 4, param("param3")))
@@ -97,7 +109,7 @@ const InferParamsFromCoalesce = customersTable
 
         return res1;
     })
-    .join('INNER', () => usersTable.as('parentUsers'), (cols, { and, coalesce }) => {
+    .join('INNER', () => usersTable.as('parentUsers'), (cols, { and, coalesce, param }) => {
         const res = and(
             coalesce("asdf", param("coalesceAnd1")).eq("sadf"),
             coalesce(new Date(), param("coalesceAnd2")).eq(new Date())
@@ -124,17 +136,17 @@ type InferParamsFromCoalesceTest = AssertTrue<AssertEqual<InferParamsFromCoalesc
 /**
  * 
  */
-coalesce(empSalaryQC, 100).between(100, 200);
-coalesce(empSalaryQC, 100).between(100, null);
-coalesce(empSalaryQC, null).between(500, null);
+coalesceTester(empSalaryQC, 100).between(100, 200);
+coalesceTester(empSalaryQC, 100).between(100, null);
+coalesceTester(empSalaryQC, null).between(500, null);
 // @ts-expect-error
-coalesce(customerNameQC, "ali").between(100, 500);
-coalesce(customerNameQC, "ali").between(coalesce("adsf"), coalesce("asdfxcv", null));
+coalesceTester(customerNameQC, "ali").between(100, 500);
+coalesceTester(customerNameQC, "ali").between(coalesceTester("adsf"), coalesceTester("asdfxcv", null));
 
 /**
  * 
  */
-const betweenCoalesceParamed = coalesce(customerNameQC, "ali").between(param("betLeft"), coalesce("asdf", param("betRight")));
+const betweenCoalesceParamed = coalesceTester(customerNameQC, "ali").between(paramTester("betLeft"), coalesceTester("asdf", paramTester("betRight")));
 
 type typeofBetweenCoalesceParamed = typeof betweenCoalesceParamed;
 type betweenCoalesceParamedParams = InferParamsFromOps<typeofBetweenCoalesceParamed>;

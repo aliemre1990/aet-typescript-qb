@@ -149,6 +149,10 @@ type caseWithParams_OnlyParamsNoElse_ParamWhen1TypeTest = AssertTrue<AssertEqual
 type caseWithParams_OnlyParamsNoElse_ParamWhen2TypeTest = AssertTrue<AssertEqual<typeof_CaseWithParams_OnlyParamsNoElse_ParamWhen2, number | null>>;
 type caseWithParams_OnlyParamsNoElse_ParamWhen3TypeTest = AssertTrue<AssertEqual<typeof_CaseWithParams_OnlyParamsNoElse_ParamWhen3, number | null>>;
 
+const caseWithNullLiteral = caseTester(customersTable.select((tables) => [tables.customers.id]).where((tables, { param }) => tables.customers.id.eq(param("where"))))
+    .when(paramTester("when1"), literalTester(1))
+    .when(paramTester("when1"), literalTester(null));
+
 const caseWithParams_NonNullResultType = caseTester(customersTable.select((tables) => [tables.customers.id]).where((tables, { param }) => tables.customers.id.eq(param("where"))))
     .when(paramTester("when"), paramTester("then").type<number>())
     .when(1, roundTester(1, 1))
