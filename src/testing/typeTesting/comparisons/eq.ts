@@ -1,7 +1,7 @@
 import type ColumnComparisonOperation from "../../../query/comparisons/_comparisonOperations.js";
 import type QueryParam from "../../../query/param.js";
 import { customerIdQC, empSalaryQC } from "../../_columns.js";
-import { literalTester, paramTester } from "../../_functions.js";
+import { literalTester, paramTester, roundTester } from "../../_functions.js";
 import type { AssertEqual, AssertTrue } from "../_typeTestingUtilities.js";
 
 //
@@ -50,3 +50,9 @@ type typeof_LiteralEqToParamTyped_AppliedParam = typeof_LiteralEqToParamTyped_Ap
 type literalEqToParamTyped_Test = AssertTrue<AssertEqual<typeof_LiteralEqToParamTyped_AppliedParam, number>>;
 // @ts-expect-error
 const literalEqToInvalidParam = literalTester(1).eq(paramTester("num").type<string>());
+
+const functionEqToVal_Valid = roundTester(1, 2).eq(1);
+const functionEqToCol_Valid = roundTester(1, 2).eq(empSalaryQC);
+const functionEqToFunction_Valid = roundTester(1, 2).eq(roundTester(1, paramTester("param")));
+// @ts-expect-error
+const functionEqToVal_Invalid = roundTester(1, 2).eq("ali");

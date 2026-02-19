@@ -72,13 +72,6 @@ const coalesce_InvalidTypedColumn = coalesceTester(customerIdQC, customerNameQC)
 // @ts-expect-error
 const coalesce_InvalidTypedValue = coalesceTester(customerIdQC, "error");
 
-// @ts-expect-error
-const coalesce_InvalidComparison = coalesceTester(customerNameQC).eq(1);
-
-const coalesce_ValidComparison1 = coalesceTester(customerIdQC).eq(1);
-
-const coalesceValidComparison2 = coalesceTester(customerIdQC).eq(customerCreatedByQC);
-
 const coalesce_WithNestedFunction = coalesceTester(
     1,
     2,
