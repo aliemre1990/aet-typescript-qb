@@ -1,13 +1,13 @@
-import type { IComparable } from "../../../query/_interfaces/IComparable.js";
-import type SQLCaseExpression from "../../../query/caseExpression.js";
-import type ColumnSQLFunction from "../../../query/functions/_functions.js";
-import type LiteralValue from "../../../query/literalValue.js";
-import type QueryParam from "../../../query/param.js";
-import type { DbValueTypes } from "../../../table/column.js";
-import { customerIdQC } from "../../_columns.js";
-import { caseTester, jsonBuildObjectTester, literalTester, paramTester, roundTester } from "../../_functions.js";
-import { corporateCustomersTable, customersTable, customerTypesTable, individualCustomersTable } from "../../_tables.js";
-import type { AssertEqual, AssertExtends, AssertTrue } from "../_typeTestingUtilities.js";
+import type { IComparable } from "../../query/_interfaces/IComparable.js";
+import type SQLCaseExpression from "../../query/caseExpression.js";
+import type ColumnSQLFunction from "../../query/functions/_functions.js";
+import type LiteralValue from "../../query/literalValue.js";
+import type QueryParam from "../../query/param.js";
+import type { DbValueTypes } from "../../table/column.js";
+import { customerIdQC } from "../_columns.js";
+import { caseTester, jsonBuildObjectTester, literalTester, paramTester, roundTester } from "../_functions.js";
+import { corporateCustomersTable, customersTable, customerTypesTable, individualCustomersTable } from "../_tables.js";
+import type { AssertEqual, AssertExtends, AssertTrue } from "./_typeTestingUtilities.js";
 
 const caseWithNoBranch = caseTester();
 type typeof_CaseWithNoBranch_ResultType = typeof caseWithNoBranch extends SQLCaseExpression<any, any, any, any, infer TResultType, any, any, any> ? TResultType : any;
