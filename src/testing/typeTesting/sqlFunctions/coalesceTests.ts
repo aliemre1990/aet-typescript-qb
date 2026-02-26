@@ -1,12 +1,8 @@
-import { type PgDbType } from "../../../db.js";
 import type { IComparable } from "../../../query/_interfaces/IComparable.js";
-import type { InferParamsFromOps } from "../../../query/_types/paramAccumulationComparison.js";
-import type ColumnComparisonOperation from "../../../query/comparisons/_comparisonOperations.js";
 import type ColumnSQLFunction from "../../../query/functions/_functions.js";
 import QueryParam from "../../../query/param.js";
 import { customerCreatedByQC, customerIdQC, customerNameQC, empSalaryQC } from "../../_columns.js";
 import { coalesceTester, paramTester } from "../../_functions.js";
-import { customersTable, employeesTable, ordersTable, usersTable } from "../../_tables.js";
 import type { AssertEqual, AssertTrue } from "../_typeTestingUtilities.js";
 
 const coalesce_NonNull = coalesceTester(empSalaryQC, 2000);

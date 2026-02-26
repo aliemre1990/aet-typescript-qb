@@ -1,10 +1,42 @@
 import type { DbType } from "../../db.js";
 import type { DbValueTypes } from "../../table/column.js";
+import type { UndefinedIfLengthZero } from "../../utility/common.js";
 import { queryBuilderContextFactory, type IComparable, type QueryBuilderContext } from "../_interfaces/IComparable.js";
-import type { InferParamsFromComparables } from "../_types/paramAccumulationComparison.js";
 import type QueryParam from "../param.js";
 import QueryBuilder from "../queryBuilder.js";
 import { convertArgsToQueryString } from "../uitlity/common.js";
+
+type ExtractComparisonParams<
+    TComparison
+> =
+    TComparison extends ColumnComparisonOperation<any, any, any, infer TParams> ? TParams : [];
+
+type InferAppliedParams<
+    TApplied extends readonly (DbValueTypes | null | IComparable<any, any, any, any, any, any, any>)[] | undefined
+> = TApplied extends undefined ? [] :
+    TApplied extends readonly [infer First, ...infer Rest] ?
+
+
+    // !!Causes circular reference error when returning ColumnComparisonOperation type!!
+    // First extends  IComparable<any, infer TParams, any, any, any, any, any> ?
+    First extends { params?: infer TParams extends readonly QueryParam<any, any, any, any, any, any>[] | undefined } ?
+
+    Rest extends readonly [any, ...any] ?
+    [...(TParams extends undefined ? [] : TParams), ...InferAppliedParams<Rest>] :
+    TParams extends undefined ? [] : TParams :
+    Rest extends readonly [any, ...any] ?
+    InferAppliedParams<Rest> :
+    [] :
+    [];
+
+
+type InferComparisonParams<
+    TComparing extends IComparable<any, any, any, any, any, any, any>,
+    TApplied extends readonly (DbValueTypes | null | IComparable<any, any, any, any, any, any, any>)[] | undefined
+> = [
+        ...(TComparing extends IComparable<any, infer TParams, any, any, any, any, any> ? TParams extends undefined ? [] : TParams : []),
+        ...InferAppliedParams<TApplied>
+    ];
 
 const comparisonOperations = {
     eq: { name: 'EQ', symbol: "=" },
@@ -33,8 +65,9 @@ type InferValueTypeFromComparable<TDbType extends DbType, T> =
 class ColumnComparisonOperation<
     TDbType extends DbType,
     TComparing extends IComparable<TDbType, any, any, any, any, any, any>,
-    TApplied extends (TValueType | null | IComparable<TDbType, any, any, any, any, any, any>)[] | undefined,
-    TValueType extends DbValueTypes = InferValueTypeFromComparable<TDbType, TComparing>
+    TApplied extends readonly (TValueType | null | IComparable<TDbType, any, any, any, any, any, any>)[] | undefined,
+    TValueType extends DbValueTypes = InferValueTypeFromComparable<TDbType, TComparing>,
+    TParams extends readonly QueryParam<TDbType, string, any, any, any, any>[] | undefined = UndefinedIfLengthZero<InferComparisonParams<TComparing, TApplied>>
 > {
 
     dbType: TDbType;
@@ -42,7 +75,7 @@ class ColumnComparisonOperation<
     comparing: TComparing;
     value?: TApplied
 
-    params?: QueryParam<TDbType, any, any, any, any, any>[];
+    params?: TParams;
 
     buildSQL(context?: QueryBuilderContext) {
         if (context === undefined) {
@@ -87,9 +120,9 @@ class ColumnComparisonOperation<
         this.comparing = comparing;
         this.value = value;
 
-        const tmpParams: QueryParam<TDbType, any, any, any, any, any>[] = [];
+        let tmpParams: readonly QueryParam<TDbType, any, any, any, any, any>[] = [];
         if (comparing.params !== undefined && comparing.params.length > 0) {
-            tmpParams.push(...comparing.params);
+            tmpParams = [...tmpParams, ...comparing.params];
         }
 
         if (value !== undefined && value.length > 0) {
@@ -101,13 +134,13 @@ class ColumnComparisonOperation<
                     Array.isArray(val.params) &&
                     val.params.length > 0
                 ) {
-                    tmpParams.push(...val.params);
+                    tmpParams = [...tmpParams, ...val.params];
                 }
             })
         }
 
         if (tmpParams.length > 0) {
-            this.params = tmpParams;
+            this.params = tmpParams as TParams;
         }
 
     }
@@ -121,5 +154,6 @@ export {
 
 export type {
     ComparisonOperation,
+    ExtractComparisonParams,
     InferValueTypeFromComparable
 }

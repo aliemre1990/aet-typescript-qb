@@ -63,7 +63,7 @@ type JoinSpecsType<TDbType extends DbType> = readonly JoinSpecsItemType<TDbType>
 type GroupBySpecs<TDbType extends DbType> = readonly (ColumnsSelection<TDbType, any, any> | IComparable<TDbType, any, any, any, any, any, any>)[];
 
 type ColumnsSelectionListType<TDbType extends DbType> = { [key: string]: ColumnsSelection<TDbType, any, any> }
-type ComparisonType<TDbType extends DbType> = ColumnComparisonOperation<TDbType, any, any, any> | ColumnLogicalOperation<TDbType, any>;
+type ComparisonType<TDbType extends DbType> = ColumnComparisonOperation<TDbType, any, any, any, any> | ColumnLogicalOperation<TDbType, any, any>;
 
 
 const cteTypes = {
@@ -598,7 +598,7 @@ class QueryBuilder<
         TJoinTable extends QueryBuilder<TDbType, any, any, any, any, any, string, any> ? MapToSubQueryObject<TDbType, TJoinTable> :
         TJoinTable extends CTEObject<TDbType, any, any, any, any, any> ? TJoinTable :
         TJoinTable,
-        TJoinParams extends readonly QueryParam<TDbType, any, any, any, any, any>[] = AccumulateSubQueryParams<TDbType, [TJoinResult], AccumulateComparisonParams<TParams, TCbResult>>,
+        TJoinParams extends readonly QueryParam<TDbType, any, any, any, any, any>[] = AccumulateSubQueryParams<TDbType, [TJoinResult], AccumulateComparisonParams<TCbResult, TParams>>,
         TJoinParamsResult extends readonly QueryParam<TDbType, any, any, any, any, any>[] | undefined = TJoinParams["length"] extends 0 ? undefined : TJoinParams,
         const TJoinAccumulated extends JoinSpecsType<TDbType> = readonly [...(TJoinSpecs extends undefined ? [] : TJoinSpecs), { joinType: TJoinType, table: TJoinResult, comparison: ComparisonType<TDbType> }]
     >(
@@ -723,7 +723,7 @@ class QueryBuilder<
             TJoinSpecs,
             TCTESpecs,
             TResult,
-            AccumulateComparisonParams<TParams, TCbResult>,
+            AccumulateComparisonParams<TCbResult, TParams>,
             TAs,
             TCastType
         > {
@@ -738,7 +738,7 @@ class QueryBuilder<
             TJoinSpecs,
             TCTESpecs,
             TResult,
-            AccumulateComparisonParams<TParams, TCbResult>,
+            AccumulateComparisonParams<TCbResult, TParams>,
             TAs,
             TCastType
         >(
@@ -822,7 +822,7 @@ class QueryBuilder<
         TJoinSpecs,
         TCTESpecs,
         TResult,
-        AccumulateComparisonParams<TParams, TCbResult>,
+            AccumulateComparisonParams<TCbResult, TParams>,
         TAs,
         TCastType
     > {
@@ -836,7 +836,7 @@ class QueryBuilder<
             TJoinSpecs,
             TCTESpecs,
             TResult,
-            AccumulateComparisonParams<TParams, TCbResult>,
+            AccumulateComparisonParams<TCbResult, TParams>,
             TAs,
             TCastType
         >(
