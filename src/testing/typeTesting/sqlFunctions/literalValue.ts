@@ -4,7 +4,7 @@ import type QueryColumn from "../../../query/queryColumn.js";
 import { customerIdQC, empSalaryQC } from "../../_columns.js";
 import { jsonBuildObjectTester, literalTester, paramTester, roundTester } from "../../_functions.js";
 import { customersTable } from "../../_tables.js";
-import type { AssertEqual, AssertTrue } from "../_typeTestingUtilities.js";
+import type { AssertEqual, AssertTrue } from "../../_typeTestingUtilities.js";
 
 const nullLiteral = literalTester(null);
 type typeof_NullLiteral = typeof nullLiteral;

@@ -2,7 +2,7 @@ import type ColumnLogicalOperation from "../../query/logicalOperations.js";
 import type QueryParam from "../../query/param.js";
 import { customerIdQC, empSalaryQC } from "../_columns.js";
 import { andTester, paramTester } from "../_functions.js";
-import type { AssertEqual, AssertTrue } from "./_typeTestingUtilities.js";
+import type { AssertEqual, AssertTrue } from "../_typeTestingUtilities.js";
 
 const logicalAndWithParams_Simple = andTester(customerIdQC.eq(paramTester("customerId")), empSalaryQC.eq(paramTester("employeeSalary")));
 type typeof_LogicalAndWithParams_Simple = typeof logicalAndWithParams_Simple;

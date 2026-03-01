@@ -1,4 +1,4 @@
-import type { IsAny } from "../../utility/common.js";
+import type { IsAny } from "../utility/common.js";
 
 type AssertTrue<T extends true> = T;
 type AssertFalse<T extends false> = T;

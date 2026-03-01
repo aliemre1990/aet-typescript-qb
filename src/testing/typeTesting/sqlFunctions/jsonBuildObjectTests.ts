@@ -2,7 +2,7 @@ import type JSONBuildObjectFunction from "../../../query/functions/jsonFunctions
 import { customerIdQC, customerNameQC } from "../../_columns.js";
 import { customersColumnsSelection } from "../../_columnsSelections.js";
 import { jsonBuildObjectTester, literalTester } from "../../_functions.js";
-import type { AssertEqual, AssertTrue } from "../_typeTestingUtilities.js";
+import type { AssertEqual, AssertTrue } from "../../_typeTestingUtilities.js";
 
 const jsonBuildObject_ColumnsSelection = jsonBuildObjectTester({ ...customersColumnsSelection });
 type typeof_JSONBuildObject_ColumnsSelection = typeof jsonBuildObject_ColumnsSelection;

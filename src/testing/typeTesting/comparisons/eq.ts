@@ -2,7 +2,7 @@ import type ColumnComparisonOperation from "../../../query/comparisons/_comparis
 import type QueryParam from "../../../query/param.js";
 import { customerIdQC, empSalaryQC } from "../../_columns.js";
 import { literalTester, paramTester, roundTester } from "../../_functions.js";
-import type { AssertEqual, AssertTrue } from "../_typeTestingUtilities.js";
+import type { AssertEqual, AssertTrue } from "../../_typeTestingUtilities.js";
 
 //
 const eqToValue = customerIdQC.eq(1);

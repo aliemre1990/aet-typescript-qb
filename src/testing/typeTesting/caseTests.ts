@@ -7,7 +7,7 @@ import type { DbValueTypes } from "../../table/column.js";
 import { customerIdQC } from "../_columns.js";
 import { caseTester, jsonBuildObjectTester, literalTester, paramTester, roundTester } from "../_functions.js";
 import { corporateCustomersTable, customersTable, customerTypesTable, individualCustomersTable } from "../_tables.js";
-import type { AssertEqual, AssertExtends, AssertTrue } from "./_typeTestingUtilities.js";
+import type { AssertEqual, AssertExtends, AssertTrue } from "../_typeTestingUtilities.js";
 
 const caseWithNoBranch = caseTester();
 type typeof_CaseWithNoBranch_ResultType = typeof caseWithNoBranch extends SQLCaseExpression<any, any, any, any, infer TResultType, any, any, any> ? TResultType : any;

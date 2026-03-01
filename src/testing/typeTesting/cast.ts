@@ -5,7 +5,7 @@ import type QueryColumn from "../../query/queryColumn.js";
 import { customerIdQC, empSalaryQC } from "../_columns.js";
 import { arithmeticAdditionTester, jsonBuildObjectTester, literalTester, paramTester, roundTester, sumTester } from "../_functions.js";
 import { customersTable } from "../_tables.js";
-import type { AssertEqual, AssertTrue } from "./_typeTestingUtilities.js";
+import type { AssertEqual, AssertTrue } from "../_typeTestingUtilities.js";
 
 //
 const castNullableNumberQCToDate = empSalaryQC.cast("DATE");

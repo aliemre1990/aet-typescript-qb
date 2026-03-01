@@ -1,6 +1,4 @@
-import type QueryColumn from "../../query/queryColumn.js";
 import { customersTable, ordersTable, shipmentsTable, usersTable } from "../_tables.js";
-import type { AssertEqual, AssertExtends, AssertTrue } from "./_typeTestingUtilities.js";
 
 /**
  * 

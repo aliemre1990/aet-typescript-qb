@@ -3,7 +3,7 @@ import type { AccumulateSubQueryParams } from "../../query/_types/subQueryUtilit
 import type ColumnLogicalOperation from "../../query/logicalOperations.js";
 import QueryBuilder, { from } from "../../query/queryBuilder.js";
 import { customersTable, employeesTable, ordersTable, shipmentsTable, usersTable } from "../_tables.js";
-import type { AssertEqual, AssertTrue } from "./_typeTestingUtilities.js";
+import type { AssertEqual, AssertTrue } from "../_typeTestingUtilities.js";
 
 
 /**

@@ -2,8 +2,8 @@ import type ColumnComparisonOperation from "../../../query/comparisons/_comparis
 import type QueryParam from "../../../query/param.js";
 import { customerIdQC, empSalaryQC } from "../../_columns.js";
 import { customersTable } from "../../_tables.js";
-import type { AssertEqual, AssertTrue } from "../_typeTestingUtilities.js";
 import { paramTester } from "../../_functions.js";
+import type { AssertEqual, AssertTrue } from "../../_typeTestingUtilities.js";
 
 //
 const betweenVal = customerIdQC.between(1, 2);

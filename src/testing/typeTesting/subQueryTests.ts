@@ -1,6 +1,6 @@
 import { from } from "../../query/queryBuilder.js";
 import { customersTable, employeesTable, ordersTable } from "../_tables.js";
-import type { AssertEqual, AssertTrue } from "./_typeTestingUtilities.js";
+import type { AssertEqual, AssertTrue } from "../_typeTestingUtilities.js";
 
 const subQuery = customersTable
     .where((cols, { param }) => cols.customers.id.eq(param("whereparam")))

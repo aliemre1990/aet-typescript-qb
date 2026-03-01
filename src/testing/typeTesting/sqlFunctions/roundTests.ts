@@ -2,7 +2,7 @@ import type ColumnSQLFunction from "../../../query/functions/_functions.js";
 import type QueryParam from "../../../query/param.js";
 import { empSalaryQC } from "../../_columns.js";
 import { paramTester, roundTester } from "../../_functions.js";
-import type { AssertEqual, AssertTrue } from "../_typeTestingUtilities.js";
+import type { AssertEqual, AssertTrue } from "../../_typeTestingUtilities.js";
 
 const roundValues = roundTester(1.55, 1);
 type typeof_RoundValues = typeof roundValues;

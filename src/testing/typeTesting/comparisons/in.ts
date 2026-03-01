@@ -3,7 +3,7 @@ import type QueryParam from "../../../query/param.js";
 import { customerIdQC } from "../../_columns.js";
 import { literalTester, paramTester } from "../../_functions.js";
 import { customersTable, employeesTable } from "../../_tables.js";
-import type { AssertEqual, AssertTrue } from "../_typeTestingUtilities.js";
+import type { AssertEqual, AssertTrue } from "../../_typeTestingUtilities.js";
 
 //
 const inVal = customerIdQC.sqlIn(1, 2, 3);
