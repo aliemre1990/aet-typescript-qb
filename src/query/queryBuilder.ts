@@ -33,6 +33,71 @@ import lte from "./comparisons/lte.js";
 import type { PgColumnType } from "../table/columnTypes.js";
 import { getDbFunctions, getDbOperations } from "./uitlity/dbOperations.js";
 
+type CombineComparableItems<
+    TLeft extends ResultShapeItem<any>,
+    TRight extends ResultShapeItem<any>
+> =
+    TLeft extends IComparable<infer TDbType, infer TParams, infer TValue, infer TFinalValue, infer TDefaultFieldKey, infer TAs, infer TCastType>
+    ? TRight extends IComparable<any, any, infer TValue2, infer TFinalValue2, any, any, any>
+    ? IComparable<
+        TDbType,
+        TParams,
+        TValue | TValue2,
+        TFinalValue | TFinalValue2,
+        TDefaultFieldKey,
+        TAs,
+        TCastType
+    >
+    : never
+    : never;
+type CalculateCombineResultRecursively<
+    TUnionSelectResult extends ResultShape<any>,
+    TSelectResult extends ResultShape<any>
+> =
+    TSelectResult extends readonly [infer SHead, ...infer STail] ?
+    TUnionSelectResult extends readonly [infer UHead, ...infer UTail] ?
+    SHead extends ResultShapeItem<any> ?
+    UHead extends ResultShapeItem<any> ?
+    STail extends readonly [any, ...any[]] ?
+    UTail extends readonly [any, ...any[]] ?
+    readonly [
+        CombineComparableItems<SHead, UHead>,
+        ...CalculateCombineResultRecursively<STail, UTail>
+    ] :
+    [CombineComparableItems<SHead, UHead>] :
+    [CombineComparableItems<SHead, UHead>] :
+    never :
+    never :
+    never :
+    never;
+
+type CalculateCombineResult<
+    TUnionQb extends QueryBuilder<any, any, any, any, MapQueryResultForCombine<any>, any, any, any>,
+    TResult extends ResultShape<any> | undefined
+> = TResult extends ResultShape<any> ?
+    TUnionQb extends QueryBuilder<any, any, any, any, infer TUnionResult, any, any, any> ?
+    TUnionResult extends ResultShape<any> ?
+    CalculateCombineResultRecursively<TUnionResult, TResult> :
+    never :
+    never :
+    never;
+
+type MapQueryResultForCombineRecursively<
+    TResult extends ResultShape<any>
+> =
+    TResult extends readonly [infer First, ...infer Rest] ?
+    First extends IComparable<infer TDbType, any, infer TValueType, any, any, any, any> ?
+    Rest extends readonly [any, ...any[]] ?
+    [IComparable<TDbType, any, any, TValueType extends null ? any : TValueType | null, any, any, any>, ...MapQueryResultForCombineRecursively<Rest>] :
+    [IComparable<TDbType, any, any, TValueType extends null ? any : TValueType | null, any, any, any>] :
+    Rest extends readonly [any, ...any[]] ?
+    [never, ...MapQueryResultForCombineRecursively<Rest>] :
+    [never] :
+    []
+    ;
+type MapQueryResultForCombine<
+    TResult extends ResultShape<any> | undefined,
+> = TResult extends undefined ? never : TResult extends ResultShape<any> ? MapQueryResultForCombineRecursively<TResult> : never;
 
 type ResultShapeItem<TDbType extends DbType> = IComparable<TDbType, any, any, any, any, any, any>;
 type ResultShape<TDbType extends DbType> = readonly ResultShapeItem<TDbType>[];
@@ -822,7 +887,7 @@ class QueryBuilder<
         TJoinSpecs,
         TCTESpecs,
         TResult,
-            AccumulateComparisonParams<TCbResult, TParams>,
+        AccumulateComparisonParams<TCbResult, TParams>,
         TAs,
         TCastType
     > {
@@ -1095,7 +1160,7 @@ class QueryBuilder<
 
     #combine <
         TCombineType extends COMBINE_TYPE,
-        TQbResult extends QueryBuilder<TDbType, any, any, any, any, any, any, any>,
+        TQbResult extends QueryBuilder<TDbType, any, any, any, MapQueryResultForCombine<TResult>, any, any, any>,
         TCombineParams extends readonly QueryParam<TDbType, any, any, any, any, any>[] | undefined = TQbResult extends QueryBuilder<TDbType, any, any, any, any, infer TParams, any, any> ? TParams : never,
         TParamsAccumulated extends readonly QueryParam<TDbType, any, any, any, any, any>[] =
         [
@@ -1112,7 +1177,7 @@ class QueryBuilder<
         TFrom,
         TJoinSpecs,
         TCTESpecs,
-        TResult,
+        CalculateCombineResult<TQbResult, TResult>,
         TFinalParamsAccumulated,
         TAs,
         TCastType
@@ -1142,7 +1207,7 @@ class QueryBuilder<
             TFrom,
             TJoinSpecs,
             TCTESpecs,
-            TResult,
+            CalculateCombineResult<TQbResult, TResult>,
             TFinalParamsAccumulated,
             TAs,
             TCastType
@@ -1156,7 +1221,7 @@ class QueryBuilder<
                 cteSpecs: this.cteSpecs,
                 joinSpecs: this.joinSpecs,
                 whereComparison: this.whereComparison,
-                selectResult: this.selectResult,
+                selectResult: this.selectResult as CalculateCombineResult<TQbResult, TResult>,
                 selectSpecs: this.selectSpecs,
                 groupedColumns: this.groupedColumns,
                 havingSpec: this.havingSpec,
@@ -1167,7 +1232,7 @@ class QueryBuilder<
 
 
     union<
-        TQbResult extends QueryBuilder<TDbType, any, any, any, any, any, any, any>,
+        TQbResult extends QueryBuilder<TDbType, any, any, any, MapQueryResultForCombine<TResult>, any, any, any>,
         TCombineParams extends readonly QueryParam<TDbType, any, any, any, any, any>[] | undefined = TQbResult extends QueryBuilder<TDbType, any, any, any, any, infer TParams, any, any> ? TParams : never,
         TParamsAccumulated extends readonly QueryParam<TDbType, any, any, any, any, any>[] =
         [
@@ -1182,7 +1247,7 @@ class QueryBuilder<
         TFrom,
         TJoinSpecs,
         TCTESpecs,
-        TResult,
+        CalculateCombineResult<TQbResult, TResult>,
         TFinalParamsAccumulated,
         TAs,
         TCastType
@@ -1192,7 +1257,7 @@ class QueryBuilder<
 
 
     unionAll<
-        TQbResult extends QueryBuilder<TDbType, any, any, any, any, any, any, any>,
+        TQbResult extends QueryBuilder<TDbType, any, any, any, MapQueryResultForCombine<TResult>, any, any, any>,
         TCombineParams extends readonly QueryParam<TDbType, any, any, any, any, any>[] | undefined = TQbResult extends QueryBuilder<TDbType, any, any, any, any, infer TParams, any, any> ? TParams : never,
         TParamsAccumulated extends readonly QueryParam<TDbType, any, any, any, any, any>[] =
         [
@@ -1207,7 +1272,7 @@ class QueryBuilder<
         TFrom,
         TJoinSpecs,
         TCTESpecs,
-        TResult,
+        CalculateCombineResult<TQbResult, TResult>,
         TFinalParamsAccumulated,
         TAs,
         TCastType
@@ -1304,5 +1369,6 @@ export type {
     CTEType,
     CTESpecsType,
     COMBINE_TYPE,
-    UNION_TYPE
+    UNION_TYPE,
+    MapQueryResultForCombine
 }

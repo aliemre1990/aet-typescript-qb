@@ -41,7 +41,7 @@ const res3 = withRecursiveAs(
     customersTable.where((tbl, { param }) => tbl.customers.id.eq(param("id"))).select((tbl) => [tbl.customers.id, tbl.customers.name, tbl.customers.createdBy]),
     "UNION", (self) => {
 
-        return employeesTable.select(() => []);
+        return employeesTable.select((tables, { literal }) => [tables.employees.id, tables.employees.name, tables.employees.id]);
     }).from((tbls) => [tbls.rec])
     .select((tbls) => [tbls.rec.id, tbls.rec.name]);
 

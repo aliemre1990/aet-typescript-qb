@@ -6,7 +6,7 @@ import type ColumnsSelection from "./ColumnsSelection.js";
 import { columnsSelectionFactory } from "./ColumnsSelection.js";
 import CTEObject, { CTEObjectEntry } from "./cteObject.js";
 import type QueryParam from "./param.js";
-import { cteTypes, type ResultShape, type UNION_TYPE } from "./queryBuilder.js";
+import { cteTypes, type MapQueryResultForCombine, type ResultShape, type UNION_TYPE } from "./queryBuilder.js";
 import QueryBuilder from "./queryBuilder.js";
 
 function withAs<
@@ -34,7 +34,16 @@ function withRecursiveAs<
     TCTEName extends string,
     const TColumnNames extends readonly string[],
     TAnchorQb extends QueryBuilder<TDbType, any, any, any, ResultShape<TDbType> | undefined, any, any, any>,
-    TRecursivePartResult extends QueryBuilder<TDbType, any, any, any, any, any, any, any>,
+    TRecursivePartResult extends QueryBuilder<
+        TDbType,
+        any,
+        any,
+        any,
+        MapQueryResultForCombine<TAnchorQb extends QueryBuilder<any, any, any, any, infer TResult, any, any, any> ? TResult : never>,
+        any,
+        any,
+        any
+    >,
     TDbType extends DbType = TAnchorQb extends IDbType<infer TDbTypeInner> ? TDbTypeInner : never,
     TFinalCTE extends CTEObject<TDbType, any, any, any, any, any> = MapToCTEObjectForRecursive<TDbType, TCTEName, typeof cteTypes.RECURSIVE, TColumnNames, TAnchorQb>
 >(
