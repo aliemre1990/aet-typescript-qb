@@ -2,7 +2,9 @@ import type { DbType } from "../db.js";
 import type { DbValueTypes } from "../table/column.js";
 import type { PgColumnType } from "../table/columnTypes.js";
 import { IComparableFinalValueDummySymbol, IComparableValueDummySymbol, queryBuilderContextFactory, type DetermineFinalValueType, type DetermineValueType, type IComparable, type QueryBuilderContext } from "./_interfaces/IComparable.js";
+import type { IDbType } from "./_interfaces/IDbType.js";
 import type { IName } from "./_interfaces/IName.js";
+import type { MapToCTEObject, MapToCTEObjectForRecursive } from "./_types/cteUtility.js";
 import between from "./comparisons/between.js";
 import eq from "./comparisons/eq.js";
 import gt from "./comparisons/gt.js";
@@ -12,8 +14,8 @@ import lt from "./comparisons/lt.js";
 import lte from "./comparisons/lte.js";
 import notEq from "./comparisons/notEq.js";
 import type QueryParam from "./param.js";
-import type { CTEType, ResultShape } from "./queryBuilder.js";
-import type QueryBuilder from "./queryBuilder.js";
+import type { CTEType, MapQueryResultForCombine, ResultShape, UNION_TYPE } from "./queryBuilder.js";
+import QueryBuilder, { cteTypes } from "./queryBuilder.js";
 
 type MapResultToCTEObjectEntry<TDbType extends DbType, TComparables extends ResultShape<TDbType>> =
     TComparables extends readonly [infer First, ...infer Rest] ?
@@ -170,10 +172,121 @@ class CTEObject<
     }
 }
 
+
+function withAs<
+    TCTEName extends string,
+    TQb extends QueryBuilder<TDbType, any, any, any, any, any, any, any>,
+    TDbType extends DbType = TQb extends IDbType<infer TDbTypeInner> ? TDbTypeInner : never
+>(as: TCTEName, qb: TQb) {
+    type TCTEObject = MapToCTEObject<TDbType, TCTEName, typeof cteTypes.NON_RECURSIVE, TQb>;
+    type TParams = TQb extends QueryBuilder<TDbType, any, any, any, any, infer TParams, any, any> ? TParams : never;
+
+    const cteObject = new CTEObject(qb.dbType, qb, as, cteTypes.NON_RECURSIVE) as TCTEObject;
+    const cteSpecs = [cteObject] as const;
+
+    return new QueryBuilder<
+        TDbType,
+        undefined,
+        undefined,
+        typeof cteSpecs,
+        undefined,
+        TParams
+    >(qb.dbType, undefined, { cteSpecs });
+}
+
+function withRecursiveAs<
+    TCTEName extends string,
+    const TColumnNames extends readonly string[],
+    TAnchorQb extends QueryBuilder<TDbType, any, any, any, ResultShape<TDbType> | undefined, any, any, any>,
+    TRecursivePartResult extends QueryBuilder<
+        TDbType,
+        any,
+        any,
+        any,
+        MapQueryResultForCombine<TAnchorQb extends QueryBuilder<any, any, any, any, infer TResult, any, any, any> ? TResult : never>,
+        any,
+        any,
+        any
+    >,
+    TDbType extends DbType = TAnchorQb extends IDbType<infer TDbTypeInner> ? TDbTypeInner : never,
+    TFinalCTE extends CTEObject<TDbType, any, any, any, any, any> = MapToCTEObjectForRecursive<TDbType, TCTEName, typeof cteTypes.RECURSIVE, TColumnNames, TAnchorQb>
+>(
+    cteName: TCTEName,
+    columnNames: TColumnNames,
+    anchorQb: TAnchorQb,
+    unionType: UNION_TYPE,
+    recursivePart: (self: TFinalCTE) => TRecursivePartResult
+
+) {
+    // Map anchorqb to cte object with name TCTEName and columns are TColumnsList if specified, else TAnchorQb columns
+    // Pass the cte object to recursive part
+    let cte: TFinalCTE;
+    let finalCTEentries: CTEObjectEntry<TDbType, any, any, any, any, any, any>[] = [];
+    if (columnNames.length === 0) {
+        cte = new CTEObject(anchorQb.dbType, anchorQb, cteName, cteTypes.RECURSIVE) as TFinalCTE;
+    } else {
+        let selectResult = anchorQb.selectResult;
+        if (selectResult === undefined) {
+            throw Error("Column list must match the selected columns.");
+        }
+
+        if (selectResult.length !== columnNames.length) {
+            throw Error("Column list must match the selected columns.");
+        }
+
+        for (let i = 0; i < columnNames.length; i++) {
+            let currName = columnNames[i];
+            let currComp = selectResult[i];
+
+            finalCTEentries.push(new CTEObjectEntry(anchorQb.dbType, currComp, undefined, cteName, currName));
+        }
+
+        cte = new CTEObject(anchorQb.dbType, anchorQb, cteName, cteTypes.RECURSIVE, finalCTEentries) as TFinalCTE;
+    }
+
+    let recursiveQb = recursivePart(cte);
+
+    let finalQb: QueryBuilder<TDbType, any, any, any, any, any, any, any>;
+    if (unionType === "UNION") {
+        finalQb = anchorQb.union(() => recursiveQb);
+    } else {
+        finalQb = anchorQb.unionAll(() => recursiveQb);
+    }
+
+    type TAnchorParams = TAnchorQb extends QueryBuilder<TDbType, any, any, any, any, infer TParams, any, any> ? TParams : never;
+    type TRecursiveParams = TRecursivePartResult extends QueryBuilder<TDbType, any, any, any, any, infer TParams, any, any> ? TParams : never;
+    type TParams = [...(TAnchorParams extends undefined ? [] : TAnchorParams), ...(TRecursiveParams extends undefined ? [] : TRecursiveParams)];
+    type TParamsResult = TParams["length"] extends 0 ? undefined : TParams;
+
+
+    const cteObject = new CTEObject(
+        anchorQb.dbType,
+        finalQb,
+        cteName,
+        cteTypes.RECURSIVE,
+        finalCTEentries.length === 0 ? undefined : finalCTEentries, // Override entries from column list if specified
+        undefined,
+        finalCTEentries.length === 0 ? false : true
+    ) as TFinalCTE;
+    const cteSpecs = [cteObject] as const;
+
+    return new QueryBuilder<
+        TDbType,
+        undefined,
+        undefined,
+        typeof cteSpecs,
+        undefined,
+        TParamsResult
+    >(anchorQb.dbType, undefined, { cteSpecs });
+}
+
+
 export default CTEObject;
 
 export {
-    CTEObjectEntry
+    CTEObjectEntry,
+    withAs,
+    withRecursiveAs
 }
 
 export type {

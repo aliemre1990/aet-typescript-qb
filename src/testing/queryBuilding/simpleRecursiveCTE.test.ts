@@ -1,9 +1,9 @@
 import test from "node:test";
 import assert from "node:assert";
 
-import { withAs, withRecursiveAs } from "../../query/cte.js";
 import { employeesTable } from "../_tables.js";
 import { joinTypes, unionTypes } from "../../query/queryBuilder.js";
+import { withRecursiveAs } from "../../query/cteObject.js";
 
 test.suite("SIMPLE RECURSIVE CTE TESTS", () => {
 

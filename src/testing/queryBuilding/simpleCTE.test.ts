@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert";
 
 import { customersTable } from "../_tables.js";
-import { withAs } from "../../query/cte.js";
+import { withAs } from "../../query/cteObject.js";
 
 test.suite("SIMPLE CTE TESTS", () => {
 

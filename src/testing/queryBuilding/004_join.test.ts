@@ -2,7 +2,8 @@ import test from "node:test";
 import assert from "node:assert";
 
 import { customersTable, orderDetailsTable, ordersTable, shipmentsTable } from "../_tables.js";
-import { withAs } from "../../query/cte.js";
+import { withAs } from "../../query/cteObject.js";
+
 
 test.suite("JOIN TESTS", () => {
     test("Select all from customers with orders and shipments.", () => {

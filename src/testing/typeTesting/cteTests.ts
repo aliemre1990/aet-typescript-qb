@@ -1,4 +1,4 @@
-import { withAs, withRecursiveAs } from "../../query/cte.js";
+import { withAs, withRecursiveAs } from "../../query/cteObject.js";
 import { customersTable, employeesTable, ordersTable } from "../_tables.js";
 
 const res = withAs("customerCte", customersTable.select((tables) => [tables.customers.id]))
