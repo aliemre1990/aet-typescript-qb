@@ -8,3 +8,4 @@ import '../typeTesting/sqlFunctions/coalesceTests.js'
 
 // common
 import '../typeTesting/caseTests.js'
+import '../typeTesting/cteTests.js'
