@@ -2,14 +2,14 @@ import type { DbType } from "../db.js";
 import type { IComparable } from "./_interfaces/IComparable.js";
 import type { FromItemType } from "./queryBuilder.js";
 
-const ColumnsSelectionQueryTableObjectSymbol = Symbol();
+const ColumnsSelectionQueryEntityObjectSymbol = Symbol();
 type ColumnsSelection<
     TDbType extends DbType,
     TQItem extends FromItemType<TDbType>,
     TColumns extends readonly IComparable<TDbType, any, any, any, any, any, any>[]
 > =
     {
-        [ColumnsSelectionQueryTableObjectSymbol]: TQItem;
+        [ColumnsSelectionQueryEntityObjectSymbol]: TQItem;
     } &
     {
         [K in TColumns[number]as K["defaultFieldKey"]]: K;
@@ -21,7 +21,7 @@ function columnsSelectionFactory<TDbType extends DbType>(
 ): ColumnsSelection<TDbType, any, any> {
 
     let res: ColumnsSelection<TDbType, any, any> = {
-        [ColumnsSelectionQueryTableObjectSymbol]: queryObject,
+        [ColumnsSelectionQueryEntityObjectSymbol]: queryObject,
     }
 
     for (const col of columns) {
@@ -34,6 +34,6 @@ function columnsSelectionFactory<TDbType extends DbType>(
 export default ColumnsSelection;
 
 export {
-    ColumnsSelectionQueryTableObjectSymbol,
+    ColumnsSelectionQueryEntityObjectSymbol,
     columnsSelectionFactory
 }

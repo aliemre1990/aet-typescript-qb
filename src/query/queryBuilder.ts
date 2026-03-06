@@ -17,7 +17,7 @@ import type { AccumulateComparisonParams } from "./_types/paramAccumulationCompa
 import type { AccumulateOrderByParams } from "./_types/paramAccumulationOrderBy.js";
 import type { AccumulateColumnParams } from "./_types/paramAccumulationSelect.js";
 import type ColumnsSelection from "./ColumnsSelection.js";
-import { columnsSelectionFactory, ColumnsSelectionQueryTableObjectSymbol } from "./ColumnsSelection.js";
+import { columnsSelectionFactory, ColumnsSelectionQueryEntityObjectSymbol } from "./ColumnsSelection.js";
 import { IComparableFinalValueDummySymbol, IComparableValueDummySymbol, queryBuilderContextFactory, type DetermineFinalValueType, type DetermineValueType, type IComparable, type QueryBuilderContext } from "./_interfaces/IComparable.js";
 import SubQueryObject from "./subQueryObject.js";
 import eq from "./comparisons/eq.js";
@@ -387,8 +387,8 @@ class QueryBuilder<
             } else {
                 selectList = this.selectSpecs
                     .map(sl => {
-                        if (ColumnsSelectionQueryTableObjectSymbol in sl) {
-                            return `"${sl[ColumnsSelectionQueryTableObjectSymbol].asName || sl[ColumnsSelectionQueryTableObjectSymbol].table.name}".*`;
+                        if (ColumnsSelectionQueryEntityObjectSymbol in sl) {
+                            return `"${sl[ColumnsSelectionQueryEntityObjectSymbol].asName || sl[ColumnsSelectionQueryEntityObjectSymbol].table.name}".*`;
                         }
 
                         return sl.buildSQL(context).query;
@@ -606,7 +606,7 @@ class QueryBuilder<
         } else {
             let finalSelectRes: ResultShapeItem<TDbType>[] = [];
             for (const it of selectRes) {
-                if (ColumnsSelectionQueryTableObjectSymbol in it) {
+                if (ColumnsSelectionQueryEntityObjectSymbol in it) {
                     for (const k in it) {
                         let comparable = it[k] as IComparable<TDbType, any, any, any, any, any, any>;
                         finalSelectRes.push(comparable);
