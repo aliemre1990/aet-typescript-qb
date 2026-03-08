@@ -197,7 +197,7 @@ function withAs<
 function withRecursiveAs<
     TCTEName extends string,
     const TColumnNames extends readonly string[],
-    TAnchorQb extends QueryBuilder<TDbType, any, any, any, ResultShape<TDbType> | undefined, any, any, any>,
+    TAnchorQb extends QueryBuilder<TDbType, any, any, any, any, any, any, any>,
     TRecursivePartResult extends QueryBuilder<
         TDbType,
         any,

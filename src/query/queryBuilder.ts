@@ -23,7 +23,7 @@ import SubQueryObject from "./subQueryObject.js";
 import eq from "./comparisons/eq.js";
 import sqlIn from "./comparisons/in.js";
 import between from "./comparisons/between.js";
-import CTEObject, { type CTEObjectEntry } from "./cteObject.js";
+import CTEObject, { CTEObjectEntry } from "./cteObject.js";
 import { mapCTESpecsToSelection } from "./utility.js";
 import notEq from "./comparisons/notEq.js";
 import gt from "./comparisons/gt.js";
@@ -32,6 +32,8 @@ import lt from "./comparisons/lt.js";
 import lte from "./comparisons/lte.js";
 import type { PgColumnType } from "../table/columnTypes.js";
 import { getDbFunctions, getDbOperations } from "./uitlity/dbOperations.js";
+import type { MapToCTEObjectForRecursive } from "./_types/cteUtility.js";
+import type { UndefinedIfLengthZero } from "../utility/common.js";
 
 type CombineComparableItems<
     TLeft extends ResultShapeItem<any>,
@@ -196,7 +198,7 @@ class QueryBuilder<
     TJoinSpecs extends JoinSpecsType<TDbType> | undefined,
     TCTESpecs extends CTESpecsType<TDbType> | undefined,
     TResult extends ResultShape<TDbType> | undefined = undefined,
-    TParams extends readonly QueryParam<TDbType, string, DbValueTypes | null, any, any, any>[] | undefined = undefined,
+    TParams extends readonly QueryParam<TDbType, any, any, any, any, any>[] | undefined = undefined,
     TAs extends string | undefined = undefined,
     TCastType extends PgColumnType | undefined = undefined
 >
@@ -1082,16 +1084,14 @@ class QueryBuilder<
     withAs<
         TCTEName extends string,
         TQb extends QueryBuilder<TDbType, any, any, any, any, any, any, any>,
-        // TCTEObject extends CTEObject<TDbType, any, any, any, any, any> = MapToCTEObject<TDbType, TCTEName, typeof cteTypes.NON_RECURSIVE, TQb>,
         TCTEObject extends CTEObject<TDbType, any, any, any, any, any> = CTEObject<TDbType, TCTEName, typeof cteTypes.NON_RECURSIVE, TQb>,
-        TFinalCTESpec extends CTESpecsType<TDbType> = readonly [...(TCTESpecs extends CTESpecsType<TDbType> ? TCTESpecs : []), TCTEObject],
+        TFinalCTESpec extends readonly CTEObject<TDbType, any, any, any, any, any>[] = readonly [...(TCTESpecs extends CTESpecsType<TDbType> ? TCTESpecs : []), TCTEObject],
         TCTEParams extends readonly QueryParam<TDbType, any, any, any, any, any>[] | undefined = TQb extends QueryBuilder<TDbType, any, any, any, any, infer TParams, any, any> ? TParams : never,
-        TParamsAccumulated extends readonly QueryParam<TDbType, any, any, any, any, any>[] =
-        [
-            ...(TParams extends readonly QueryParam<TDbType, any, any, any, any, any>[] ? TParams : []),
-            ...(TCTEParams extends readonly QueryParam<TDbType, any, any, any, any, any>[] ? TCTEParams : [])
-        ],
-        TFinalParamsAccumulated extends readonly QueryParam<TDbType, any, any, any, any, any>[] | undefined = TParamsAccumulated["length"] extends 0 ? undefined : TParamsAccumulated
+        TParamsAccumulated extends readonly QueryParam<TDbType, any, any, any, any, any>[] | undefined = UndefinedIfLengthZero<
+            [
+                ...(TParams extends readonly QueryParam<TDbType, any, any, any, any, any>[] ? TParams : []),
+                ...(TCTEParams extends readonly QueryParam<TDbType, any, any, any, any, any>[] ? TCTEParams : [])
+            ]>
     >(
         as: TCTEName,
         pick: TQb | ((ctes: MapCtesToSelectionType<TDbType, TCTESpecs>) => TQb)
@@ -1102,7 +1102,7 @@ class QueryBuilder<
             TJoinSpecs,
             TFinalCTESpec,
             TResult,
-            TFinalParamsAccumulated,
+            TParamsAccumulated,
             TAs,
             TCastType
         > {
@@ -1110,13 +1110,13 @@ class QueryBuilder<
         let res;
         if (typeof pick === "function") {
 
-            let cteSpecs: MapCtesToSelectionType<TDbType, TCTESpecs>;
+            let cteSelection: MapCtesToSelectionType<TDbType, TCTESpecs>;
             if (this.cteSpecs === undefined) {
-                cteSpecs = {} as MapCtesToSelectionType<TDbType, TCTESpecs>;
+                cteSelection = {} as MapCtesToSelectionType<TDbType, TCTESpecs>;
             } else {
-                cteSpecs = mapCTESpecsToSelection(this.cteSpecs);
+                cteSelection = mapCTESpecsToSelection(this.cteSpecs);
             }
-            res = pick(cteSpecs);
+            res = pick(cteSelection);
         } else {
             res = pick;
         }
@@ -1137,7 +1137,7 @@ class QueryBuilder<
             TJoinSpecs,
             TFinalCTESpec,
             TResult,
-            TFinalParamsAccumulated,
+            TParamsAccumulated,
             TAs,
             TCastType
         >(
@@ -1155,7 +1155,140 @@ class QueryBuilder<
                 havingSpec: this.havingSpec,
                 orderBySpecs: this.orderBySpecs,
                 combineSpecs: this.combineSpecs
-            });
+            }
+        );
+    }
+
+    withRecursiveAs<
+        TCTEName extends string,
+        const TColumnNames extends readonly string[],
+        TAnchorQb extends QueryBuilder<TDbType, any, any, any, any, any, any, any>,
+        TRecursivePartResult extends QueryBuilder<
+            TDbType,
+            any,
+            any,
+            any,
+            MapQueryResultForCombine<TAnchorQb extends QueryBuilder<any, any, any, any, infer TResult, any, any, any> ? TResult : never>,
+            any,
+            any,
+            any
+        >,
+        TFinalCTE extends CTEObject<TDbType, any, any, any, any, any> = MapToCTEObjectForRecursive<TDbType, TCTEName, typeof cteTypes.RECURSIVE, TColumnNames, TAnchorQb>,
+        TFinalCTESpecs extends readonly CTEObject<TDbType, any, any, any, any, any>[] = readonly [...(TCTESpecs extends CTESpecsType<TDbType> ? TCTESpecs : []), TFinalCTE],
+        TAnchorParams extends readonly QueryParam<TDbType, any, any, any, any>[] | undefined = TAnchorQb extends QueryBuilder<TDbType, any, any, any, any, infer TParams, any, any> ? TParams : never,
+        TRecursiveParams extends readonly QueryParam<TDbType, any, any, any, any>[] | undefined = TRecursivePartResult extends QueryBuilder<TDbType, any, any, any, any, infer TParams, any, any> ? TParams : never,
+        TParamsAccumulated extends readonly QueryParam<TDbType, any, any, any, any>[] | undefined = UndefinedIfLengthZero<[
+            ...(TParams extends undefined ? [] : TParams),
+            ...(TAnchorParams extends undefined ? [] : TAnchorParams),
+            ...(TRecursiveParams extends undefined ? [] : TRecursiveParams)
+        ]>
+    >(
+        cteName: TCTEName,
+        columnNames: TColumnNames,
+        anchorTable: TAnchorQb | ((ctes: MapCtesToSelectionType<TDbType, TCTESpecs>) => TAnchorQb),
+        unionType: UNION_TYPE,
+        recursivePart: (self: TFinalCTE, tables: MapCtesToSelectionType<TDbType, TCTESpecs>) => TRecursivePartResult
+
+    ): QueryBuilder<
+        TDbType,
+        TFrom,
+        TJoinSpecs,
+        TFinalCTESpecs,
+        TResult,
+        TParamsAccumulated,
+        TAs,
+        TCastType
+    > {
+        let cteSelection: MapCtesToSelectionType<TDbType, TCTESpecs>;
+        if (this.cteSpecs === undefined) {
+            cteSelection = {} as MapCtesToSelectionType<TDbType, TCTESpecs>;
+        } else {
+            cteSelection = mapCTESpecsToSelection(this.cteSpecs);
+        }
+
+        let anchorQb;
+        if (typeof anchorTable === "function") {
+            anchorQb = anchorTable(cteSelection);
+        } else {
+            anchorQb = anchorTable;
+        }
+
+        let cte: TFinalCTE;
+        let finalCTEentries: CTEObjectEntry<TDbType, any, any, any, any, any, any>[] = [];
+        if (columnNames.length === 0) {
+            cte = new CTEObject(anchorQb.dbType, anchorQb, cteName, cteTypes.RECURSIVE) as TFinalCTE;
+        } else {
+            let selectResult = anchorQb.selectResult;
+            if (selectResult === undefined) {
+                throw Error("Column list must match the selected columns.");
+            }
+
+            if (selectResult.length !== columnNames.length) {
+                throw Error("Column list must match the selected columns.");
+            }
+
+            for (let i = 0; i < columnNames.length; i++) {
+                let currName = columnNames[i];
+                let currComp = selectResult[i];
+
+                finalCTEentries.push(new CTEObjectEntry(anchorQb.dbType, currComp, undefined, cteName, currName));
+            }
+
+            cte = new CTEObject(anchorQb.dbType, anchorQb, cteName, cteTypes.RECURSIVE, finalCTEentries) as TFinalCTE;
+        }
+
+        let recursiveQb = recursivePart(cte, cteSelection);
+
+        let finalQb: QueryBuilder<TDbType, any, any, any, any, any, any, any>;
+        if (unionType === "UNION") {
+            finalQb = anchorQb.union(() => recursiveQb);
+        } else {
+            finalQb = anchorQb.unionAll(() => recursiveQb);
+        }
+
+
+        const cteObject = new CTEObject(
+            anchorQb.dbType,
+            finalQb,
+            cteName,
+            cteTypes.RECURSIVE,
+            finalCTEentries.length === 0 ? undefined : finalCTEentries, // Override entries from column list if specified
+            undefined,
+            finalCTEentries.length === 0 ? false : true
+        ) as TFinalCTE;
+        let finalCTEs: CTESpecsType<TDbType>;
+        if (this.cteSpecs) {
+            finalCTEs = [...this.cteSpecs, cteObject]
+        } else {
+            finalCTEs = [cteObject];
+        }
+
+        return new QueryBuilder<
+            TDbType,
+            TFrom,
+            TJoinSpecs,
+            TFinalCTESpecs,
+            TResult,
+            TParamsAccumulated,
+            TAs,
+            TCastType
+        >(
+            this.dbType,
+            this.fromSpecs,
+            {
+                asName: this.asName,
+                castType: this.castType,
+                queryType: this.queryType,
+                cteSpecs: finalCTEs as TFinalCTESpecs,
+                joinSpecs: this.joinSpecs,
+                whereComparison: this.whereComparison,
+                selectResult: this.selectResult,
+                groupedColumns: this.groupedColumns,
+                havingSpec: this.havingSpec,
+                orderBySpecs: this.orderBySpecs,
+                combineSpecs: this.combineSpecs
+            }
+        );
     }
 
     #combine <
@@ -1305,7 +1438,8 @@ function from<
     TFrom extends readonly (
         Table<TDbType, any, any> |
         QueryTable<TDbType, any, any, any, any, any> |
-        QueryBuilder<TDbType, any, any, any, any, any, string, any>
+        QueryBuilder<TDbType, any, any, any, any, any, string, any> |
+        CTEObject<TDbType, any, any, any, any, any>
     )[],
     TDbType extends DbType = InferDbTypeFromFromFirstIDbType<TFrom>
 >(...from: TFrom) {
