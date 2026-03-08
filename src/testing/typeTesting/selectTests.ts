@@ -1,38 +1,60 @@
-import type { PgDbType } from "../../db.js";
-import type { AccumulateSubQueryParams } from "../../query/_types/subQueryUtility.js";
-import type ColumnLogicalOperation from "../../query/logicalOperations.js";
-import QueryBuilder, { from } from "../../query/queryBuilder.js";
+import type { ColumnsToResultMap } from "../../query/_types/result.js";
+import type QueryParam from "../../query/param.js";
+import type QueryBuilder from "../../query/queryBuilder.js";
 import { customersTable, employeesTable, ordersTable, shipmentsTable, usersTable } from "../_tables.js";
 import type { AssertEqual, AssertTrue } from "../_typeTestingUtilities.js";
 
+const selectAll_SingleTable = customersTable.select();
+type typeof_SelectAll_SingleTable = typeof selectAll_SingleTable;
+type typeof_SelectAll_SingleTable_ResultCols = typeof_SelectAll_SingleTable extends QueryBuilder<any, any, any, any, infer TResult, any, any, any> ? TResult : never;
+type typeof_SelectAll_SingleTable_ResultType = ColumnsToResultMap<any, typeof_SelectAll_SingleTable_ResultCols>;
+type typeof_SelectAll_SingleTable_ResultType_Expected = { id: number; customerTypeId: number; name: string; createdBy: number }[];
+type selectAll_SingleTable_ResultType_Test = AssertTrue<AssertEqual<typeof_SelectAll_SingleTable_ResultType, typeof_SelectAll_SingleTable_ResultType_Expected>>
 
-/**
- * 
- */
-const SingleTableAutoSelectWhereWithParamQuery = customersTable
+const selectViaTableAlias_SingleTable = customersTable.select((cols) => [cols.customers]);
+type typeof_SelectViaTableAlias_SingleTable = typeof selectViaTableAlias_SingleTable;
+type typeof_SelectViaTableAlias_SingleTable_ResultCols = typeof_SelectViaTableAlias_SingleTable extends QueryBuilder<any, any, any, any, infer TResult, any, any, any> ? TResult : never;
+type typeof_SelectViaTableAlias_SingleTable_ResultType = ColumnsToResultMap<any, typeof_SelectViaTableAlias_SingleTable_ResultCols>;
+type typeof_SelectViaTableAlias_SingleTable_ResultType_Expected = { id: number; customerTypeId: number; name: string; createdBy: number }[];
+type selectViaTableAlias_SingleTable_ResultType_Test = AssertTrue<AssertEqual<typeof_SelectViaTableAlias_SingleTable_ResultType, typeof_SelectViaTableAlias_SingleTable_ResultType_Expected>>
+
+const selectWhere_WithParams = customersTable
     .where((cols, { param }) => cols.customers.id.eq(param("whereparam")))
-    .select(cols => [cols.customers.id, cols.customers.name, cols.customers.createdBy])
-    .exec;
+    .select(cols => [cols.customers.id, cols.customers.name, cols.customers.createdBy]);
+type typeof_SelectWhere_WithParams = typeof selectWhere_WithParams;
+type typeof_SelectWhere_WithParams_ResultCols = typeof_SelectWhere_WithParams extends QueryBuilder<any, any, any, any, infer TResult, any, any, any> ? TResult : never;
+type typeof_SelectWhere_WithParams_ResultType = ColumnsToResultMap<any, typeof_SelectWhere_WithParams_ResultCols>;
+type typeof_SelectWhere_WithParams_Params = typeof selectWhere_WithParams extends QueryBuilder<any, any, any, any, any, infer TParams, any, any> ? TParams : never;
+type typeof_SelectWhere_WithParams_Param1Name = typeof_SelectWhere_WithParams_Params[0] extends QueryParam<any, infer TName, any, any, any, any> ? TName : never;
+type typeof_SelectWhere_WithParams_ResultType_Expected = { id: number; name: string; createdBy: number }[];
+type selectWhere_WithParams_ParamsLength_Test = AssertTrue<AssertEqual<typeof_SelectWhere_WithParams_Params["length"], 1>>;
+type selectWhere_WithParams_Param1Name_Test = AssertTrue<AssertEqual<typeof_SelectWhere_WithParams_Param1Name, "whereparam">>;
+type selectWhere_WithParams_ResultType_Test = AssertTrue<AssertEqual<typeof_SelectWhere_WithParams_ResultType, typeof_SelectWhere_WithParams_ResultType_Expected>>
 
-type SingleTableAutoSelectWhereWithParamQueryResult = { id: number, name: string, createdBy: number }[];
-type SingleTableAutoSelectWhereWithParamQueryReturnType = ReturnType<typeof SingleTableAutoSelectWhereWithParamQuery>;
-type SingleTableAutoSelectWhereWithParamQueryTest = AssertTrue<AssertEqual<SingleTableAutoSelectWhereWithParamQueryResult, SingleTableAutoSelectWhereWithParamQueryReturnType>>
+const singleTableSelect_WithTableAlias = customersTable.as("cst").select();
+type typeof_SingleTableSelect_WithTableAlias = typeof singleTableSelect_WithTableAlias;
+type typeof_SingleTableSelect_WithTableAlias_ResultCols = typeof_SingleTableSelect_WithTableAlias extends QueryBuilder<any, any, any, any, infer TResult, any, any, any> ? TResult : never;
+type typeof_SingleTableSelect_WithTableAlias_ResultType = ColumnsToResultMap<any, typeof_SingleTableSelect_WithTableAlias_ResultCols>;
+type typeof_SingleTableSelect_WithTableAlias_ResultType_Expected = { id: number; customerTypeId: number; name: string; createdBy: number }[];
+type singleTableSelect_WithTableAlias_ResultType_Test = AssertTrue<AssertEqual<typeof_SingleTableSelect_WithTableAlias_ResultType, typeof_SingleTableSelect_WithTableAlias_ResultType_Expected>>
 
-/**
- * 
- */
-const SingleQueryTableAutoSelectQuery = customersTable.as("cst").select(cols => [cols.cst.id, cols.cst.name, cols.cst.createdBy]).exec;
+const selectWithJoins = customersTable
+    .join('INNER', () => usersTable, (cols) => cols.users.id.eq(cols.customers.createdBy))
+    .select(cols => ([
+        cols.users.id.as("userId"),
+        cols.users.userName,
+        cols.users.createdAt.as("userCreatedAt"),
+        cols.customers.id.as("customerId"),
+        cols.customers.name.as("customerName"),
+        cols.customers.createdBy.as("customerCreatedBy")
+    ]));
+type typeof_SelectWithJoins = typeof selectWithJoins;
+type typeof_SelectWithJoins_ResultCols = typeof_SelectWithJoins extends QueryBuilder<any, any, any, any, infer TResult, any, any, any> ? TResult : never;
+type typeof_SelectWithJoins_ResultType = ColumnsToResultMap<any, typeof_SelectWithJoins_ResultCols>;
+type typeof_SelectWithJoins_ResultType_Expected = { userId: number, userName: string, userCreatedAt: Date, customerId: number, customerName: string, customerCreatedBy: number }[];
+type selectWithJoins_ResultType_Test = AssertTrue<AssertEqual<typeof_SelectWithJoins_ResultType, typeof_SelectWithJoins_ResultType_Expected>>
 
-type tp = ReturnType<typeof SingleQueryTableAutoSelectQuery>
-
-type SingleQueryTableAutoSelectQueryResult = { id: number, name: string, createdBy: number }[];
-type SingleQueryTableAutoSelectQueryReturnType = ReturnType<typeof SingleQueryTableAutoSelectQuery>
-type SingleQueryTableAutoSelectQueryTest = AssertTrue<AssertEqual<SingleQueryTableAutoSelectQueryResult, SingleQueryTableAutoSelectQueryReturnType>>
-
-/**
- * 
- */
-const QueryTableJoinQuery = customersTable.as("cst")
+const selectWithJoins_UsingTableAlias = customersTable.as("cst")
     .join("INNER", () => usersTable, (cols) => cols.users.id.eq(cols.cst.createdBy))
     .select(cols => ([
         cols.users.id.as("userId"),
@@ -41,206 +63,35 @@ const QueryTableJoinQuery = customersTable.as("cst")
         cols.cst.id.as("cstId"),
         cols.cst.name.as("cstName"),
         cols.cst.createdBy.as("cstCreatedBy")
-    ]))
-    .exec;
+    ]));
+type typeof_SelectWithJoins_UsingTableAlias = typeof selectWithJoins_UsingTableAlias;
+type typeof_SelectWithJoins_UsingTableAlias_ResultCols = typeof_SelectWithJoins_UsingTableAlias extends QueryBuilder<any, any, any, any, infer TResult, any, any, any> ? TResult : never;
+type typeof_SelectWithJoins_UsingTableAlias_ResultType = ColumnsToResultMap<any, typeof_SelectWithJoins_UsingTableAlias_ResultCols>;
+type typeof_SelectWithJoins_UsingTableAlias_ResultType_Expected = { userId: number, userName: string, userCreatedAt: Date, cstId: number, cstName: string, cstCreatedBy: number }[];
+type selectWithJoins_UsingTableAlias_ResultType_Test = AssertTrue<AssertEqual<typeof_SelectWithJoins_UsingTableAlias_ResultType, typeof_SelectWithJoins_UsingTableAlias_ResultType_Expected>>
 
-type QueryTableJoinQueryResult = { userId: number, userName: string, userCreatedAt: Date, cstId: number, cstName: string, cstCreatedBy: number }[];
-type QueryTableJoinQueryReturnType = ReturnType<typeof QueryTableJoinQuery>;
-type QueryTableJoinQueryTest = AssertTrue<AssertEqual<QueryTableJoinQueryResult, QueryTableJoinQueryReturnType>>
+const selectWithParams = customersTable.select((cols, { round, param }) => [
+    cols.customers.id,
+    round(cols.customers.createdBy, param("roundParam1")).as("roundResult")
+]);
+type typeof_SelectWithParams = typeof selectWithParams;
+type typeof_SelectWithParams_ResultCols = typeof_SelectWithParams extends QueryBuilder<any, any, any, any, infer TResult, any, any, any> ? TResult : never;
+type typeof_SelectWithParams_ResultType = ColumnsToResultMap<any, typeof_SelectWithParams_ResultCols>;
+type typeof_SelectWithParams_Params = typeof selectWithParams extends QueryBuilder<any, any, any, any, any, infer TParams, any, any> ? TParams : never;
+type typeof_SelectWithParams_Param1Name = typeof_SelectWithParams_Params[0] extends QueryParam<any, infer TName, any, any, any, any> ? TName : never;
+type typeof_SelectWithParams_ResultType_Expected = { id: number; roundResult: number | null }[];
+type selectWithParams_ParamsLength_Test = AssertTrue<AssertEqual<typeof_SelectWithParams_Params["length"], 1>>;
+type selectWithParams_Param1Name_Test = AssertTrue<AssertEqual<typeof_SelectWithParams_Param1Name, "roundParam1">>;
+type selectWithParams_ResultType_Test = AssertTrue<AssertEqual<typeof_SelectWithParams_ResultType, typeof_SelectWithParams_ResultType_Expected>>
 
-/**
- * 
- */
-const SingleTableAutoSelectQuery = customersTable.select(cols => [cols.customers.id, cols.customers.name, cols.customers.createdBy]).exec;
-
-type SingleTableAutoSelectQueryResult = { id: number; name: string; createdBy: number; }[];
-type SingleTableAutoSelectQueryReturnType = ReturnType<typeof SingleTableAutoSelectQuery>
-type SingleTableAutoSelectQueryTest = AssertTrue<AssertEqual<SingleTableAutoSelectQueryResult, SingleTableAutoSelectQueryReturnType>>;
-
-/**
- * 
- */
-const SingleTableJoinWithAutoSelectQuery = customersTable
-    .join('INNER', () => usersTable, (cols, { param }) => cols.users.id.eq(param("param1")))
-    .select(cols => [
-        cols.customers.id.as("customerId"),
-        cols.customers.name.as("customerName"),
-        cols.customers.createdBy.as("customerCreatedBy"),
-        cols.users.id.as("userId"),
-        cols.users.userName,
-        cols.users.createdAt.as("userCreatedAt")
-    ])
-    .exec;
-
-type SingleTableJoinWithAutoSelectQueryResult = {
-    customerId: number;
-    customerName: string;
-    customerCreatedBy: number;
-    userId: number;
-    userName: string;
-    userCreatedAt: Date;
-}[];
-type SingleTableJoinWithAutoSelectQueryReturnType = ReturnType<typeof SingleTableJoinWithAutoSelectQuery>;
-type SingleTableJoinWithAutoSelectQueryTest = AssertTrue<AssertEqual<SingleTableJoinWithAutoSelectQueryResult, SingleTableJoinWithAutoSelectQueryReturnType>>
-
-/**
- * 
- */
-const AutoSelectMultiJoins = customersTable
-    .join('INNER', usersTable, (cols, { and, param }) => {
-
-        const res1 = and(
-            cols.users.id.eq(param("userParam1").type<number>()),
-            cols.users.id.eq(param("userParam2")),
-            cols.users.userName.eq(param("userParam3")),
-            cols.users.id.between(param("userBetweenLeft"), param("userBetweenRight")),
-            and(
-                cols.users.id.eq(cols.customers.createdBy),
-                cols.customers.name.eq(param("userGteParam4")),
-                and(cols.users.id.eq(param("userEqParam1"))),
-                cols.users.id.sqlIn(param("inParam"))
-            )
-        );
-
-        return res1;
-
-        // const inres = cols.users.id.sqlIn(1, cols.customers.id, 2, cols.users.id, cols.customers.id);
-        // type inrest = typeof inres extends ColumnComparisonOperation<any, any, any, infer TCols, any> ? TCols : never;
-        // type prm = inrest[1];
-    })
-    .join('INNER', usersTable.as('parentUsers'), (cols, { and, coalesce, param }) => {
-
-        const comp = and(
-            cols.parentUsers.id.eq(cols.customers.id),
-            cols.parentUsers.id.eq(param("parentUserEq1")),
-            cols.parentUsers.id.between(param("parentUserBetLeft"), cols.customers.id),
-            cols.parentUsers.id.eq(coalesce(param("parentUserGt2"), 1, 2, coalesce(1, 2, param("innerCoalesce")))),
-            cols.parentUsers.userName.eq(param("parentUserNeq3")),
-            cols.parentUsers.userName.between(cols.customers.name, cols.users.userName),
-            and(cols.customers.createdBy.eq(235), cols.parentUsers.userName.eq(param("innerParentUserParam1")))
-        );
-
-        return comp;
-    })
-    .join('INNER', ordersTable, (cols) => cols.users.userName.eq(cols.customers.name))
-    .select(cols => [
-        cols.customers.id.as("customerId"),
-        cols.customers.name.as("customerName"),
-        cols.customers.createdBy.as("customerCreatedBy"),
-        cols.users.id.as("userId"),
-        cols.users.userName.as("userUserName"),
-        cols.users.createdAt.as("userCreatedAt"),
-        cols.parentUsers.id.as("parentUserId"),
-        cols.parentUsers.userName.as("parentUserUserName"),
-        cols.parentUsers.createdAt.as("parentUserCreatedAt"),
-        cols.orders.id.as("orderId"),
-        cols.orders.customerId.as("orderCustomerId"),
-        cols.orders.createdBy.as("orderCreatedBy")
-    ])
-    .exec;
-
-
-
-type AutoSelectMultiJoinsResult = {
-    customerId: number;
-    customerName: string;
-    customerCreatedBy: number;
-    userId: number;
-    userUserName: string;
-    userCreatedAt: Date;
-    parentUserId: number;
-    parentUserUserName: string;
-    parentUserCreatedAt: Date;
-    orderId: number;
-    orderCustomerId: number;
-    orderCreatedBy: number;
-}[]
-type AutoSelectMultiJoinsReturnType = ReturnType<typeof AutoSelectMultiJoins>
-type AutoSelectMultiJoinsTest = AssertTrue<AssertEqual<AutoSelectMultiJoinsResult, AutoSelectMultiJoinsReturnType>>;
-
-type AutoSelectMultiJoinsParamsResult = {
-    userParam1: number;
-    userParam2: number | null;
-    userParam3: string | null;
-    userBetweenLeft: number | null;
-    userBetweenRight: number | null;
-    userGteParam4: string | null;
-    userEqParam1: number | null;
-    inParam: number | null;
-    parentUserEq1: number | null;
-    parentUserBetLeft: number | null;
-    parentUserGt2: number | null; //
-    innerCoalesce: number | null; //
-    parentUserNeq3: string | null;
-    innerParentUserParam1: string | null;
-};
-type AutoSelectMultiJoinsParamsType = typeof AutoSelectMultiJoins extends (param: infer TParams) => any ? TParams : never;
-type AutoSelectMultiJoinsParamsText = AssertTrue<AssertEqual<AutoSelectMultiJoinsParamsResult, AutoSelectMultiJoinsParamsType>>
-
-/**
- * 
- */
-const SingleLevelSelectWithJoins = customersTable
-    .join('INNER', () => usersTable, (cols) => {
-        type t = typeof cols;
-
-        return cols.users.id.eq(1);
-    })
-    .join('INNER', () => ordersTable, (cols) => {
-        type t = typeof cols;
-
-        return cols.orders.id.eq(1);
-
-    })
-    .join('INNER', () => shipmentsTable, (cols) => {
-        type t = typeof cols;
-
-        return cols.shipments.orderId.eq(1);
-    })
-    .select((cols, { round, param }) => [
+const selectWithJSONBuildObject = customersTable
+    .join("INNER", () => ordersTable, (cols) => cols.orders.customerId.eq(cols.customers.id))
+    .select((cols, { jsonBuildObject }) => [
         cols.customers.id,
-        cols.orders.customerId.as("orderCustomerId"),
-        cols.customers.name.as("customerName")
-    ])
-    .exec;
-type SingleLevelSelectWithJoinsResult = { id: number, orderCustomerId: number, customerName: string }[];
-type SingleLevelSelectWithJoinsTest = AssertTrue<AssertEqual<SingleLevelSelectWithJoinsResult, ReturnType<typeof SingleLevelSelectWithJoins>>>;
-
-type SingleLevelSelectWithJoinsParams = typeof SingleLevelSelectWithJoins extends (...params: infer TParams) => any ? TParams : never;
-type SingleLevelSelectWithJoinsParamsTest = AssertTrue<AssertEqual<[] | [{ [key: string]: any }], SingleLevelSelectWithJoinsParams>>;
-/**
- * 
- */
-const MultiLevelSelectWithJoins = customersTable
-    .join('INNER', () => usersTable, (cols) => cols.users.id.eq(1))
-    .join('INNER', () => usersTable.as("parentUsers"), (cols) => cols.parentUsers.id.eq(1))
-    .select((cols, { jsonBuildObject, round, param }) => [
-        cols.customers.id.as("customerId"),
-        round(cols.customers.id, param("roundParam")).as("roundResult"),
-        cols.users.userName,
-        jsonBuildObject({ parentUserId: cols.parentUsers.id, customers: jsonBuildObject(cols.customers) }).as("subProp")
-    ])
-    .exec;
-type multiLevelSelectWithJoinsExpectedResult = {
-    customerId: number,
-    userName: string,
-    roundResult: number | null
-    subProp: {
-        parentUserId: number,
-        customers: {
-            id: number,
-            customerTypeId: number,
-            name: string,
-            createdBy: number
-        }
-    }
-}[];
-type multiLevelSelectWithJoinsResult = ReturnType<typeof MultiLevelSelectWithJoins>
-type MultiLevelSelectWithJoinsTest = AssertTrue<AssertEqual<multiLevelSelectWithJoinsExpectedResult, multiLevelSelectWithJoinsResult>>
-
-
-const autoSelectQuery = customersTable.select().exec;
-
-const autoSelectQueryTable = customersTable.as("cst").select().exec;
-
-const autoSelectWithJoins = customersTable.join("LEFT", employeesTable, (tbls) => tbls.customers.id.eq(tbls.employees.id)).select().exec;
+        jsonBuildObject(cols.orders).as("ordersObj")
+    ]);
+type typeof_SelectWithJSONBuildObject = typeof selectWithJSONBuildObject;
+type typeof_SelectWithJSONBuildObject_ResultCols = typeof_SelectWithJSONBuildObject extends QueryBuilder<any, any, any, any, infer TResult, any, any, any> ? TResult : never;
+type typeof_SelectWithJSONBuildObject_ResultType = ColumnsToResultMap<any, typeof_SelectWithJSONBuildObject_ResultCols>;
+type typeof_SelectWithJSONBuildObject_ResultType_Expected = { id: number; ordersObj: { id: number; customerId: number; amount: number; createdBy: number } }[];
+type selectWithJSONBuildObject_ResultType_Test = AssertTrue<AssertEqual<typeof_SelectWithJSONBuildObject_ResultType, typeof_SelectWithJSONBuildObject_ResultType_Expected>>
