@@ -1,8 +1,5 @@
-import { customersTable, ordersTable, shipmentsTable, usersTable } from "../_tables.js";
+import { customersTable } from "../_tables.js";
 
-/**
- * 
- */
-const SimpleOrderByQuery = customersTable
+const orderByValid_Simple = customersTable
     .where((cols, { param }) => cols.customers.id.eq(param("whereparam")))
-    .orderBy(cols => [cols.customers.name, [cols.customers.id, 'ASC']]);
+    .orderBy(cols => [cols.customers.name, [cols.customers.id, 'ASC'], [cols.customers.id, 'DESC']]);
