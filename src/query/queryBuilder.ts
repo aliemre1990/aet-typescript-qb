@@ -16,8 +16,8 @@ import type { AccumulateSubQueryParams, ConvertElementsToSubQueryCompliant, Infe
 import type { AccumulateComparisonParams } from "./_types/paramAccumulationComparison.js";
 import type { AccumulateOrderByParams } from "./_types/paramAccumulationOrderBy.js";
 import type { AccumulateColumnParams } from "./_types/paramAccumulationSelect.js";
-import type ColumnsSelection from "./ColumnsSelection.js";
-import { columnsSelectionFactory, ColumnsSelectionQueryObjectSymbol } from "./ColumnsSelection.js";
+import type ColumnsSelection from "./columnsSelection.js";
+import { columnsSelectionFactory, ColumnsSelectionQueryObjectSymbol } from "./columnsSelection.js";
 import { IComparableFinalValueDummySymbol, IComparableValueDummySymbol, queryBuilderContextFactory, type DetermineFinalValueType, type DetermineValueType, type IComparable, type QueryBuilderContext } from "./_interfaces/IComparable.js";
 import SubQueryObject from "./subQueryObject.js";
 import eq from "./comparisons/eq.js";
