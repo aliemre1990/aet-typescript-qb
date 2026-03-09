@@ -1,102 +1,83 @@
+import type { Query } from "pg";
 import type { IComparable } from "../../query/_interfaces/IComparable.js";
 import { customersTable, employeesTable, shipmentsTable, usersTable } from "../_tables.js";
 import type { AssertEqual, AssertTrue } from "../_typeTestingUtilities.js";
+import type QueryBuilder from "../../query/queryBuilder.js";
+import type { ColumnsToResultMap } from "../../query/_types/result.js";
+import type QueryParam from "../../query/param.js";
 
-/**
- * 
- */
-const SingleTableGroupAutoSelectQuery = customersTable
+const groupBy_SingleTable = customersTable
     .groupBy(cols => [cols.customers.id, cols.customers.name])
     .select(cols => [cols.customers.id, cols.customers.name])
-    .exec;
+    ;
+type typeof_GroupBy_SingleTable = typeof groupBy_SingleTable;
+type typeof_GroupBy_SingleTable_ResultCols = typeof_GroupBy_SingleTable extends QueryBuilder<any, any, any, any, infer TResult, any, any, any> ? TResult : never;
+type typeof_GroupBy_SingleTable_ResultType = ColumnsToResultMap<any, typeof_GroupBy_SingleTable_ResultCols>;
+type typeof_GroupBy_SingleTable_ResultType_Expected = { id: number; name: string; }[];
+type groupBy_SingleTable_ResultType_Test = AssertTrue<AssertEqual<typeof_GroupBy_SingleTable_ResultType, typeof_GroupBy_SingleTable_ResultType_Expected>>
 
-type SingleTableGroupAutoSelectQueryResult = { id: number, name: string }[];
-type SingleTableGroupAutoSelectQueryReturnType = ReturnType<typeof SingleTableGroupAutoSelectQuery>;
-type SingleTableGroupAutoSelectQueryTest = AssertTrue<AssertEqual<SingleTableGroupAutoSelectQueryResult, SingleTableGroupAutoSelectQueryReturnType>>
-
-
-const res = employeesTable.as("emp");
-type typeofcol = typeof res.columns.salary;
-
-/**
- * 
- */
-const MultiTableGroupByQuery = customersTable
+const groupBy_MultipleTable = customersTable
     .join('INNER', () => usersTable, cols => cols.users.id.eq(cols.customers.createdBy))
     .join('INNER', () => shipmentsTable, cols => cols.shipments.id.eq(1))
     .join('INNER', () => employeesTable, cols => cols.shipments.id.eq(1))
     .groupBy(cols => [cols.customers, cols.users.id, cols.shipments, cols.employees.id])
-    .select((cols, { sum, jsonAgg, jsonBuildObject }) => {
+    .select();
+type typeof_GroupBy_MultipleTable = typeof groupBy_MultipleTable;
+type typeof_GroupBy_MultipleTable_ResultCols = typeof_GroupBy_MultipleTable extends QueryBuilder<any, any, any, any, infer TResult, any, any, any> ? TResult : never;
+type typeof_GroupBy_MultipleTable_ResultType = ColumnsToResultMap<any, typeof_GroupBy_MultipleTable_ResultCols>;
+type typeof_GroupBy_MultipleTable_ResultType_Expected = {
+    id: number;
+    customerTypeId: number;
+    name: string;
+    createdBy: number;
+    userName: string;
+    createdAt: Date;
+    orderId: number;
+    managerId: number | null;
+    salary: number | null;
+    deptId: number;
+}[];
+type groupBy_MultipleTable_ResultType_Test = AssertTrue<AssertEqual<typeof_GroupBy_MultipleTable_ResultType, typeof_GroupBy_MultipleTable_ResultType_Expected>>
 
-        type t = (typeof cols.employees.salary);
-
-        return [
-            cols.customers.id.as("customerId"),
-            cols.customers.name.as("customerName"),
-            cols.customers.createdBy.as("customerCreatedBy"),
-            cols.users.id.as("userId"),
-            cols.shipments.id.as("shipmentId"),
-            cols.shipments.orderId.as("shipmentOrderId"),
-            cols.shipments.createdBy.as("shipmentCreatedBy"),
-            sum(cols.employees.salary).as("sumNull"),
-            sum(cols.employees.deptId).as("sumNotNull"),
-            jsonAgg(cols.customers.id).as("jsonAggResult2"),
-            jsonAgg(jsonBuildObject(cols.customers)).as("jsonAggResult3")
-        ]
-    }
-    )
-    .exec;
-
-type MultiTableGroupByQueryResult = {
-    customerId: number,
-    customerName: string,
-    customerCreatedBy: number,
-    userId: number,
-    shipmentId: number,
-    shipmentOrderId: number,
-    shipmentCreatedBy: number,
-    sumNull: number | null,
-    sumNotNull: number,
-    jsonAggResult2: number[],
-    jsonAggResult3: { id: number, name: string, customerTypeId: number, createdBy: number }[]
-}[]
-type MultiTableGroupByQueryReturnType = ReturnType<typeof MultiTableGroupByQuery>;
-
-type MultiTableGroupByQueryTest = AssertTrue<AssertEqual<MultiTableGroupByQueryResult, MultiTableGroupByQueryReturnType>>
-
-/**
- * 
- */
-const GroupByWithMultilevelSelectQuery = customersTable
+const groupBy_Aggregation = customersTable
     .join('INNER', () => usersTable, cols => cols.users.id.eq(cols.customers.createdBy))
     .join('INNER', () => shipmentsTable, cols => cols.shipments.id.eq(1))
-    .groupBy((cols) => {
-        return [cols.customers, cols.users.id, cols.shipments]
-    })
-    .select((cols, { jsonBuildObject }) => [
+    .groupBy(cols => [cols.customers, cols.users.id])
+    .select((cols, { sum }) => [
         cols.customers.id,
-        cols.customers.name.as("customerName"),
-        jsonBuildObject({ id: cols.customers.id, name: cols.customers.name, createdBy: cols.customers.createdBy }).as("customer"),
-        jsonBuildObject({ id: cols.shipments.id, shipment: jsonBuildObject({ id: cols.shipments.id, orderId: cols.shipments.orderId, createdBy: cols.shipments.createdBy }) }).as("example")
-    ])
-    .exec;
+        sum(cols.shipments.orderId).as("totalOrderId")
+    ]);
+type typeof_GroupBy_Aggregation = typeof groupBy_Aggregation;
+type typeof_GroupBy_Aggregation_ResultCols = typeof_GroupBy_Aggregation extends QueryBuilder<any, any, any, any, infer TResult, any, any, any> ? TResult : never;
+type typeof_GroupBy_Aggregation_ResultType = ColumnsToResultMap<any, typeof_GroupBy_Aggregation_ResultCols>;
+type typeof_GroupBy_Aggregation_ResultType_Expected = { id: number; totalOrderId: number; }[];
+type groupBy_Aggregation_ResultType_Test = AssertTrue<AssertEqual<typeof_GroupBy_Aggregation_ResultType, typeof_GroupBy_Aggregation_ResultType_Expected>>
 
-type GroupByWithMultilevelSelectQueryResult = {
-    id: number,
-    customerName: string,
-    customer: { id: number, name: string, createdBy: number },
-    example: { id: number, shipment: { id: number, orderId: number, createdBy: number } }
-}[]
-type GroupByWithMultilevelSelectQueryReturnType = ReturnType<typeof GroupByWithMultilevelSelectQuery>;
-type GroupByWithMultilevelSelectQueryTest = AssertTrue<AssertEqual<GroupByWithMultilevelSelectQueryResult, GroupByWithMultilevelSelectQueryReturnType>>
-
-
-const GroupByHaving = customersTable
+const groupBy_Having = customersTable
     .join('INNER', () => usersTable, cols => cols.users.id.eq(cols.customers.createdBy))
     .join('INNER', () => shipmentsTable, cols => cols.shipments.id.eq(1))
     .groupBy((cols) => {
         return [cols.customers, cols.users.id]
     })
     .having((cols, { param, sum, and }) => and(cols.customers.id.eq(param("havingParam")), sum(cols.shipments.id).eq(param("sumParam"))))
-    .select((cols) => [cols.customers.id])
-    .exec;
+    .select();
+type typeof_GroupBy_Having = typeof groupBy_Having;
+type typeof_GroupBy_Having_ResultCols = typeof_GroupBy_Having extends QueryBuilder<any, any, any, any, infer TResult, any, any, any> ? TResult : never;
+type typeof_GroupBy_Having_ResultType = ColumnsToResultMap<any, typeof_GroupBy_Having_ResultCols>;
+type typeof_GroupBy_Having_Params = typeof_GroupBy_Having extends QueryBuilder<any, any, any, any, any, infer TParams, any, any> ? TParams : never;
+type typeof_GroupBy_Having_Param1Name = typeof_GroupBy_Having_Params[0] extends QueryParam<any, infer TName, any, any, any, any> ? TName : never;
+type typeof_GroupBy_Having_Param2Name = typeof_GroupBy_Having_Params[1] extends QueryParam<any, infer TName, any, any, any, any> ? TName : never;
+type typeof_GroupBy_Having_ResultType_Expected = {
+    id: number;
+    customerTypeId: number;
+    name: string;
+    userName: string;
+    createdAt: Date;
+    orderId: number;
+    createdBy: number;
+}[];
+type groupBy_Having_ResultType_Test = AssertTrue<AssertEqual<typeof_GroupBy_Having_ResultType, typeof_GroupBy_Having_ResultType_Expected>>;
+type groupBy_Having_ParamsLength_Test = AssertTrue<AssertEqual<typeof_GroupBy_Having_Params["length"], 2>>;
+type groupBy_Having_Param1Name_Test = AssertTrue<AssertEqual<typeof_GroupBy_Having_Param1Name, "havingParam">>;
+type groupBy_Having_Param2Name_Test = AssertTrue<AssertEqual<typeof_GroupBy_Having_Param2Name, "sumParam">>;
+
