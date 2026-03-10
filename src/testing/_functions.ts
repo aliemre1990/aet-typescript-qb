@@ -8,6 +8,7 @@ import { generateParamFn } from "../query/param.js";
 import generateSumFn from "../query/aggregation/sum.js";//Keep this below, it causes circullar reference issues.
 import { generateCoalesceFn } from "../query/functions/coalesce.js";
 import { generateAndFn, generateOrFn } from "../query/logicalOperations.js";
+import { generateSqlOperatorFn } from "../query/sqlOperator.js";
 
 const paramTester = generateParamFn(dbTypes.postgresql);
 const literalTester = generateLiteralValueFn(dbTypes.postgresql);
@@ -25,6 +26,8 @@ const coalesceTester = generateCoalesceFn(dbTypes.postgresql);
 const orTester = generateOrFn(dbTypes.postgresql);
 const andTester = generateAndFn(dbTypes.postgresql);
 
+const sqlTester = generateSqlOperatorFn(dbTypes.postgresql);
+
 export {
     orTester,
     andTester,
@@ -35,5 +38,6 @@ export {
     jsonBuildObjectTester,
     roundTester,
     sumTester,
-    arithmeticAdditionTester
+    arithmeticAdditionTester,
+    sqlTester
 }

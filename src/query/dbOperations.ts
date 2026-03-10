@@ -16,6 +16,7 @@ import generateRoundFn from "./functions/round.js"
 import { generateLiteralValueFn } from "./literalValue.js"
 import { generateAndFn, generateOrFn } from "./logicalOperations.js"
 import { generateParamFn } from "./param.js"
+import { generateSqlOperatorFn } from "./sqlOperator.js"
 
 /**
  * Aggregation operations
@@ -69,6 +70,7 @@ function generateCommonFunctions<TDbType extends DbType>(dbType: TDbType) {
         param: generateParamFn(dbType),
         literal: generateLiteralValueFn(dbType),
         sqlCase: generateSQLCaseFn(dbType),
+        sql: generateSqlOperatorFn(dbType),
 
         coalesce: generateCoalesceFn(dbType),
         round: generateRoundFn(dbType),

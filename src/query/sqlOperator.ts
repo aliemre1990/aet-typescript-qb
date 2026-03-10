@@ -1,0 +1,133 @@
+import type { DbType } from "../db.js";
+import type { DbValueTypes } from "../table/column.js";
+import type { PgColumnType } from "../table/columnTypes.js";
+import type { IsExact, UndefinedIfLengthZero } from "../utility/common.js";
+import { IComparableFinalValueDummySymbol, IComparableValueDummySymbol, queryBuilderContextFactory, type DetermineFinalValueType, type DetermineValueType, type IComparable, type QueryBuilderContext } from "./_interfaces/IComparable.js";
+import type ColumnComparisonOperation from "./comparisons/_comparisonOperations.js";
+import between from "./comparisons/between.js";
+import eq from "./comparisons/eq.js";
+import gt from "./comparisons/gt.js";
+import gte from "./comparisons/gte.js";
+import sqlIn from "./comparisons/in.js";
+import lt from "./comparisons/lt.js";
+import lte from "./comparisons/lte.js";
+import notEq from "./comparisons/notEq.js";
+import type ColumnLogicalOperation from "./logicalOperations.js";
+import type QueryParam from "./param.js";
+
+type CalculateSQLParams<
+    TValues extends readonly (IComparable<any, any, any, any, any, any, any> | ColumnComparisonOperation<any, any, any, any, any> | ColumnLogicalOperation<any, any, any> | DbValueTypes | null)[],
+> = TValues extends readonly [infer First, ...infer Rest] ?
+    First extends { params?: infer TParams extends readonly QueryParam<any, any, any, any, any, any>[] | undefined } ?
+    Rest extends readonly [any, ...any[]] ?
+    [...(TParams extends undefined ? [] : TParams), ...CalculateSQLParams<Rest>] :
+    (TParams extends undefined ? [] : TParams) :
+    Rest extends readonly [any, ...any[]] ?
+    CalculateSQLParams<Rest> :
+    [] :
+    [];
+
+const sqlOperatorDefaultColumnName = '';
+type TSQLOperatorDefaultColumnName = typeof sqlOperatorDefaultColumnName;
+
+class SQLOperator<
+    TDbType extends DbType,
+    TValues extends readonly (IComparable<TDbType, any, any, any, any, any, any> | ColumnComparisonOperation<TDbType, any, any, any, any> | ColumnLogicalOperation<TDbType, any, any> | DbValueTypes | null)[],
+    TValueType extends DbValueTypes | null = any,
+    TAs extends string | undefined = undefined,
+    TCastType extends PgColumnType | undefined = undefined,
+    TName extends string = TSQLOperatorDefaultColumnName,
+    TParams extends readonly QueryParam<TDbType, any, any, any, any, any>[] | undefined = UndefinedIfLengthZero<CalculateSQLParams<TValues>>
+> implements IComparable<
+    TDbType,
+    TParams,
+    IsExact<TValueType, null> extends true ? null : DetermineValueType<TCastType, NonNullable<TValueType>>,
+    DetermineFinalValueType<TValueType, DetermineValueType<TCastType, TValueType>>,
+    TName,
+    TAs,
+    TCastType
+
+> {
+    dbType: TDbType;
+
+    [IComparableValueDummySymbol]?: IsExact<TValueType, null> extends true ? null : DetermineValueType<TCastType, NonNullable<TValueType>>;
+    [IComparableFinalValueDummySymbol]?: DetermineFinalValueType<TValueType, DetermineValueType<TCastType, TValueType>>;
+    params?: TParams;
+    defaultFieldKey: TName;
+    asName?: TAs;
+    castType?: TCastType;
+
+    strs: TemplateStringsArray;
+    values: TValues;
+
+
+    eq: typeof eq = eq;
+    notEq: typeof notEq = notEq;
+    gt: typeof gt = gt;
+    gte: typeof gte = gte;
+    lt: typeof lt = lt;
+    lte: typeof lte = lte;
+    sqlIn: typeof sqlIn = sqlIn;
+    between: typeof between = between;
+
+
+
+    constructor(dbType: TDbType, strs: TemplateStringsArray, values: TValues, asName?: TAs, castType?: TCastType) {
+        this.dbType = dbType;
+        this.asName = asName;
+        this.castType = castType;
+
+        this.strs = strs;
+        this.values = values;
+
+        this.defaultFieldKey = 'the value does not matter, try to match TName parameter with sql query result.' as TName;
+    }
+
+    as<TAs extends string>(asName: TAs) {
+        return new SQLOperator<TDbType, TValues, TValueType, TAs, TCastType, TName, TParams>(this.dbType, this.strs, this.values, asName, this.castType);
+    }
+    cast<TCastType extends PgColumnType>(type: TCastType) {
+        return new SQLOperator<TDbType, TValues, TValueType, TAs, TCastType, TName, TParams>(this.dbType, this.strs, this.values, this.asName, type);
+    }
+    specs<TValueType extends DbValueTypes | null, TName extends string = ''>() {
+        return new SQLOperator<TDbType, TValues, TValueType, TAs, TCastType, TName, TParams>(this.dbType, this.strs, this.values, this.asName, this.castType);
+    }
+
+    buildSQL(context?: QueryBuilderContext): { query: string, params: string[] } {
+        if (context === undefined) {
+            context = queryBuilderContextFactory();
+        }
+
+        let query = '';
+
+        this.strs.forEach((str, i) => {
+            const val = this.values[i];
+
+            if (val !== null && typeof val === 'object' && 'buildSQL' in val) {
+                const built = val.buildSQL(context);
+                query += `${str}${built.query}`;
+            } else {
+                query += `${str}${this.values[i]}`;
+            }
+        });
+
+        return { query, params: context.params };
+    }
+}
+
+
+function generateSqlOperatorFn<
+    TDbType extends DbType
+>(dbType: TDbType) {
+    return function <
+        TValues extends readonly (IComparable<TDbType, any, any, any, any, any, any> | ColumnComparisonOperation<TDbType, any, any, any, any> | ColumnLogicalOperation<TDbType, any, any> | DbValueTypes | null)[]
+    >(strs: TemplateStringsArray, ...values: TValues): SQLOperator<TDbType, TValues> {
+        return new SQLOperator(dbType, strs, values);
+    }
+}
+
+export default SQLOperator;
+
+export {
+    generateSqlOperatorFn
+}

@@ -15,6 +15,7 @@ import type generateRoundFn from "../functions/round.js"
 import type { generateLiteralValueFn } from "../literalValue.js"
 import type { generateAndFn, generateOrFn, } from "../logicalOperations.js"
 import type { generateParamFn } from "../param.js"
+import type { generateSqlOperatorFn } from "../sqlOperator.js"
 
 type PgArithmeticAddition = ReturnType<typeof generateArithmeticAddition<PgDbType>>;
 type MySQLArithmeticAddition = ReturnType<typeof generateArithmeticAddition<MySQLDbType>>;
@@ -52,6 +53,9 @@ type PgCoalesceFn = ReturnType<typeof generateCoalesceFn<PgDbType>>;
 type MySQLCoalesceFn = ReturnType<typeof generateCoalesceFn<MySQLDbType>>;
 type PgRoundFn = ReturnType<typeof generateRoundFn<PgDbType>>;
 type MySQLRoundFn = ReturnType<typeof generateRoundFn<MySQLDbType>>;
+
+type PgSQLFn = ReturnType<typeof generateSqlOperatorFn<PgDbType>>;
+type MySQLSQLFn = ReturnType<typeof generateSqlOperatorFn<MySQLDbType>>;
 
 
 
@@ -100,6 +104,7 @@ type DbFunctions<TDbType extends DbType> =
         param: TDbType extends PgDbType ? PgParamFn : TDbType extends MySQLDbType ? MySQLParamFn : never;
         literal: TDbType extends PgDbType ? PgLiteralFn : TDbType extends MySQLDbType ? MySQLLiteralFn : never;
         sqlCase: TDbType extends PgDbType ? PgCaseFn : TDbType extends MySQLDbType ? MySQLCaseFn : never;
+        sql: TDbType extends PgDbType ? PgSQLFn : TDbType extends MySQLDbType ? MySQLSQLFn : never;
     } &
     {
         coalesce: TDbType extends PgDbType ? PgCoalesceFn : TDbType extends MySQLDbType ? MySQLCoalesceFn : never,
