@@ -100,16 +100,26 @@ class SQLOperator<
 
         let query = '';
 
-        this.strs.forEach((str, i) => {
+        for (let i = 0; i < this.strs.length; i++) {
             const val = this.values[i];
+            const str = this.strs[i];
+
+            if (i === this.strs.length - 1) {
+                query = `${query}${str}`;
+                break;
+            }
 
             if (val !== null && typeof val === 'object' && 'buildSQL' in val) {
                 const built = val.buildSQL(context);
-                query += `${str}${built.query}`;
+                query = `${query}${str}${built.query}`;
             } else {
-                query += `${str}${this.values[i]}`;
+                query = `${query}${str}${this.values[i]}`;
             }
-        });
+        };
+
+        if (this.asName) {
+            query = `${query} AS "${this.asName}"`;
+        }
 
         return { query, params: context.params };
     }
