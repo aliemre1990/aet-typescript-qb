@@ -14,6 +14,7 @@ import lte from "./comparisons/lte.js";
 import notEq from "./comparisons/notEq.js";
 import type ColumnLogicalOperation from "./logicalOperations.js";
 import type QueryParam from "./param.js";
+import { convertValueToQueryString } from "./uitlity/common.js";
 
 type CalculateSQLParams<
     TValues extends readonly (IComparable<any, any, any, any, any, any, any> | ColumnComparisonOperation<any, any, any, any, any> | ColumnLogicalOperation<any, any, any> | DbValueTypes | null)[],
@@ -113,7 +114,8 @@ class SQLOperator<
                 const built = val.buildSQL(context);
                 query = `${query}${str}${built.query}`;
             } else {
-                query = `${query}${str}${this.values[i]}`;
+                const arg = convertValueToQueryString(this.values[i]);
+                query = `${query}${str}${arg}`;
             }
         };
 
