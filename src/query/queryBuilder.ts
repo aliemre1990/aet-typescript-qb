@@ -1268,9 +1268,9 @@ class QueryBuilder<
         >,
         TFinalCTE extends CTEObject<TDbType, any, any, any, any, any> = MapToCTEObjectForRecursive<TDbType, TCTEName, typeof cteTypes.RECURSIVE, TColumnNames, TAnchorQb>,
         TFinalCTESpecs extends readonly CTEObject<TDbType, any, any, any, any, any>[] = readonly [...(TCTESpecs extends CTESpecsType<TDbType> ? TCTESpecs : []), TFinalCTE],
-        TAnchorParams extends readonly QueryParam<TDbType, any, any, any, any>[] | undefined = TAnchorQb extends QueryBuilder<TDbType, any, any, any, any, infer TParams, any, any> ? TParams : never,
-        TRecursiveParams extends readonly QueryParam<TDbType, any, any, any, any>[] | undefined = TRecursivePartResult extends QueryBuilder<TDbType, any, any, any, any, infer TParams, any, any> ? TParams : never,
-        TParamsAccumulated extends readonly QueryParam<TDbType, any, any, any, any>[] | undefined = UndefinedIfLengthZero<[
+        TAnchorParams extends readonly QueryParam<TDbType, any, any, any, any, any>[] | undefined = TAnchorQb extends QueryBuilder<TDbType, any, any, any, any, infer TParams, any, any> ? TParams : never,
+        TRecursiveParams extends readonly QueryParam<TDbType, any, any, any, any, any>[] | undefined = TRecursivePartResult extends QueryBuilder<TDbType, any, any, any, any, infer TParams, any, any> ? TParams : never,
+        TParamsAccumulated extends readonly QueryParam<TDbType, any, any, any, any, any>[] | undefined = UndefinedIfLengthZero<[
             ...(TParams extends undefined ? [] : TParams),
             ...(TAnchorParams extends undefined ? [] : TAnchorParams),
             ...(TRecursiveParams extends undefined ? [] : TRecursiveParams)
