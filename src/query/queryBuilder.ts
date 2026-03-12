@@ -142,7 +142,14 @@ const cteTypes = {
     }
 } as const;
 type CTEType = (typeof cteTypes)[keyof typeof cteTypes];
-type CTESpecsType<TDbType extends DbType> = readonly CTEObject<TDbType, string, CTEType, any, readonly CTEObjectEntry<TDbType, any, any, any, string, string | undefined, any>[], any>[];
+type CTESpecsType<TDbType extends DbType> = readonly CTEObject<
+    TDbType,
+    string,
+    CTEType,
+    QueryBuilder<TDbType, any, any, any, any, QueryParam<TDbType, any, any, any, any, any>[] | undefined, any, any>,
+    readonly CTEObjectEntry<TDbType, any, any, any, string, string | undefined, any>[],
+    any
+>[];
 
 type GetFirstTypeFromResult<TDbType extends DbType, TResult extends ResultShape<TDbType> | undefined> =
     TResult extends undefined ? never :
@@ -283,6 +290,92 @@ class QueryBuilder<
         this.queryType = data?.queryType;
 
         this.defaultFieldKey = data?.selectResult !== undefined && data.selectResult.length > 0 ? data.selectResult[0].defaultFieldKey : "";
+
+        let tmpParams: readonly QueryParam<TDbType, any, any, any, any, any>[] = [];
+        if (this.cteSpecs) {
+            for (let i = 0; i < this.cteSpecs.length; i++) {
+                let currCTE = this.cteSpecs[i];
+                if (currCTE.qb.params) {
+                    tmpParams = [...tmpParams, ...currCTE.qb.params];
+                }
+            }
+        }
+
+        if (this.fromSpecs) {
+            for (let i = 0; i < this.fromSpecs.length; i++) {
+                let currFrom = this.fromSpecs[i];
+                // Params from CTEObject is already accumulated in cteSpecs loop, so we only need to check for SubQueryObject here.
+                // if ((currFrom instanceof CTEObject || currFrom instanceof SubQueryObject) && currFrom.qb.params) {
+                if (currFrom instanceof SubQueryObject && currFrom.qb.params) {
+                    tmpParams = [...tmpParams, ...currFrom.qb.params];
+                }
+            }
+        }
+
+        if (this.joinSpecs) {
+            for (let i = 0; i < this.joinSpecs.length; i++) {
+                let currJoin = this.joinSpecs[i];
+                if ((currJoin.table instanceof CTEObject || currJoin.table instanceof SubQueryObject) && currJoin.table.qb.params) {
+                    tmpParams = [...tmpParams, ...currJoin.table.qb.params];
+                }
+
+                if (currJoin.comparison.params) {
+                    tmpParams = [...tmpParams, ...currJoin.comparison.params];
+                }
+            }
+        }
+
+        if (this.selectResult) {
+            for (let i = 0; i < this.selectResult.length; i++) {
+                let currSelect = this.selectResult[i];
+                if (currSelect.params) {
+                    tmpParams = [...tmpParams, ...currSelect.params];
+                }
+            }
+        }
+
+        if (this.whereComparison?.params) {
+            tmpParams = [...tmpParams, ...this.whereComparison.params];
+        }
+
+        if (this.groupedColumns) {
+            for (let i = 0; i < this.groupedColumns.length; i++) {
+                let currGroup = this.groupedColumns[i];
+                if (currGroup.params) {
+                    tmpParams = [...tmpParams, ...currGroup.params];
+                }
+            }
+        }
+
+        if (this.havingSpec?.params) {
+            tmpParams = [...tmpParams, ...this.havingSpec.params];
+        }
+
+        if (this.orderBySpecs) {
+            for (let i = 0; i < this.orderBySpecs.length; i++) {
+                let currOrder = this.orderBySpecs[i];
+                if (Array.isArray(currOrder)) {
+                    if (currOrder[0].params) {
+                        tmpParams = [...tmpParams, ...currOrder[0].params];
+                    }
+                } else {
+                    if (currOrder.params) {
+                        tmpParams = [...tmpParams, ...currOrder.params];
+                    }
+                }
+            }
+        }
+
+        if (this.combineSpecs) {
+            for (let i = 0; i < this.combineSpecs.length; i++) {
+                let currCombine = this.combineSpecs[i];
+                if (currCombine.qb.params) {
+                    tmpParams = [...tmpParams, ...currCombine.qb.params];
+                }
+            }
+        }
+
+        this.params = tmpParams as TParams;
     }
 
     as<TAs extends string>(asName: TAs) {
