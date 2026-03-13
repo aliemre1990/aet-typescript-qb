@@ -14,7 +14,8 @@ import lt from "./comparisons/lt.js";
 import lte from "./comparisons/lte.js";
 import notEq from "./comparisons/notEq.js";
 import type ColumnLogicalOperation from "./logicalOperations.js";
-import type QueryParam from "./param.js";
+import type { ExtractParams } from "./param.js";
+import QueryParam from "./param.js";
 
 type MapQueryParamToType<TQP extends QueryParam<any, any, any, any, any, any>, TValueType extends DbValueTypes | null> =
     TQP extends QueryParam<infer TDbType, infer TName, any, infer TAs, infer TDefaultFieldKey, infer TCastType> ?
@@ -89,21 +90,15 @@ type AccumulateWhenParams<
     ][] | undefined,
 > = TWhenExpressions extends readonly [infer First, ...infer Rest] ?
     First extends readonly [infer TWhen, infer TThen] ?
-    TThen extends IComparable<any, infer TThenParams, any, any, any, any, any> ?
-    TWhen extends IComparable<any, infer TWhenParams, any, any, any, any, any> ?
-    Rest extends readonly [any, ...any] ?
-    [...(TWhenParams extends undefined ? [] : TWhenParams), ...(TThenParams extends undefined ? [] : TThenParams), ...AccumulateWhenParams<TMainExpression, Rest>] :
-    [...(TWhenParams extends undefined ? [] : TWhenParams), ...(TThenParams extends undefined ? [] : TThenParams)] :
     TWhen extends (ColumnComparisonOperation<any, any, any, any, any> | ColumnLogicalOperation<any, any, any>) ?
     Rest extends readonly [any, ...any] ?
-    [...(TThenParams extends undefined ? [] : TThenParams), ...(AccumulateComparisonParams<TWhen>), ...AccumulateWhenParams<TMainExpression, Rest>] :
-    [...(TThenParams extends undefined ? [] : TThenParams), ...(AccumulateComparisonParams<TWhen>)] :
-    Rest extends readonly [any, ...any] ?
-    [...(TThenParams extends undefined ? [] : TThenParams), ...AccumulateWhenParams<TMainExpression, Rest>] :
-    [...(TThenParams extends undefined ? [] : TThenParams)] :
+    [...(AccumulateComparisonParams<TWhen>), ...(ExtractParams<TThen>), ...AccumulateWhenParams<TMainExpression, Rest>] :
+    [...(AccumulateComparisonParams<TWhen>), ...(ExtractParams<TThen>)] :
+    Rest extends readonly [any, ...any[]] ?
+    [...(ExtractParams<TWhen>), ...(ExtractParams<TThen>), ...AccumulateWhenParams<TMainExpression, Rest>] :
+    [...(ExtractParams<TWhen>), ...(ExtractParams<TThen>)] :
     Rest extends readonly [any, ...any] ?
     [...AccumulateWhenParams<TMainExpression, Rest>] :
-    [] :
     [] :
     [];
 
@@ -116,9 +111,9 @@ type AccumulateCaseParams<
     ][] | undefined,
 > =
     [
-        ...(TMainExpression extends IComparable<any, infer TParams, any, any, any, any, any> ? TParams extends undefined ? [] : TParams : []),
+        ...(ExtractParams<TMainExpression>),
         ...(TWhenExpressions extends undefined ? [] : AccumulateWhenParams<TMainExpression, TWhenExpressions>),
-        ...(TElseExpression extends IComparable<any, infer TParams, any, any, any, any, any> ? TParams extends undefined ? [] : TParams : [])
+        ...(ExtractParams<TElseExpression>)
     ];
 
 type InferMainExpressionType<TMainExpression> =
@@ -243,6 +238,8 @@ class SQLCaseExpression<
         let tmpParams: readonly QueryParam<TDbType, any, any, any, any, any>[] = [];
         if (mainExpression?.params !== undefined && mainExpression.params.length > 0) {
             tmpParams = [...mainExpression.params];
+        } else if (mainExpression instanceof QueryParam) {
+            tmpParams = [mainExpression];
         }
 
         if (tmpParams.length > 0) {

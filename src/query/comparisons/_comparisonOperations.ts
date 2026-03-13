@@ -2,7 +2,8 @@ import type { DbType } from "../../db.js";
 import type { DbValueTypes } from "../../table/column.js";
 import type { UndefinedIfLengthZero } from "../../utility/common.js";
 import { queryBuilderContextFactory, type IComparable, type QueryBuilderContext } from "../_interfaces/IComparable.js";
-import type QueryParam from "../param.js";
+import type { ExtractParams } from "../param.js";
+import QueryParam from "../param.js";
 import QueryBuilder from "../queryBuilder.js";
 import { convertArgsToQueryString } from "../uitlity/common.js";
 
@@ -16,17 +17,9 @@ type InferAppliedParams<
 > = TApplied extends undefined ? [] :
     TApplied extends readonly [infer First, ...infer Rest] ?
 
-
-    // !!Causes circular reference error when returning ColumnComparisonOperation type!!
-    // First extends  IComparable<any, infer TParams, any, any, any, any, any> ?
-    First extends { params?: infer TParams extends readonly QueryParam<any, any, any, any, any, any>[] | undefined } ?
-
     Rest extends readonly [any, ...any] ?
-    [...(TParams extends undefined ? [] : TParams), ...InferAppliedParams<Rest>] :
-    TParams extends undefined ? [] : TParams :
-    Rest extends readonly [any, ...any] ?
-    InferAppliedParams<Rest> :
-    [] :
+    [...ExtractParams<First>, ...InferAppliedParams<Rest>] :
+    ExtractParams<First> :
     [];
 
 
@@ -135,6 +128,8 @@ class ColumnComparisonOperation<
                     val.params.length > 0
                 ) {
                     tmpParams = [...tmpParams, ...val.params];
+                } else if (val instanceof QueryParam) {
+                    tmpParams = [...tmpParams, val];
                 }
             })
         }

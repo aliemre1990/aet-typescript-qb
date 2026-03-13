@@ -5,7 +5,7 @@ import { customersTable, ordersTable } from "../_tables.js";
 import { from } from "../../query/queryBuilder.js";
 import { withAs } from "../../query/cteObject.js";
 
-test.suite("SIMPLE SELECT TESTS", () => {
+test.suite("Param accumulation tests.", () => {
 
     // test("Should 'params' value exist in queryBuilder object.", () => {
     //     const qb = customersTable.select((tables, { param }) => [param("param").as("param")]);

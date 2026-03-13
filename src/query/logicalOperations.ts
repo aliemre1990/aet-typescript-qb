@@ -2,7 +2,7 @@ import { type DbType } from "../db.js";
 import type { UndefinedIfLengthZero } from "../utility/common.js";
 import { queryBuilderContextFactory, type QueryBuilderContext } from "./_interfaces/IComparable.js";
 import ColumnComparisonOperation from "./comparisons/_comparisonOperations.js";
-import type QueryParam from "./param.js";
+import QueryParam from "./param.js";
 
 type InferLogicalOperationParams<
     TComparisons extends readonly (ColumnComparisonOperation<any, any, any, any, any> | ColumnLogicalOperation<any, any, any>)[],
@@ -54,6 +54,8 @@ class ColumnLogicalOperation<
                 comp.params.length > 0
             ) {
                 tmpParams = [...tmpParams, ...comp.params];
+            } else if (comp instanceof QueryParam) {
+                tmpParams = [...tmpParams, comp];
             }
         })
 

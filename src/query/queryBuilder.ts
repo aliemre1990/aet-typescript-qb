@@ -9,7 +9,7 @@ import type { ColumnsToResultMap, QueryParamsToObject, SelectToAllColumnsMapRecu
 import QueryTable from "./queryTable.js";
 import type Column from "../table/column.js";
 import type { DbFunctions, DbOperators } from "./_types/ops.js";
-import type QueryParam from "./param.js";
+import QueryParam from "./param.js";
 import type { DbValueTypes } from "../table/column.js";
 import type { IDbType } from "./_interfaces/IDbType.js";
 import type { AccumulateSubQueryParams, ConvertElementsToSubQueryCompliant, InferDbTypeFromFromFirstIDbType, MapToSubQueryObject } from "./_types/subQueryUtility.js";
@@ -34,16 +34,17 @@ import type { PgColumnType } from "../table/columnTypes.js";
 import { getDbFunctions, getDbOperations } from "./uitlity/dbOperations.js";
 import type { MapToCTEObjectForRecursive } from "./_types/cteUtility.js";
 import type { UndefinedIfLengthZero } from "../utility/common.js";
+import type { ExtractParams } from "./param.js";
 
 type CombineComparableItems<
     TLeft extends ResultShapeItem<any>,
     TRight extends ResultShapeItem<any>
 > =
-    TLeft extends IComparable<infer TDbType, infer TParams, infer TValue, infer TFinalValue, infer TDefaultFieldKey, infer TAs, infer TCastType>
+    TLeft extends IComparable<infer TDbType, any, infer TValue, infer TFinalValue, infer TDefaultFieldKey, infer TAs, infer TCastType>
     ? TRight extends IComparable<any, any, infer TValue2, infer TFinalValue2, any, any, any>
     ? IComparable<
         TDbType,
-        TParams,
+        UndefinedIfLengthZero<ExtractParams<TLeft>>,
         TValue | TValue2,
         TFinalValue | TFinalValue2,
         TDefaultFieldKey,
@@ -330,6 +331,8 @@ class QueryBuilder<
                 let currSelect = this.selectResult[i];
                 if (currSelect.params) {
                     tmpParams = [...tmpParams, ...currSelect.params];
+                } else if (currSelect instanceof QueryParam) {
+                    tmpParams = [...tmpParams, currSelect];
                 }
             }
         }
@@ -609,7 +612,7 @@ class QueryBuilder<
         TJoinSpecs,
         TCTESpecs,
         TCbResult["length"] extends 0 ? SelectToAllColumnsMapRecursively<TDbType, TFrom, TJoinSpecs> : TFinalResult,
-        TCbResult["length"] extends 0 ? TParams : AccumulateColumnParams<TParams, TFinalResult>,
+        TCbResult["length"] extends 0 ? TParams : UndefinedIfLengthZero<AccumulateColumnParams<TParams, TFinalResult>>,
         TAs,
         TCastType
     >
@@ -627,7 +630,7 @@ class QueryBuilder<
         TJoinSpecs,
         TCTESpecs,
         TCbResult["length"] extends 0 ? SelectToAllColumnsMapRecursively<TDbType, TFrom, TJoinSpecs> : TFinalResult,
-        TCbResult["length"] extends 0 ? TParams : AccumulateColumnParams<TParams, TFinalResult>,
+        TCbResult["length"] extends 0 ? TParams : UndefinedIfLengthZero<AccumulateColumnParams<TParams, TFinalResult>>,
         TAs,
         TCastType
     > {
@@ -677,7 +680,7 @@ class QueryBuilder<
                 TJoinSpecs,
                 TCTESpecs,
                 TCbResult["length"] extends 0 ? SelectToAllColumnsMapRecursively<TDbType, TFrom, TJoinSpecs> : TFinalResult,
-                TCbResult["length"] extends 0 ? TParams : AccumulateColumnParams<TParams, TFinalResult>,
+                TCbResult["length"] extends 0 ? TParams : UndefinedIfLengthZero<AccumulateColumnParams<TParams, TFinalResult>>,
                 TAs,
                 TCastType
             >(
@@ -717,7 +720,7 @@ class QueryBuilder<
                 TJoinSpecs,
                 TCTESpecs,
                 TCbResult["length"] extends 0 ? SelectToAllColumnsMapRecursively<TDbType, TFrom, TJoinSpecs> : TFinalResult,
-                TCbResult["length"] extends 0 ? TParams : AccumulateColumnParams<TParams, TFinalResult>,
+                TCbResult["length"] extends 0 ? TParams : UndefinedIfLengthZero<AccumulateColumnParams<TParams, TFinalResult>>,
                 TAs,
                 TCastType
             >(

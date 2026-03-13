@@ -5,7 +5,7 @@ import between from "../comparisons/between.js";
 import eq from "../comparisons/eq.js";
 import sqlIn from "../comparisons/in.js";
 import type { InferParamsFromFnArgs } from "../_types/inferParamsFromArgs.js";
-import type QueryParam from "../param.js";
+import QueryParam from "../param.js";
 import notEq from "../comparisons/notEq.js";
 import gt from "../comparisons/gt.js";
 import gte from "../comparisons/gte.js";
@@ -134,6 +134,8 @@ class BasicColumnAggregationOperation<
                 arg.params.length > 0
             ) {
                 tmpParams.push(...arg.params);
+            } else if (arg instanceof QueryParam) {
+                tmpParams.push(arg);
             }
         }
 

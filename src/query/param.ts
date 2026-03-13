@@ -12,6 +12,11 @@ import lt from "./comparisons/lt.js";
 import lte from "./comparisons/lte.js";
 import notEq from "./comparisons/notEq.js";
 
+type ExtractParams<T> =
+    T extends QueryParam<any, any, any, any, any, any> ? [T] :
+    T extends { params?: infer TParams extends QueryParam<any, any, any, any, any, any>[] | undefined } ? TParams extends undefined ? [] : TParams :
+    [];
+
 const paramDefaultColumnName = '?column?';
 type TParameDefaultColumnName = typeof paramDefaultColumnName;
 
@@ -25,7 +30,7 @@ class QueryParam<
 >
     implements IComparable<
         TDbType,
-        [QueryParam<TDbType, TName, TValueType>],
+        undefined,
         DetermineValueType<TCastType, NonNullable<TValueType>>,
         DetermineFinalValueType<IsAny<TValueType> extends true ? DetermineValueType<TCastType, TValueType> | null : TValueType, DetermineValueType<TCastType, NonNullable<TValueType>>>,
         TDefaultFieldKey,
@@ -35,7 +40,7 @@ class QueryParam<
 
     dbType: TDbType;
 
-    params?: [QueryParam<TDbType, TName, TValueType>];
+    params?: undefined;
     [IComparableValueDummySymbol]?: DetermineValueType<TCastType, NonNullable<TValueType>>;
     [IComparableFinalValueDummySymbol]?: DetermineFinalValueType<IsAny<TValueType> extends true ? DetermineValueType<TCastType, TValueType> | null : TValueType, DetermineValueType<TCastType, NonNullable<TValueType>>>;
 
@@ -52,8 +57,6 @@ class QueryParam<
         this.ownerName = ownerName;
 
         this.defaultFieldKey = paramDefaultColumnName as TDefaultFieldKey;
-
-        this.params = [this] as [QueryParam<TDbType, TName, TValueType, any, any, any>];
     }
 
     as<TAs extends string>(asName: TAs) {
@@ -116,4 +119,8 @@ export default QueryParam;
 
 export {
     generateParamFn
+}
+
+export type {
+    ExtractParams
 }

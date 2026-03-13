@@ -13,19 +13,16 @@ import lt from "./comparisons/lt.js";
 import lte from "./comparisons/lte.js";
 import notEq from "./comparisons/notEq.js";
 import type ColumnLogicalOperation from "./logicalOperations.js";
+import type { ExtractParams } from "./param.js";
 import type QueryParam from "./param.js";
 import { convertValueToQueryString } from "./uitlity/common.js";
 
 type CalculateSQLParams<
     TValues extends readonly (IComparable<any, any, any, any, any, any, any> | ColumnComparisonOperation<any, any, any, any, any> | ColumnLogicalOperation<any, any, any> | DbValueTypes | null)[],
 > = TValues extends readonly [infer First, ...infer Rest] ?
-    First extends { params?: infer TParams extends readonly QueryParam<any, any, any, any, any, any>[] | undefined } ?
     Rest extends readonly [any, ...any[]] ?
-    [...(TParams extends undefined ? [] : TParams), ...CalculateSQLParams<Rest>] :
-    (TParams extends undefined ? [] : TParams) :
-    Rest extends readonly [any, ...any[]] ?
-    CalculateSQLParams<Rest> :
-    [] :
+    [...ExtractParams<First>, ...CalculateSQLParams<Rest>] :
+    ExtractParams<First> :
     [];
 
 const sqlOperatorDefaultColumnName = '';

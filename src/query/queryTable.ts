@@ -2,6 +2,7 @@ import type { DbType } from "../db.js";
 import QueryColumn from "../query/queryColumn.js";
 import type Column from "../table/column.js";
 import type Table from "../table/table.js";
+import type { UndefinedIfLengthZero } from "../utility/common.js";
 import { queryBuilderContextFactory, type IComparable, type QueryBuilderContext } from "./_interfaces/IComparable.js";
 import type { IDbType } from "./_interfaces/IDbType.js";
 import type { IName } from "./_interfaces/IName.js";
@@ -98,7 +99,7 @@ class QueryTable<
         undefined,
         undefined,
         TCbResult["length"] extends 0 ? SelectToAllColumnsMapRecursively<TDbType, [QueryTable<TDbType, TColumns, TTableName, TTable, TQColumns, TAsName>], undefined> : TFinalResult,
-        TCbResult["length"] extends 0 ? undefined : AccumulateColumnParams<undefined, TFinalResult>
+        TCbResult["length"] extends 0 ? undefined : UndefinedIfLengthZero<AccumulateColumnParams<undefined, TFinalResult>>
     >
     select<
         const TCbResult extends readonly (ColumnsSelection<TDbType, any, any> | IComparable<TDbType, any, any, any, any, any, any>)[],
@@ -114,7 +115,7 @@ class QueryTable<
         undefined,
         undefined,
         TCbResult["length"] extends 0 ? SelectToAllColumnsMapRecursively<TDbType, [QueryTable<TDbType, TColumns, TTableName, TTable, TQColumns, TAsName>], undefined> : TFinalResult,
-        TCbResult["length"] extends 0 ? undefined : AccumulateColumnParams<undefined, TFinalResult>
+        TCbResult["length"] extends 0 ? undefined : UndefinedIfLengthZero<AccumulateColumnParams<undefined, TFinalResult>>
     > {
         if (cb === undefined) {
             return new QueryBuilder<TDbType, [QueryTable<TDbType, TColumns, TTableName, TTable, TQColumns, TAsName>], undefined, undefined>(this.dbType, [this]).select() as QueryBuilder<
@@ -123,7 +124,7 @@ class QueryTable<
                 undefined,
                 undefined,
                 TCbResult["length"] extends 0 ? SelectToAllColumnsMapRecursively<TDbType, [QueryTable<TDbType, TColumns, TTableName, TTable, TQColumns, TAsName>], undefined> : TFinalResult,
-                TCbResult["length"] extends 0 ? undefined : AccumulateColumnParams<undefined, TFinalResult>
+                TCbResult["length"] extends 0 ? undefined : UndefinedIfLengthZero<AccumulateColumnParams<undefined, TFinalResult>>
             >;
         } else {
             return new QueryBuilder<TDbType, [QueryTable<TDbType, TColumns, TTableName, TTable, TQColumns, TAsName>], undefined, undefined>(this.dbType, [this]).select(cb) as QueryBuilder<
@@ -132,7 +133,7 @@ class QueryTable<
                 undefined,
                 undefined,
                 TCbResult["length"] extends 0 ? SelectToAllColumnsMapRecursively<TDbType, [QueryTable<TDbType, TColumns, TTableName, TTable, TQColumns, TAsName>], undefined> : TFinalResult,
-                TCbResult["length"] extends 0 ? undefined : AccumulateColumnParams<undefined, TFinalResult>
+                TCbResult["length"] extends 0 ? undefined : UndefinedIfLengthZero<AccumulateColumnParams<undefined, TFinalResult>>
             >;
         }
     }
