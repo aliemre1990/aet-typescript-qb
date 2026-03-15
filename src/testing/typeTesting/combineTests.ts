@@ -4,13 +4,13 @@ import type { AssertEqual, AssertTrue } from "../_typeTestingUtilities.js";
 const unionWithError1 = customersTable.select((tables) => [tables.customers.id, tables.customers.name])
     .unionAll(
         // @ts-expect-error: Column count mismatch
-        () => customersTable.select((tablesInner) => [tablesInner.customers.id])
+        customersTable.select((tablesInner) => [tablesInner.customers.id])
     )
 
 const unionWithError2 = customersTable.select((tables) => [tables.customers.id, tables.customers.name])
     .unionAll(
         // @ts-expect-error: Column type mismatch
-        () => customersTable.select((tablesInner) => [tablesInner.customers.id, tablesInner.customers.id])
+        customersTable.select((tablesInner) => [tablesInner.customers.id, tablesInner.customers.id])
     )
 
 const unionValid_SelectViaTableAlias_BothSide = customersTable

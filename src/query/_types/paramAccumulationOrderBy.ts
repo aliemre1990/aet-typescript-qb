@@ -1,4 +1,5 @@
 import type { DbType } from "../../db.js";
+import type { UndefinedIfLengthZero } from "../../utility/common.js";
 import type { IComparable } from "../_interfaces/IComparable.js";
 import type { ExtractParams } from "../param.js";
 import type QueryParam from "../param.js";
@@ -10,7 +11,7 @@ type AccumulateOrderByParams<
     TOrderByParams extends OrderBySpecsType<TDbType>
 > =
     TParams extends undefined ?
-    InferParamsFromOrderByParams<TDbType, TOrderByParams>["length"] extends 0 ? undefined : InferParamsFromOrderByParams<TDbType, TOrderByParams> :
+    UndefinedIfLengthZero<InferParamsFromOrderByParams<TDbType, TOrderByParams>> :
     TParams extends QueryParam<any, any, any, any, any, any>[] ? [...TParams, ...InferParamsFromOrderByParams<TDbType, TOrderByParams>] :
     never;
 

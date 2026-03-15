@@ -184,6 +184,11 @@ function withAs<
     const cteObject = new CTEObject(qb.dbType, qb, as, cteTypes.NON_RECURSIVE) as TCTEObject;
     const cteSpecs = [cteObject] as const;
 
+    let params: readonly QueryParam<TDbType, any, any, any, any, any>[] | undefined = qb.params;
+    if (params && params.length === 0) {
+        params = undefined;
+    }
+
     return new QueryBuilder<
         TDbType,
         undefined,
@@ -191,7 +196,14 @@ function withAs<
         typeof cteSpecs,
         undefined,
         TParams
-    >(qb.dbType, undefined, { cteSpecs });
+    >(
+        qb.dbType,
+        undefined,
+        {
+            params: params as TParams,
+            cteSpecs
+        }
+    );
 }
 
 function withRecursiveAs<
@@ -270,6 +282,12 @@ function withRecursiveAs<
     ) as TFinalCTE;
     const cteSpecs = [cteObject] as const;
 
+    let params: readonly QueryParam<TDbType, any, any, any, any, any>[] | undefined = finalQb.params;
+    if (params && params.length === 0) {
+        params = undefined;
+    }
+
+
     return new QueryBuilder<
         TDbType,
         undefined,
@@ -277,7 +295,14 @@ function withRecursiveAs<
         typeof cteSpecs,
         undefined,
         TParamsResult
-    >(anchorQb.dbType, undefined, { cteSpecs });
+    >(
+        anchorQb.dbType,
+        undefined,
+        {
+            params: params as TParamsResult,
+            cteSpecs
+        }
+    );
 }
 
 
