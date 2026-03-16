@@ -99,7 +99,7 @@ type PgFunctions = {
     jsonbBuildObject: typeof jsonbBuildObjectFn;
 }
 
-type DbFunctions<TDbType extends DbType> =
+type DbOperations<TDbType extends DbType> =
     {
         param: TDbType extends PgDbType ? PgParamFn : TDbType extends MySQLDbType ? MySQLParamFn : never;
         literal: TDbType extends PgDbType ? PgLiteralFn : TDbType extends MySQLDbType ? MySQLLiteralFn : never;
@@ -112,19 +112,12 @@ type DbFunctions<TDbType extends DbType> =
     } &
     AggregationFunctions<TDbType> &
     (TDbType extends PgDbType ? PgFunctions : {}) &
-    ArithmeticOperations<TDbType>
+    ArithmeticOperations<TDbType> &
+    LogicalOperators<TDbType>
     ;
-
-
-type DbOperators<TDbType extends DbType> =
-    LogicalOperators<TDbType> &
-    DbFunctions<TDbType>
-    ;
-
 
 export {
-    DbOperators,
-    DbFunctions,
+    DbOperations,
     AggregationFunctions,
     ArithmeticOperations,
     LogicalOperators

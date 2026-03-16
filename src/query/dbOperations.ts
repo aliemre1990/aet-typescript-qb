@@ -1,5 +1,5 @@
 import { dbTypes, type DbType, type MySQLDbType, type PgDbType } from "../db.js"
-import type { AggregationFunctions, ArithmeticOperations, DbFunctions, DbOperators, LogicalOperators } from "./_types/ops.js"
+import type { AggregationFunctions, ArithmeticOperations, DbOperations, LogicalOperators } from "./_types/ops.js"
 import generateAvgFn from "./aggregation/avg.js"
 import { jsonAggFn, jsonbAggFn } from "./aggregation/json/jsonAgg.js"
 import generateSumFn from "./aggregation/sum.js"
@@ -78,26 +78,6 @@ function generateCommonFunctions<TDbType extends DbType>(dbType: TDbType) {
 }
 
 
-const pgFunctions: DbFunctions<PgDbType> = {
-    ...generateCommonFunctions(dbTypes.postgresql),
-
-    jsonBuildObject: jsonBuildObjectFn,
-    jsonbBuildObject: jsonbBuildObjectFn,
-
-    ...pgArithmeticOperations,
-    ...pgAggregationFunctions
-}
-
-
-const mysqlFunctions: DbFunctions<MySQLDbType> = {
-    ...generateCommonFunctions(dbTypes.mysql),
-
-    ...mysqlArithmeticOperations,
-    ...mysqlAggregationFunctions
-}
-
-
-
 /**
  * Logical Operations
  */
@@ -116,24 +96,28 @@ const mysqlLogicalOperators: LogicalOperators<MySQLDbType> = {
     ...generateCommonLogicalOperators(dbTypes.mysql)
 }
 
-/**
- * All operators
- */
-const pgDbOperators: DbOperators<PgDbType> = {
-    ...pgLogicalOperators,
-    ...pgFunctions
+const pgFunctions: DbOperations<PgDbType> = {
+    ...generateCommonFunctions(dbTypes.postgresql),
+
+    jsonBuildObject: jsonBuildObjectFn,
+    jsonbBuildObject: jsonbBuildObjectFn,
+
+    ...pgArithmeticOperations,
+    ...pgAggregationFunctions,
+    ...pgLogicalOperators
 }
 
+const mysqlFunctions: DbOperations<MySQLDbType> = {
+    ...generateCommonFunctions(dbTypes.mysql),
 
-const mysqlDbOperators: DbOperators<MySQLDbType> = {
-    ...mysqlLogicalOperators,
-    ...mysqlFunctions
+    ...mysqlArithmeticOperations,
+    ...mysqlAggregationFunctions,
+    ...mysqlLogicalOperators
 }
+
 
 
 export {
     pgFunctions,
-    mysqlFunctions,
-    pgDbOperators,
-    mysqlDbOperators
+    mysqlFunctions
 }

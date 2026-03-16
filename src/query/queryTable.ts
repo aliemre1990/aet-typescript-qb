@@ -7,7 +7,7 @@ import { queryBuilderContextFactory, type IComparable, type QueryBuilderContext 
 import type { IDbType } from "./_interfaces/IDbType.js";
 import type { IName } from "./_interfaces/IName.js";
 import type { TablesToObject, TableToColumnsMap } from "./_types/miscellaneous.js";
-import type { DbFunctions, DbOperators } from "./_types/ops.js";
+import type { DbOperations } from "./_types/ops.js";
 import type { AccumulateComparisonParams } from "./_types/paramAccumulationComparison.js";
 import type { AccumulateOrderByParams } from "./_types/paramAccumulationOrderBy.js";
 import type { AccumulateColumnParams } from "./_types/paramAccumulationSelect.js";
@@ -91,7 +91,7 @@ class QueryTable<
     >(
         cb: (
             tables: TableToColumnsMap<TDbType, TablesToObject<TDbType, [QueryTable<TDbType, TColumns, TTableName, TTable, TQColumns, TAsName>]>>,
-            ops: DbFunctions<TDbType>
+            ops: DbOperations<TDbType>
         ) => TCbResult
     ): QueryBuilder<
         TDbType,
@@ -107,7 +107,7 @@ class QueryTable<
     >(
         cb?: (
             tables: TableToColumnsMap<TDbType, TablesToObject<TDbType, [QueryTable<TDbType, TColumns, TTableName, TTable, TQColumns, TAsName>]>>,
-            ops: DbFunctions<TDbType>
+            ops: DbOperations<TDbType>
         ) => TCbResult
     ): QueryBuilder<
         TDbType,
@@ -162,7 +162,7 @@ class QueryTable<
         tableSelection: TJoinTable | (() => TJoinTable),
         cb: (
             tables: TableToColumnsMap<TDbType, TablesToObject<TDbType, [QueryTable<TDbType, TColumns, TTableName, TTable, TQColumns, TAsName>], TJoinAccumulated>>,
-            ops: DbOperators<TDbType>
+            ops: DbOperations<TDbType>
         ) => TCbResult
     ):
         QueryBuilder<
@@ -181,7 +181,7 @@ class QueryTable<
     where<TCbResult extends ComparisonType<TDbType>>(
         cb: (
             tables: TableToColumnsMap<TDbType, TablesToObject<TDbType, [QueryTable<TDbType, TColumns, TTableName, TTable, TQColumns, TAsName>]>>,
-            ops: DbOperators<TDbType>
+            ops: DbOperations<TDbType>
         ) => TCbResult) {
         return new QueryBuilder<TDbType, [QueryTable<TDbType, TColumns, TTableName, TTable, TQColumns, TAsName>], undefined, undefined>(this.dbType, [this]).where(cb);
     }
@@ -191,7 +191,7 @@ class QueryTable<
         const TCbResult extends GroupBySpecs<TDbType>
     >(cb: (
         tables: TableToColumnsMap<TDbType, TablesToObject<TDbType, [QueryTable<TDbType, TColumns, TTableName, TTable, TQColumns, TAsName>]>>,
-        ops: DbFunctions<TDbType>
+        ops: DbOperations<TDbType>
     ) => TCbResult
     ): QueryBuilder<
         TDbType,

@@ -16,7 +16,7 @@ import type { SelectToAllColumnsMapRecursively, SelectToResultMapRecursively } f
 import Column from "./column.js";
 import QueryColumn from "../query/queryColumn.js";
 import QueryTable from "../query/queryTable.js";
-import type { DbFunctions, DbOperators } from "../query/_types/ops.js";
+import type { DbOperations } from "../query/_types/ops.js";
 import type { IDbType } from "../query/_interfaces/IDbType.js";
 import type { AccumulateColumnParams } from "../query/_types/paramAccumulationSelect.js";
 import type { AccumulateSubQueryParams, MapToSubQueryObject } from "../query/_types/subQueryUtility.js";
@@ -102,7 +102,7 @@ class Table<
     >(
         cb: (
             tables: TableToColumnsMap<TDbType, TablesToObject<TDbType, [QueryTable<TDbType, TColumns, TTableName, Table<TDbType, TColumns, TTableName>, MapToQueryColumns<TDbType, TTableName, TColumns>, undefined>]>>,
-            ops: DbFunctions<TDbType>
+            ops: DbOperations<TDbType>
         ) => TCbResult
     ): QueryBuilder<
         TDbType,
@@ -118,7 +118,7 @@ class Table<
     >(
         cb?: (
             tables: TableToColumnsMap<TDbType, TablesToObject<TDbType, [QueryTable<TDbType, TColumns, TTableName, Table<TDbType, TColumns, TTableName>, MapToQueryColumns<TDbType, TTableName, TColumns>, undefined>]>>,
-            ops: DbFunctions<TDbType>
+            ops: DbOperations<TDbType>
         ) => TCbResult
     ): QueryBuilder<
         TDbType,
@@ -181,7 +181,7 @@ class Table<
         tableSelection: TJoinTable | (() => TJoinTable),
         cb: (
             tables: TableToColumnsMap<TDbType, TablesToObject<TDbType, [QueryTable<TDbType, TColumns, TTableName, Table<TDbType, TColumns, TTableName>, MapToQueryColumns<TDbType, TTableName, TColumns>>], TJoinAccumulated>>,
-            ops: DbOperators<TDbType>
+            ops: DbOperations<TDbType>
         ) => TCbResult
     ):
         QueryBuilder<
@@ -204,7 +204,7 @@ class Table<
     where<TCbResult extends ComparisonType<TDbType>>(
         cb: (
             tables: TableToColumnsMap<TDbType, TablesToObject<TDbType, [QueryTable<TDbType, TColumns, TTableName, Table<TDbType, TColumns, TTableName>, MapToQueryColumns<TDbType, TTableName, TColumns>, undefined>]>>,
-            ops: DbOperators<TDbType>
+            ops: DbOperations<TDbType>
         ) => TCbResult
     ) {
         const queryColumns = this.columnsList.map((col) => {
@@ -220,7 +220,7 @@ class Table<
         const TCbResult extends GroupBySpecs<TDbType>
     >(cb: (
         tables: TableToColumnsMap<TDbType, TablesToObject<TDbType, [QueryTable<TDbType, TColumns, TTableName, Table<TDbType, TColumns, TTableName>, MapToQueryColumns<TDbType, TTableName, TColumns>, undefined>]>>,
-        ops: DbFunctions<TDbType>
+        ops: DbOperations<TDbType>
     ) => TCbResult
     ): QueryBuilder<
         TDbType,

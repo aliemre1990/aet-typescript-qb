@@ -95,3 +95,21 @@ type typeof_SelectWithJSONBuildObject_ResultCols = typeof_SelectWithJSONBuildObj
 type typeof_SelectWithJSONBuildObject_ResultType = ColumnsToResultMap<any, typeof_SelectWithJSONBuildObject_ResultCols>;
 type typeof_SelectWithJSONBuildObject_ResultType_Expected = { id: number; ordersObj: { id: number; customerId: number; amount: number; createdBy: number } }[];
 type selectWithJSONBuildObject_ResultType_Test = AssertTrue<AssertEqual<typeof_SelectWithJSONBuildObject_ResultType, typeof_SelectWithJSONBuildObject_ResultType_Expected>>
+
+const selectComparison = customersTable.select((cols) => [
+    cols.customers.id.eq(1)
+]);
+type typeof_selectComparison = typeof selectComparison;
+type typeof_selectComparison_ResultCols = typeof_selectComparison extends QueryBuilder<any, any, any, any, infer TResult, any, any, any> ? TResult : never;
+type typeof_selectComparison_ResultType = ColumnsToResultMap<any, typeof_selectComparison_ResultCols>;
+type typeof_selectComparison_ResultType_Expected = { "?column?": boolean }[];
+type selectComparison_ResultType_Test = AssertTrue<AssertEqual<typeof_selectComparison_ResultType, typeof_selectComparison_ResultType_Expected>>
+
+const selectLogical = customersTable.select((cols, { and }) => [
+    and(cols.customers.id.eq(1), cols.customers.name.eq("Jane"))
+]);
+type typeof_selectLogical = typeof selectLogical;
+type typeof_selectLogical_ResultCols = typeof_selectLogical extends QueryBuilder<any, any, any, any, infer TResult, any, any, any> ? TResult : never;
+type typeof_selectLogical_ResultType = ColumnsToResultMap<any, typeof_selectLogical_ResultCols>;
+type typeof_selectLogical_ResultType_Expected = { "?column?": boolean }[];
+type selectLogical_ResultType_Test = AssertTrue<AssertEqual<typeof_selectLogical_ResultType, typeof_selectLogical_ResultType_Expected>>
