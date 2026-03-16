@@ -38,9 +38,9 @@ type TLogicalOperationDefaultColumnName = typeof logicalOperationDefaultColumnNa
 class ColumnLogicalOperation<
     TDbType extends DbType,
     TComparisons extends readonly (ColumnComparisonOperation<TDbType, any, any, any, any> | ColumnLogicalOperation<TDbType, any, any, any, any>)[],
+    TParams extends readonly QueryParam<TDbType, string, any, any, any, any>[] | undefined = UndefinedIfLengthZero<InferLogicalOperationParams<TComparisons>>,
     TAs extends string | undefined = undefined,
-    TCastType extends PgColumnType | undefined = undefined,
-    TParams extends readonly QueryParam<TDbType, string, any, any, any, any>[] | undefined = UndefinedIfLengthZero<InferLogicalOperationParams<TComparisons>>
+    TCastType extends PgColumnType | undefined = undefined
 > implements IComparable<
     TDbType,
     TParams,
@@ -71,10 +71,10 @@ class ColumnLogicalOperation<
     between: typeof between = between;
 
     as<TAs extends string>(asName: TAs) {
-        return new ColumnLogicalOperation<TDbType, TComparisons, TAs, TCastType, TParams>(this.dbType, this.operator, this.comparisons, asName, this.castType);
+        return new ColumnLogicalOperation<TDbType, TComparisons, TParams, TAs, TCastType>(this.dbType, this.operator, this.comparisons, asName, this.castType);
     }
     cast<TCastType extends PgColumnType>(type: TCastType) {
-        return new ColumnLogicalOperation<TDbType, TComparisons, TAs, TCastType, TParams>(this.dbType, this.operator, this.comparisons, this.asName, type);
+        return new ColumnLogicalOperation<TDbType, TComparisons, TParams, TAs, TCastType>(this.dbType, this.operator, this.comparisons, this.asName, type);
     }
 
     constructor(
