@@ -18,7 +18,7 @@ import type QueryParam from "./param.js";
 import { convertValueToQueryString } from "./uitlity/common.js";
 
 type CalculateSQLParams<
-    TValues extends readonly (IComparable<any, any, any, any, any, any, any> | ColumnComparisonOperation<any, any, any, any, any> | ColumnLogicalOperation<any, any, any> | DbValueTypes | null)[],
+    TValues extends readonly (IComparable<any, any, any, any, any, any, any> | ColumnComparisonOperation<any, any, any, any, any> | ColumnLogicalOperation<any, any, any, any, any> | DbValueTypes | null)[],
 > = TValues extends readonly [infer First, ...infer Rest] ?
     Rest extends readonly [any, ...any[]] ?
     [...ExtractParams<First>, ...CalculateSQLParams<Rest>] :
@@ -30,7 +30,7 @@ type TSQLOperatorDefaultColumnName = typeof sqlOperatorDefaultColumnName;
 
 class SQLOperator<
     TDbType extends DbType,
-    TValues extends readonly (IComparable<TDbType, any, any, any, any, any, any> | ColumnComparisonOperation<TDbType, any, any, any, any> | ColumnLogicalOperation<TDbType, any, any> | DbValueTypes | null)[],
+    TValues extends readonly (IComparable<TDbType, any, any, any, any, any, any> | ColumnComparisonOperation<TDbType, any, any, any, any> | ColumnLogicalOperation<TDbType, any, any, any, any> | DbValueTypes | null)[],
     TValueType extends DbValueTypes | null = any,
     TAs extends string | undefined = undefined,
     TCastType extends PgColumnType | undefined = undefined,
@@ -129,7 +129,7 @@ function generateSqlOperatorFn<
     TDbType extends DbType
 >(dbType: TDbType) {
     return function <
-        TValues extends readonly (IComparable<TDbType, any, any, any, any, any, any> | ColumnComparisonOperation<TDbType, any, any, any, any> | ColumnLogicalOperation<TDbType, any, any> | DbValueTypes | null)[]
+        TValues extends readonly (IComparable<TDbType, any, any, any, any, any, any> | ColumnComparisonOperation<TDbType, any, any, any, any> | ColumnLogicalOperation<TDbType, any, any, any, any> | DbValueTypes | null)[]
     >(strs: TemplateStringsArray, ...values: TValues): SQLOperator<TDbType, TValues> {
         return new SQLOperator(dbType, strs, values);
     }
