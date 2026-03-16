@@ -131,7 +131,7 @@ type JoinSpecsType<TDbType extends DbType> = readonly JoinSpecsItemType<TDbType>
 type GroupBySpecs<TDbType extends DbType> = readonly (ColumnsSelection<TDbType, any, any> | IComparable<TDbType, any, any, any, any, any, any>)[];
 
 type ColumnsSelectionListType<TDbType extends DbType> = { [key: string]: ColumnsSelection<TDbType, any, any> }
-type ComparisonType<TDbType extends DbType> = ColumnComparisonOperation<TDbType, any, any, any, any> | ColumnLogicalOperation<TDbType, any, any, any, any>;
+type ComparisonType<TDbType extends DbType> = ColumnComparisonOperation<TDbType, any, any, any, any, any, any> | ColumnLogicalOperation<TDbType, any, any, any, any>;
 
 
 const cteTypes = {

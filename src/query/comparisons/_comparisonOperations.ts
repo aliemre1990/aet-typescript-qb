@@ -1,16 +1,20 @@
 import type { DbType } from "../../db.js";
 import type { DbValueTypes } from "../../table/column.js";
+import type { PgColumnType } from "../../table/columnTypes.js";
 import type { UndefinedIfLengthZero } from "../../utility/common.js";
-import { queryBuilderContextFactory, type IComparable, type QueryBuilderContext } from "../_interfaces/IComparable.js";
+import { IComparableFinalValueDummySymbol, IComparableValueDummySymbol, queryBuilderContextFactory, type DetermineValueType, type IComparable, type QueryBuilderContext } from "../_interfaces/IComparable.js";
 import type { ExtractParams } from "../param.js";
 import QueryParam from "../param.js";
 import QueryBuilder from "../queryBuilder.js";
 import { convertArgsToQueryString } from "../uitlity/common.js";
-
-type ExtractComparisonParams<
-    TComparison
-> =
-    TComparison extends ColumnComparisonOperation<any, any, any, infer TParams> ? TParams : [];
+import between from "./between.js";
+import eq from "./eq.js";
+import gt from "./gt.js";
+import gte from "./gte.js";
+import sqlIn from "./in.js";
+import lt from "./lt.js";
+import lte from "./lte.js";
+import notEq from "./notEq.js";
 
 type InferAppliedParams<
     TApplied extends readonly (DbValueTypes | null | IComparable<any, any, any, any, any, any, any>)[] | undefined
@@ -55,20 +59,54 @@ type ComparisonOperation = (typeof comparisonOperations)[keyof typeof comparison
 type InferValueTypeFromComparable<TDbType extends DbType, T> =
     T extends IComparable<TDbType, any, infer TValueType, any, any, any, any> ? TValueType : never;
 
+const comparisonOperationDefaultColumnName = '?column?';
+type TComparisonOperationDefaultColumnName = typeof comparisonOperationDefaultColumnName;
+
 class ColumnComparisonOperation<
     TDbType extends DbType,
     TComparing extends IComparable<TDbType, any, any, any, any, any, any>,
     TApplied extends readonly (TValueType | null | IComparable<TDbType, any, any, any, any, any, any>)[] | undefined,
     TValueType extends DbValueTypes = InferValueTypeFromComparable<TDbType, TComparing>,
-    TParams extends readonly QueryParam<TDbType, string, any, any, any, any>[] | undefined = UndefinedIfLengthZero<InferComparisonParams<TComparing, TApplied>>
+    TParams extends readonly QueryParam<TDbType, string, any, any, any, any>[] | undefined = UndefinedIfLengthZero<InferComparisonParams<TComparing, TApplied>>,
+    TAs extends string | undefined = undefined,
+    TCastType extends PgColumnType | undefined = undefined
+> implements IComparable<
+    TDbType,
+    TParams,
+    DetermineValueType<TCastType, boolean>,
+    DetermineValueType<TCastType, boolean>,
+    TComparisonOperationDefaultColumnName,
+    TAs,
+    TCastType
 > {
 
     dbType: TDbType;
+    params?: TParams;
+    [IComparableValueDummySymbol]?: DetermineValueType<TCastType, boolean>;
+    [IComparableFinalValueDummySymbol]?: DetermineValueType<TCastType, boolean>;
+    defaultFieldKey: TComparisonOperationDefaultColumnName = comparisonOperationDefaultColumnName;
+    asName?: TAs;
+    castType?: TCastType;
+
     operation: ComparisonOperation;
     comparing: TComparing;
     value?: TApplied
 
-    params?: TParams;
+    eq: typeof eq = eq;
+    notEq: typeof notEq = notEq;
+    gt: typeof gt = gt;
+    gte: typeof gte = gte;
+    lt: typeof lt = lt;
+    lte: typeof lte = lte;
+    sqlIn: typeof sqlIn = sqlIn;
+    between: typeof between = between;
+
+    as<TAs extends string>(asName: TAs) {
+        return new ColumnComparisonOperation<TDbType, TComparing, TApplied, TValueType, TParams, TAs, TCastType>(this.dbType, this.operation, this.comparing, this.value, asName, this.castType);
+    }
+    cast<TCastType extends PgColumnType>(type: TCastType) {
+        return new ColumnComparisonOperation<TDbType, TComparing, TApplied, TValueType, TParams, TAs, TCastType>(this.dbType, this.operation, this.comparing, this.value, this.asName, type);
+    }
 
     buildSQL(context?: QueryBuilderContext) {
         if (context === undefined) {
@@ -106,12 +144,16 @@ class ColumnComparisonOperation<
         dbType: TDbType,
         operation: ComparisonOperation,
         comparing: TComparing,
-        value?: TApplied
+        value?: TApplied,
+        asName?: TAs,
+        castType?: TCastType
     ) {
         this.dbType = dbType;
         this.operation = operation;
         this.comparing = comparing;
         this.value = value;
+        this.asName = asName;
+        this.castType = castType;
 
         let tmpParams: readonly QueryParam<TDbType, any, any, any, any, any>[] = [];
         if (comparing.params !== undefined && comparing.params.length > 0) {
@@ -149,6 +191,5 @@ export {
 
 export type {
     ComparisonOperation,
-    ExtractComparisonParams,
     InferValueTypeFromComparable
 }
