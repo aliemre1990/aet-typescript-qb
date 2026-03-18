@@ -38,7 +38,7 @@ type ConvertElementsToSubQueryCompliant<TDbType extends DbType, TFrom> =
 type AccumulateSubQueryParams<
     TDbType extends DbType,
     TFrom extends FromType<TDbType>,
-    TParams extends readonly QueryParam<TDbType, any, any, any, any, any>[] | undefined = undefined
+    TParams extends readonly QueryParam<TDbType, any, any, any, any>[] | undefined = undefined
 > =
     TFrom extends readonly [infer First, ...infer Rest] ?
     First extends SubQueryObject<TDbType, infer TQb, any, any> ?

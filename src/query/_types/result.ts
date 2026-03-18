@@ -21,19 +21,18 @@ type ColumnsToResultMapRecursively<
     Acc extends { [key: string]: any } = {}
 > =
     T extends readonly [infer First, ...infer Rest] ?
-    First extends IComparable<TDbType, any, any, infer TFinalType, infer TDefaultKey, infer TAs, any> ?
-
-    TAs extends undefined ?
-
-    Rest extends any[] ?
-    ColumnsToResultMapRecursively<TDbType, Rest, Omit<Acc, TDefaultKey> & { [K in TDefaultKey]: TFinalType }> :
-    Omit<Acc, TDefaultKey> & { [K in TDefaultKey]: TFinalType } :
+    First extends IComparable<TDbType, any, any, infer TFinalType, infer TName, infer TAs, any> ?
 
     TAs extends string ?
-
-    Rest extends any[] ?
+    Rest extends [any, ...any[]] ?
     ColumnsToResultMapRecursively<TDbType, Rest, Omit<Acc, TAs> & { [K in TAs]: TFinalType }> :
     Omit<Acc, TAs> & { [K in TAs]: TFinalType } :
+
+    TName extends string ?
+    Rest extends [any, ...any[]] ?
+    ColumnsToResultMapRecursively<TDbType, Rest, Omit<Acc, TName> & { [K in TName]: TFinalType }> :
+    Omit<Acc, TName> & { [K in TName]: TFinalType } :
+
 
     never :
     never :
@@ -118,13 +117,13 @@ type FromToAllColumnsMapRecursively<
     ;
 
 // Convert array of QueryParam to object type
-type QueryParamsToObject<T extends readonly QueryParam<any, any, any, any, any, any>[] | undefined> =
+type QueryParamsToObject<T extends readonly QueryParam<any, any, any, any, any>[] | undefined> =
     T extends undefined ? undefined :
-    T extends QueryParam<any, any, any, any, any, any>[] ?
+    T extends QueryParam<any, any, any, any, any>[] ?
     T["length"] extends 0 ? undefined :
-    T extends readonly QueryParam<any, any, any, any, any, any>[] ? {
-        [K in T[number]as K extends QueryParam<any, infer Name, any, any, any, any> ? Name : never]:
-        K extends QueryParam<any, any, infer ValueType, any, any, any> ? ValueType : never
+    T extends readonly QueryParam<any, any, any, any, any>[] ? {
+        [K in T[number]as K extends QueryParam<any, infer Name, any, any, any> ? Name : never]:
+        K extends QueryParam<any, any, infer ValueType, any, any> ? ValueType : never
     }
     : never
     : undefined;

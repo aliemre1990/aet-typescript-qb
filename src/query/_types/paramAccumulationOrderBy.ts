@@ -7,12 +7,12 @@ import type { OrderBySpecsType, OrderType } from "../queryBuilder.js";
 
 type AccumulateOrderByParams<
     TDbType extends DbType,
-    TParams extends readonly QueryParam<any, any, any, any, any, any>[] | undefined,
+    TParams extends readonly QueryParam<any, any, any, any, any>[] | undefined,
     TOrderByParams extends OrderBySpecsType<TDbType>
 > =
     TParams extends undefined ?
     UndefinedIfLengthZero<InferParamsFromOrderByParams<TDbType, TOrderByParams>> :
-    TParams extends QueryParam<any, any, any, any, any, any>[] ? [...TParams, ...InferParamsFromOrderByParams<TDbType, TOrderByParams>] :
+    TParams extends QueryParam<any, any, any, any, any>[] ? [...TParams, ...InferParamsFromOrderByParams<TDbType, TOrderByParams>] :
     never;
 
 type InferParamsFromOrderByParams<TDbType extends DbType, TOrderByParams extends OrderBySpecsType<TDbType>> =

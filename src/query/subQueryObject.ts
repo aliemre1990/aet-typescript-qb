@@ -30,7 +30,7 @@ class SubQueryEntry<
     TComparable extends IComparable<TDbType, any, any, any, any, any, any>,
     TValueType extends DbValueTypes = TComparable extends IComparable<TDbType, any, infer TValType, any, any, any, any> ? TValType : never,
     TFinalValueType extends TValueType | null = TComparable extends IComparable<TDbType, any, any, infer TFinalType, any, any, any> ? TFinalType : never,
-    TDefaultFieldKey extends string = TComparable extends IComparable<TDbType, any, any, any, infer TDefaultFieldKey, infer TAs, any> ? TAs extends undefined ? TDefaultFieldKey : TAs : never,
+    TFieldName extends string = TComparable extends IComparable<TDbType, any, any, any, infer TFieldName, infer TAs, any> ? TAs extends undefined ? TFieldName : TAs : never,
     TAsName extends string | undefined = undefined,
     TCastType extends PgColumnType | undefined = undefined
 > implements IComparable<
@@ -38,7 +38,7 @@ class SubQueryEntry<
     undefined,
     DetermineValueType<TCastType, TValueType>,
     DetermineFinalValueType<TFinalValueType, DetermineValueType<TCastType, TValueType>>,
-    TDefaultFieldKey,
+    TFieldName,
     TAsName,
     TCastType
 > {
@@ -50,7 +50,7 @@ class SubQueryEntry<
     params?: undefined;
     asName?: TAsName;
     castType?: TCastType;
-    defaultFieldKey: TDefaultFieldKey;
+    fieldName: TFieldName;
 
     comparable: TComparable;
 
@@ -64,15 +64,15 @@ class SubQueryEntry<
     between: typeof between = between;
 
     as<TAsName extends string>(val: TAsName) {
-        return new SubQueryEntry<TDbType, TComparable, TValueType, TFinalValueType, TDefaultFieldKey, TAsName, TCastType>(this.dbType, this.comparable, val, this.ownerName, this.castType);
+        return new SubQueryEntry<TDbType, TComparable, TValueType, TFinalValueType, TFieldName, TAsName, TCastType>(this.dbType, this.comparable, val, this.ownerName, this.castType);
     }
     cast<TCastType extends PgColumnType>(type: TCastType) {
-        return new SubQueryEntry<TDbType, TComparable, TValueType, TFinalValueType, TDefaultFieldKey, TAsName, TCastType>(this.dbType, this.comparable, this.asName, this.ownerName, type);
+        return new SubQueryEntry<TDbType, TComparable, TValueType, TFinalValueType, TFieldName, TAsName, TCastType>(this.dbType, this.comparable, this.asName, this.ownerName, type);
 
     }
     ownerName?: string;
-    setOwnerName(val: string): SubQueryEntry<TDbType, TComparable, TValueType, TFinalValueType, TDefaultFieldKey, TAsName, TCastType> {
-        return new SubQueryEntry<TDbType, TComparable, TValueType, TFinalValueType, TDefaultFieldKey, TAsName, TCastType>(this.dbType, this.comparable, this.asName, val, this.castType);
+    setOwnerName(val: string): SubQueryEntry<TDbType, TComparable, TValueType, TFinalValueType, TFieldName, TAsName, TCastType> {
+        return new SubQueryEntry<TDbType, TComparable, TValueType, TFinalValueType, TFieldName, TAsName, TCastType>(this.dbType, this.comparable, this.asName, val, this.castType);
     }
 
     buildSQL(context?: QueryBuilderContext) {
@@ -80,7 +80,7 @@ class SubQueryEntry<
             context = queryBuilderContextFactory();
         }
 
-        return { query: `"${this.ownerName}"."${this.asName || this.defaultFieldKey}"`, params: context.params };
+        return { query: `"${this.ownerName}"."${this.asName || this.fieldName}"`, params: context.params };
     }
 
     constructor(
@@ -96,7 +96,7 @@ class SubQueryEntry<
         this.ownerName = ownerName;
         this.castType = castType;
 
-        this.defaultFieldKey = comparable.asName === undefined ? comparable.defaultFieldKey : comparable.asName;
+        this.fieldName = comparable.asName === undefined ? comparable.fieldName : comparable.asName;
     }
 }
 

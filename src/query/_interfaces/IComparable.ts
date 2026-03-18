@@ -37,10 +37,10 @@ const IComparableFinalValueDummySymbol = Symbol();
 
 interface IComparable<
     TDbType extends DbType,
-    TParams extends readonly QueryParam<TDbType, string, any, any, any, any>[] | undefined,
+    TParams extends readonly QueryParam<TDbType, string, any, any, any>[] | undefined,
     TValueType extends DbValueTypes | null,
     TFinalValueType extends DbValueTypes | null,
-    TDefaultFieldKey extends string,
+    TFieldName extends string | undefined,
     TAs extends string | undefined,
     TCastType extends PgColumnType | undefined
 > extends IDbType<TDbType> {
@@ -50,9 +50,9 @@ interface IComparable<
     [IComparableFinalValueDummySymbol]?: TFinalValueType;
 
     params?: TParams;
+    fieldName: TFieldName;
     asName?: TAs;
     castType?: TCastType;
-    defaultFieldKey: TDefaultFieldKey;
 
     eq: typeof eq;
     notEq: typeof notEq;
@@ -63,8 +63,8 @@ interface IComparable<
     sqlIn: typeof sqlIn;
     between: typeof between;
 
-    as<TAs extends string>(asName: TAs): IComparable<TDbType, TParams, TValueType, TFinalValueType, TDefaultFieldKey, TAs, TCastType>
-    cast<TCastType extends PgColumnType>(type: TCastType): IComparable<TDbType, TParams, any, any, TDefaultFieldKey, TAs, TCastType>
+    as<TAs extends string>(asName: TAs): IComparable<TDbType, TParams, TValueType, TFinalValueType, TFieldName, TAs, TCastType>
+    cast<TCastType extends PgColumnType>(type: TCastType): IComparable<TDbType, TParams, any, any, TFieldName, TAs, TCastType>
 
     buildSQL(context?: QueryBuilderContext): { query: string, params: string[] };
 }

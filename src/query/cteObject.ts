@@ -32,7 +32,7 @@ class CTEObjectEntry<
     TComparable extends IComparable<TDbType, any, any, any, any, any, any>,
     TValueType extends DbValueTypes = TComparable extends IComparable<TDbType, any, infer TValType, any, any, any, any> ? TValType : never,
     TFinalValueType extends TValueType | null = TComparable extends IComparable<TDbType, any, any, infer TFinalType, any, any, any> ? TFinalType : never,
-    TDefaultFieldKey extends string = TComparable extends IComparable<TDbType, any, any, any, infer TDefaultFieldKey, infer TAs, any> ? TAs extends undefined ? TDefaultFieldKey : TAs : never,
+    TFieldName extends string = TComparable extends IComparable<TDbType, any, any, any, infer TName, infer TAs, any> ? TAs extends undefined ? TName : TAs : never,
     TAsName extends string | undefined = undefined,
     TCastType extends PgColumnType | undefined = undefined
 > implements IComparable<
@@ -40,7 +40,7 @@ class CTEObjectEntry<
     undefined,
     DetermineValueType<TCastType, TValueType>,
     DetermineFinalValueType<TFinalValueType, DetermineValueType<TCastType, TValueType>>,
-    TDefaultFieldKey,
+    TFieldName,
     TAsName,
     TCastType
 > {
@@ -52,7 +52,7 @@ class CTEObjectEntry<
 
     params?: undefined;
     asName?: TAsName;
-    defaultFieldKey: TDefaultFieldKey;
+    fieldName: TFieldName;
     castType?: TCastType;
 
     comparable: TComparable;
@@ -67,15 +67,15 @@ class CTEObjectEntry<
     between: typeof between = between;
 
     as<TAsName extends string>(val: TAsName) {
-        return new CTEObjectEntry<TDbType, TComparable, TValueType, TFinalValueType, TDefaultFieldKey, TAsName, TCastType>(this.dbType, this.comparable, val, this.ownerName, this.defaultFieldKey, this.castType);
+        return new CTEObjectEntry<TDbType, TComparable, TValueType, TFinalValueType, TFieldName, TAsName, TCastType>(this.dbType, this.comparable, val, this.ownerName, this.fieldName, this.castType);
     }
     cast<TCastType extends PgColumnType>(type: TCastType) {
-        return new CTEObjectEntry<TDbType, TComparable, TValueType, TFinalValueType, TDefaultFieldKey, TAsName, TCastType>(this.dbType, this.comparable, this.asName, this.ownerName, this.defaultFieldKey, type);
+        return new CTEObjectEntry<TDbType, TComparable, TValueType, TFinalValueType, TFieldName, TAsName, TCastType>(this.dbType, this.comparable, this.asName, this.ownerName, this.fieldName, type);
     }
 
     ownerName?: string;
     setOwnerName(val: string) {
-        return new CTEObjectEntry<TDbType, TComparable, TValueType, TFinalValueType, TDefaultFieldKey, TAsName, TCastType>(this.dbType, this.comparable, this.asName, val);
+        return new CTEObjectEntry<TDbType, TComparable, TValueType, TFinalValueType, TFieldName, TAsName, TCastType>(this.dbType, this.comparable, this.asName, val);
     }
 
     buildSQL(context?: QueryBuilderContext) {
@@ -83,7 +83,7 @@ class CTEObjectEntry<
             context = queryBuilderContextFactory();
         }
 
-        return { query: `"${this.ownerName}"."${this.asName || this.defaultFieldKey}"`, params: context.params };
+        return { query: `"${this.ownerName}"."${this.asName || this.fieldName}"`, params: context.params };
     }
 
     constructor(
@@ -91,7 +91,7 @@ class CTEObjectEntry<
         comparable: TComparable,
         asName?: TAsName,
         ownerName?: string,
-        defaultFieldKey?: TDefaultFieldKey,
+        fieldName?: TFieldName,
         castType?: TCastType
     ) {
         this.dbType = dbType;
@@ -100,7 +100,7 @@ class CTEObjectEntry<
         this.ownerName = ownerName;
         this.castType = castType;
 
-        this.defaultFieldKey = defaultFieldKey || (comparable.asName === undefined ? comparable.defaultFieldKey : comparable.asName);
+        this.fieldName = fieldName || (comparable.asName === undefined ? comparable.fieldName : comparable.asName);
     }
 }
 
@@ -166,7 +166,7 @@ class CTEObject<
 
     as<TAs extends string>(val: TAs) {
         const newEntries = this.cteObjectEntries
-            .map(ent => new CTEObjectEntry(ent.dbType, ent.comparable, ent.asName, val, ent.defaultFieldKey)) as readonly CTEObjectEntry<TDbType, any, any, any, any, any>[] as TEntries;
+            .map(ent => new CTEObjectEntry(ent.dbType, ent.comparable, ent.asName, val, ent.fieldName)) as readonly CTEObjectEntry<TDbType, any, any, any, any, any>[] as TEntries;
 
         return new CTEObject<TDbType, TCTEName, TCTEType, TQb, TEntries, TAs>(this.dbType, this.qb, this.cteName, this.cteType, newEntries, val);
     }
@@ -184,7 +184,7 @@ function withAs<
     const cteObject = new CTEObject(qb.dbType, qb, as, cteTypes.NON_RECURSIVE) as TCTEObject;
     const cteSpecs = [cteObject] as const;
 
-    let params: readonly QueryParam<TDbType, any, any, any, any, any>[] | undefined = qb.params;
+    let params: readonly QueryParam<TDbType, any, any, any, any>[] | undefined = qb.params;
     if (params && params.length === 0) {
         params = undefined;
     }
@@ -282,7 +282,7 @@ function withRecursiveAs<
     ) as TFinalCTE;
     const cteSpecs = [cteObject] as const;
 
-    let params: readonly QueryParam<TDbType, any, any, any, any, any>[] | undefined = finalQb.params;
+    let params: readonly QueryParam<TDbType, any, any, any, any>[] | undefined = finalQb.params;
     if (params && params.length === 0) {
         params = undefined;
     }

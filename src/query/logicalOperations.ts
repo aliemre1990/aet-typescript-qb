@@ -16,7 +16,7 @@ import QueryParam from "./param.js";
 type InferLogicalOperationParams<
     TComparisons extends readonly (ColumnComparisonOperation<any, any, any, any, any, any, any> | ColumnLogicalOperation<any, any, any, any, any>)[],
 > = TComparisons extends readonly [infer First, ...infer Rest] ?
-    First extends { params?: infer TParams extends readonly QueryParam<any, any, any, any, any, any>[] | undefined } ?
+    First extends { params?: infer TParams extends readonly QueryParam<any, any, any, any, any>[] | undefined } ?
     Rest extends readonly [any, ...any[]] ?
     [...(TParams extends undefined ? [] : TParams), ...InferLogicalOperationParams<Rest>] :
     (TParams extends undefined ? [] : TParams) :
@@ -32,13 +32,10 @@ const logicalOperations = {
 
 type LogicalOperation = (typeof logicalOperations[keyof typeof logicalOperations]);
 
-const logicalOperationDefaultColumnName = '?column?';
-type TLogicalOperationDefaultColumnName = typeof logicalOperationDefaultColumnName;
-
 class ColumnLogicalOperation<
     TDbType extends DbType,
     TComparisons extends readonly (ColumnComparisonOperation<TDbType, any, any, any, any, any, any> | ColumnLogicalOperation<TDbType, any, any, any, any>)[],
-    TParams extends readonly QueryParam<TDbType, string, any, any, any, any>[] | undefined = UndefinedIfLengthZero<InferLogicalOperationParams<TComparisons>>,
+    TParams extends readonly QueryParam<TDbType, string, any, any, any>[] | undefined = UndefinedIfLengthZero<InferLogicalOperationParams<TComparisons>>,
     TAs extends string | undefined = undefined,
     TCastType extends PgColumnType | undefined = undefined
 > implements IComparable<
@@ -46,7 +43,7 @@ class ColumnLogicalOperation<
     TParams,
     DetermineValueType<TCastType, boolean>,
     DetermineValueType<TCastType, boolean>,
-    TLogicalOperationDefaultColumnName,
+    undefined,
     TAs,
     TCastType
 > {
@@ -54,7 +51,7 @@ class ColumnLogicalOperation<
     params?: TParams;
     [IComparableValueDummySymbol]?: DetermineValueType<TCastType, boolean>;
     [IComparableFinalValueDummySymbol]?: DetermineValueType<TCastType, boolean>;
-    defaultFieldKey: TLogicalOperationDefaultColumnName = logicalOperationDefaultColumnName;
+    fieldName: undefined = undefined;
     asName?: TAs;
     castType?: TCastType;
 
@@ -91,7 +88,7 @@ class ColumnLogicalOperation<
         this.asName = asName;
         this.castType = castType;
 
-        let tmpParams: readonly QueryParam<TDbType, any, any, any, any, any>[] = [];
+        let tmpParams: readonly QueryParam<TDbType, any, any, any, any>[] = [];
 
         comparisons.forEach(comp => {
             if (

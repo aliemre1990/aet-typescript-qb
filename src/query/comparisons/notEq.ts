@@ -7,10 +7,10 @@ import QueryParam from "../param.js";
 function notEq<
     TComparing extends IComparable<TDbType, any, any, any, any, any, any>,
     TValueType extends InferValueTypeFromComparable<TDbType, TComparing>,
-    TParamMedian extends QueryParam<TDbType, string, any, any, any, any>,
-    TParamName extends TParamMedian extends QueryParam<any, infer U, any, any, any, any> ? U : never,
-    TParamValue extends TParamMedian extends QueryParam<any, any, infer TVal, any, any, any> ? TVal : never,
-    TParam extends QueryParam<TDbType, TParamName, IsAny<TParamValue> extends true ? LiteralToBase<TValueType> | null : TParamValue, any, any, any>,
+    TParamMedian extends QueryParam<TDbType, string, any, any, any>,
+    TParamName extends TParamMedian extends QueryParam<any, infer U, any, any, any> ? U : never,
+    TParamValue extends TParamMedian extends QueryParam<any, any, infer TVal, any, any> ? TVal : never,
+    TParam extends QueryParam<TDbType, TParamName, IsAny<TParamValue> extends true ? LiteralToBase<TValueType> | null : TParamValue, any, any>,
     TDbType extends DbType = TComparing extends IComparable<infer DbType, any, any, any, any, any, any> ? DbType : never,
 >(this: TComparing, value: TParamValue extends (LiteralToBase<TValueType> | null) ? TParamMedian : never
 ): ColumnComparisonOperation<
@@ -41,9 +41,9 @@ function notEq<
 function notEq<
     TComparing extends IComparable<TDbType, any, any, any, any, any, any>,
     TValueType extends InferValueTypeFromComparable<TDbType, TComparing>,
-    TParamMedian extends QueryParam<TDbType, string, any, any, any, any> | undefined,
-    TParamName extends (TParamMedian extends QueryParam<any, infer U, any, any, any, any> ? U : never) | undefined,
-    TParamValue extends TParamMedian extends QueryParam<any, any, infer TVal, any, any, any> ? TVal : never,
+    TParamMedian extends QueryParam<TDbType, string, any, any, any> | undefined,
+    TParamName extends (TParamMedian extends QueryParam<any, infer U, any, any, any> ? U : never) | undefined,
+    TParamValue extends TParamMedian extends QueryParam<any, any, infer TVal, any, any> ? TVal : never,
     TApplied extends IComparable<TDbType, any, TValueType extends null ? any : LiteralToBase<TValueType>, any, any, any, any>,
     TDbType extends DbType = TComparing extends IComparable<infer DbType, any, any, any, any, any, any> ? DbType : never,
 >

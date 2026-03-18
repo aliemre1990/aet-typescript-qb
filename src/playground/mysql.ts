@@ -7,6 +7,6 @@ const connection = await mysql.createConnection({
     database: 'sakila',
 });
 
-const res = await connection.query('SELECT * FROM customer, actor');
+const res = await connection.query('SELECT \'1\' as id, \'2\' as id');
 
 console.log(res);

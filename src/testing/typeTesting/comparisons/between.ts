@@ -16,7 +16,7 @@ const betweenInvalidVal3 = customerIdQC.between("ali", "veli");
 //
 const betweenLRParam = customerIdQC.between(paramTester("left"), paramTester("right"));
 type typeof_BetweenLRParam = typeof betweenLRParam;
-type typeof_BetweenLRParam_Applied = typeof_BetweenLRParam extends ColumnComparisonOperation<any, any, infer TApplied, any, any, any> ? TApplied : never;
+type typeof_BetweenLRParam_Applied = typeof_BetweenLRParam extends ColumnComparisonOperation<any, any, infer TApplied, any, any, any, any> ? TApplied : never;
 type typeof_BetweenLRParam_LParamType = typeof_BetweenLRParam_Applied[0] extends QueryParam<any, any, infer TVal, any, any> ? TVal : never;
 type typeof_BetweenLRParam_RParamType = typeof_BetweenLRParam_Applied[1] extends QueryParam<any, any, infer TVal, any, any> ? TVal : never;
 type betweenLRParam_LParamTest = AssertTrue<AssertEqual<typeof_BetweenLRParam_LParamType, number | null>>;

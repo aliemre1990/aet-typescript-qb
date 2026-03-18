@@ -50,11 +50,11 @@ type MapParamsToTypeRecursively<
     T extends readonly (TValueType | IComparable<any, any, TValueType, any, any, any, any>)[]
 > =
     T extends readonly [infer First, ...infer Rest] ?
-    First extends QueryParam<infer DbType, infer Name, infer ValueType, infer As, infer DefaultFieldKey, infer TCastType> ?
+    First extends QueryParam<infer DbType, infer Name, infer ValueType, infer As, infer TCastType> ?
     IsAny<ValueType> extends true ?
     Rest extends readonly [any, ...any[]] ?
-    [QueryParam<DbType, Name, TValueType | null, As, DefaultFieldKey, TCastType>, ...MapParamsToTypeRecursively<TValueType, Rest>] :
-    [QueryParam<DbType, Name, TValueType | null, As, DefaultFieldKey, TCastType>] :
+    [QueryParam<DbType, Name, TValueType | null, As, TCastType>, ...MapParamsToTypeRecursively<TValueType, Rest>] :
+    [QueryParam<DbType, Name, TValueType | null, As, TCastType>] :
     Rest extends readonly [any, ...any[]] ?
     [First, ...MapParamsToTypeRecursively<TValueType, Rest>] :
     [First] :

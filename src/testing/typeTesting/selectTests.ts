@@ -25,7 +25,7 @@ type typeof_SelectWhere_WithParams = typeof selectWhere_WithParams;
 type typeof_SelectWhere_WithParams_ResultCols = typeof_SelectWhere_WithParams extends QueryBuilder<any, any, any, any, infer TResult, any, any, any> ? TResult : never;
 type typeof_SelectWhere_WithParams_ResultType = ColumnsToResultMap<any, typeof_SelectWhere_WithParams_ResultCols>;
 type typeof_SelectWhere_WithParams_Params = typeof selectWhere_WithParams extends QueryBuilder<any, any, any, any, any, infer TParams, any, any> ? TParams : never;
-type typeof_SelectWhere_WithParams_Param1Name = typeof_SelectWhere_WithParams_Params[0] extends QueryParam<any, infer TName, any, any, any, any> ? TName : never;
+type typeof_SelectWhere_WithParams_Param1Name = typeof_SelectWhere_WithParams_Params[0] extends QueryParam<any, infer TName, any, any, any> ? TName : never;
 type typeof_SelectWhere_WithParams_ResultType_Expected = { id: number; name: string; createdBy: number }[];
 type selectWhere_WithParams_ParamsLength_Test = AssertTrue<AssertEqual<typeof_SelectWhere_WithParams_Params["length"], 1>>;
 type selectWhere_WithParams_Param1Name_Test = AssertTrue<AssertEqual<typeof_SelectWhere_WithParams_Param1Name, "whereparam">>;
@@ -78,7 +78,7 @@ type typeof_SelectWithParams = typeof selectWithParams;
 type typeof_SelectWithParams_ResultCols = typeof_SelectWithParams extends QueryBuilder<any, any, any, any, infer TResult, any, any, any> ? TResult : never;
 type typeof_SelectWithParams_ResultType = ColumnsToResultMap<any, typeof_SelectWithParams_ResultCols>;
 type typeof_SelectWithParams_Params = typeof selectWithParams extends QueryBuilder<any, any, any, any, any, infer TParams, any, any> ? TParams : never;
-type typeof_SelectWithParams_Param1Name = typeof_SelectWithParams_Params[0] extends QueryParam<any, infer TName, any, any, any, any> ? TName : never;
+type typeof_SelectWithParams_Param1Name = typeof_SelectWithParams_Params[0] extends QueryParam<any, infer TName, any, any, any> ? TName : never;
 type typeof_SelectWithParams_ResultType_Expected = { id: number; roundResult: number | null }[];
 type selectWithParams_ParamsLength_Test = AssertTrue<AssertEqual<typeof_SelectWithParams_Params["length"], 1>>;
 type selectWithParams_Param1Name_Test = AssertTrue<AssertEqual<typeof_SelectWithParams_Param1Name, "roundParam1">>;
@@ -97,19 +97,19 @@ type typeof_SelectWithJSONBuildObject_ResultType_Expected = { id: number; orders
 type selectWithJSONBuildObject_ResultType_Test = AssertTrue<AssertEqual<typeof_SelectWithJSONBuildObject_ResultType, typeof_SelectWithJSONBuildObject_ResultType_Expected>>
 
 const selectComparison = customersTable.select((cols) => [
-    cols.customers.id.eq(1)
+    cols.customers.id.eq(1).as("idEquals1")
 ]);
 type typeof_selectComparison = typeof selectComparison;
 type typeof_selectComparison_ResultCols = typeof_selectComparison extends QueryBuilder<any, any, any, any, infer TResult, any, any, any> ? TResult : never;
 type typeof_selectComparison_ResultType = ColumnsToResultMap<any, typeof_selectComparison_ResultCols>;
-type typeof_selectComparison_ResultType_Expected = { "?column?": boolean }[];
+type typeof_selectComparison_ResultType_Expected = { "idEquals1": boolean }[];
 type selectComparison_ResultType_Test = AssertTrue<AssertEqual<typeof_selectComparison_ResultType, typeof_selectComparison_ResultType_Expected>>
 
 const selectLogical = customersTable.select((cols, { and }) => [
-    and(cols.customers.id.eq(1), cols.customers.name.eq("Jane"))
+    and(cols.customers.id.eq(1), cols.customers.name.eq("Jane")).as("idEquals1AndNameEqualsJane")
 ]);
 type typeof_selectLogical = typeof selectLogical;
 type typeof_selectLogical_ResultCols = typeof_selectLogical extends QueryBuilder<any, any, any, any, infer TResult, any, any, any> ? TResult : never;
 type typeof_selectLogical_ResultType = ColumnsToResultMap<any, typeof_selectLogical_ResultCols>;
-type typeof_selectLogical_ResultType_Expected = { "?column?": boolean }[];
+type typeof_selectLogical_ResultType_Expected = { "idEquals1AndNameEqualsJane": boolean }[];
 type selectLogical_ResultType_Test = AssertTrue<AssertEqual<typeof_selectLogical_ResultType, typeof_selectLogical_ResultType_Expected>>

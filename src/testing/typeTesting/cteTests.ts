@@ -1,5 +1,5 @@
 import type { ColumnsToResultMap } from "../../query/_types/result.js";
-import { withAs, withRecursiveAs } from "../../query/cteObject.js";
+import CTEObject, { withAs, withRecursiveAs } from "../../query/cteObject.js";
 import type QueryParam from "../../query/param.js";
 import QueryBuilder, { from } from "../../query/queryBuilder.js";
 import { customersTable, employeesTable, ordersTable } from "../_tables.js";
@@ -30,6 +30,9 @@ const recursiveCTEValid_Regular = withRecursiveAs(
         .select((tbl) => [tbl.employees.id, tbl.employees.name, tbl.employees.managerId]),
     "UNION",
     (self) => {
+
+        type tp = typeof self extends { entries: infer  TEntries } ? TEntries : never;
+
         return employeesTable
             .select((tables) => [tables.employees.id, tables.employees.name, tables.employees.id])
             .join("INNER", self, (tables) => tables.subordinates.id.eq(tables.employees.managerId));
@@ -38,7 +41,7 @@ const recursiveCTEValid_Regular = withRecursiveAs(
     .select((tbls) => [tbls.subordinates.id, tbls.subordinates.name]);
 type typeof_RecursiveCTEValid_Regular = typeof recursiveCTEValid_Regular;
 type typeof_RecursiveCTEValid_Regular_Params = typeof_RecursiveCTEValid_Regular extends QueryBuilder<any, any, any, any, any, infer TParams, any, any> ? TParams : never;
-type typeof_RecursiveCTEValid_Regular_Param1_Name = typeof_RecursiveCTEValid_Regular_Params[0] extends QueryParam<any, infer TName, any, any, any, any> ? TName : never;
+type typeof_RecursiveCTEValid_Regular_Param1_Name = typeof_RecursiveCTEValid_Regular_Params[0] extends QueryParam<any, infer TName, any, any, any> ? TName : never;
 type typeof_RecursiveCTEValid_Regular_ResultCols = typeof_RecursiveCTEValid_Regular extends QueryBuilder<any, any, any, any, infer TResult, any, any, any> ? TResult : never;
 type typeof_RecursiveCTEValid_Regular_ResultType = ColumnsToResultMap<any, typeof_RecursiveCTEValid_Regular_ResultCols>;
 type typeof_RecursiveCTEValid_Regular_ResultType_Expected = { id: number; name: string; }[]
@@ -65,8 +68,8 @@ const recursiveCTEValid_Chained =
         .select((tbls) => [tbls.subordinates.id, tbls.subordinates.name]);
 type typeof_RecursiveCTEValid_Chained = typeof recursiveCTEValid_Chained;
 type typeof_RecursiveCTEValid_Chained_Params = typeof_RecursiveCTEValid_Chained extends QueryBuilder<any, any, any, any, any, infer TParams, any, any> ? TParams : "a";
-type typeof_RecursiveCTEValid_Chained_Param1_Name = typeof_RecursiveCTEValid_Chained_Params[0] extends QueryParam<any, infer TName, any, any, any, any> ? TName : never;
-type typeof_RecursiveCTEValid_Chained_Param2_Name = typeof_RecursiveCTEValid_Chained_Params[1] extends QueryParam<any, infer TName, any, any, any, any> ? TName : never;
+type typeof_RecursiveCTEValid_Chained_Param1_Name = typeof_RecursiveCTEValid_Chained_Params[0] extends QueryParam<any, infer TName, any, any, any> ? TName : never;
+type typeof_RecursiveCTEValid_Chained_Param2_Name = typeof_RecursiveCTEValid_Chained_Params[1] extends QueryParam<any, infer TName, any, any, any> ? TName : never;
 type typeof_RecursiveCTEValid_Chained_ResultCols = typeof_RecursiveCTEValid_Chained extends QueryBuilder<any, any, any, any, infer TResult, any, any, any> ? TResult : never;
 type typeof_RecursiveCTEValid_Chained_ResultType = ColumnsToResultMap<any, typeof_RecursiveCTEValid_Chained_ResultCols>;
 type typeof_RecursiveCTEValid_Chained_ResultType_Expected = { id: number; name: string; }[]

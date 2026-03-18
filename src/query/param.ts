@@ -13,19 +13,15 @@ import lte from "./comparisons/lte.js";
 import notEq from "./comparisons/notEq.js";
 
 type ExtractParams<T> =
-    T extends QueryParam<any, any, any, any, any, any> ? [T] :
-    T extends { params?: infer TParams extends QueryParam<any, any, any, any, any, any>[] | undefined } ? TParams extends undefined ? [] : TParams :
+    T extends QueryParam<any, any, any, any, any> ? [T] :
+    T extends { params?: infer TParams extends QueryParam<any, any, any, any, any>[] | undefined } ? TParams extends undefined ? [] : TParams :
     [];
-
-const paramDefaultColumnName = '?column?';
-type TParameDefaultColumnName = typeof paramDefaultColumnName;
 
 class QueryParam<
     TDbType extends DbType,
     TName extends string,
     TValueType extends DbValueTypes | null,
     TAs extends string | undefined = undefined,
-    TDefaultFieldKey extends string = TParameDefaultColumnName,
     TCastType extends PgColumnType | undefined = undefined
 >
     implements IComparable<
@@ -33,7 +29,7 @@ class QueryParam<
         undefined,
         DetermineValueType<TCastType, NonNullable<TValueType>>,
         DetermineFinalValueType<IsAny<TValueType> extends true ? DetermineValueType<TCastType, TValueType> | null : TValueType, DetermineValueType<TCastType, NonNullable<TValueType>>>,
-        TDefaultFieldKey,
+        undefined,
         TAs,
         TCastType
     > {
@@ -46,8 +42,8 @@ class QueryParam<
 
     name: TName;
     asName?: TAs;
+    fieldName: undefined = undefined;
     castType?: TCastType;
-    defaultFieldKey: TDefaultFieldKey;
 
     constructor(dbType: TDbType, name: TName, asName?: TAs, ownerName?: string, castType?: TCastType) {
         this.dbType = dbType;
@@ -55,20 +51,18 @@ class QueryParam<
         this.asName = asName;
         this.castType = castType;
         this.ownerName = ownerName;
-
-        this.defaultFieldKey = paramDefaultColumnName as TDefaultFieldKey;
     }
 
     as<TAs extends string>(asName: TAs) {
-        return new QueryParam<TDbType, TName, TValueType, TAs, TDefaultFieldKey, TCastType>(this.dbType, this.name, asName, this.ownerName, this.castType);
+        return new QueryParam<TDbType, TName, TValueType, TAs, TCastType>(this.dbType, this.name, asName, this.ownerName, this.castType);
     }
     cast<TCastType extends PgColumnType>(type: TCastType) {
-        return new QueryParam<TDbType, TName, TValueType, TAs, TDefaultFieldKey, TCastType>(this.dbType, this.name, this.asName, this.ownerName, type);
+        return new QueryParam<TDbType, TName, TValueType, TAs, TCastType>(this.dbType, this.name, this.asName, this.ownerName, type);
     }
 
     ownerName?: string;
-    setOwnerName(val: string): QueryParam<TDbType, TName, TValueType, TAs, TDefaultFieldKey, TCastType> {
-        return new QueryParam<TDbType, TName, TValueType, TAs, TDefaultFieldKey, TCastType>(this.dbType, this.name, this.asName, val, this.castType);
+    setOwnerName(val: string): QueryParam<TDbType, TName, TValueType, TAs, TCastType> {
+        return new QueryParam<TDbType, TName, TValueType, TAs, TCastType>(this.dbType, this.name, this.asName, val, this.castType);
     }
 
     buildSQL(context?: QueryBuilderContext) {
@@ -85,7 +79,7 @@ class QueryParam<
     }
 
     type<TValueType extends DbValueTypes | null>() {
-        return new QueryParam<TDbType, TName, TValueType, TAs, TDefaultFieldKey, TCastType>(this.dbType, this.name, this.asName, this.ownerName, this.castType);
+        return new QueryParam<TDbType, TName, TValueType, TAs, TCastType>(this.dbType, this.name, this.asName, this.ownerName, this.castType);
     }
 
     eq: typeof eq = eq;

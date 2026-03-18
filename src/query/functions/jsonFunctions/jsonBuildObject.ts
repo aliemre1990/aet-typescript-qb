@@ -57,16 +57,15 @@ class JSONBuildObjectFunction<
     TDbType extends PgDbType,
     TObj extends JSONBuildObjectParam<TDbType>,
     TReturnType extends DbValueTypes | null = TDbType extends PgDbType ? InferReturnTypeFromJSONBuildObjectParam<TDbType, TObj> : never,
-    TParams extends QueryParam<TDbType, string, any, any, any, any>[] | undefined = InferParamsFromJsonBuildObjectArg<TDbType, TObj>,
+    TParams extends QueryParam<TDbType, string, any, any, any>[] | undefined = InferParamsFromJsonBuildObjectArg<TDbType, TObj>,
     TAs extends string | undefined = undefined,
-    TDefaultFieldKey extends string = 'json_build_object',
     TCastType extends PgColumnType | undefined = undefined
 > implements IComparable<
     TDbType,
     TParams,
     DetermineValueType<TCastType, NonNullable<TReturnType>>,
     DetermineFinalValueType<TReturnType, DetermineValueType<TCastType, NonNullable<TReturnType>>>,
-    TDefaultFieldKey,
+    undefined,
     TAs,
     TCastType
 > {
@@ -79,14 +78,14 @@ class JSONBuildObjectFunction<
 
     params?: TParams;
     asName?: TAs;
+    fieldName: undefined = undefined;
     castType?: TCastType;
-    defaultFieldKey: TDefaultFieldKey;
 
     as<TAs extends string>(asName: TAs) {
-        return new JSONBuildObjectFunction<TDbType, TObj, TReturnType, TParams, TAs, TDefaultFieldKey, TCastType>(this.dbType, this.obj, this.isJsonB, asName, this.castType);
+        return new JSONBuildObjectFunction<TDbType, TObj, TReturnType, TParams, TAs, TCastType>(this.dbType, this.obj, this.isJsonB, asName, this.castType);
     }
     cast<TCastType extends PgColumnType>(type: TCastType) {
-        return new JSONBuildObjectFunction<TDbType, TObj, TReturnType, TParams, TAs, TDefaultFieldKey, TCastType>(this.dbType, this.obj, this.isJsonB, this.asName, type);
+        return new JSONBuildObjectFunction<TDbType, TObj, TReturnType, TParams, TAs, TCastType>(this.dbType, this.obj, this.isJsonB, this.asName, type);
     }
 
     buildSQL(context?: QueryBuilderContext) {
@@ -111,11 +110,10 @@ class JSONBuildObjectFunction<
         this.obj = obj;
         this.isJsonB = isJsonB;
         this.asName = asName;
-        this.defaultFieldKey = 'json_build_object' as TDefaultFieldKey;
         this.castType = castType;
 
 
-        const tmpParams: QueryParam<TDbType, any, any, any, any, any>[] = [];
+        const tmpParams: QueryParam<TDbType, any, any, any, any>[] = [];
         let entries = Object.entries(this.obj);
 
         for (const entry of entries) {

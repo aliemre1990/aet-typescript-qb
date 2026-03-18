@@ -59,15 +59,13 @@ type ComparisonOperation = (typeof comparisonOperations)[keyof typeof comparison
 type InferValueTypeFromComparable<TDbType extends DbType, T> =
     T extends IComparable<TDbType, any, infer TValueType, any, any, any, any> ? TValueType : never;
 
-const comparisonOperationDefaultColumnName = '?column?';
-type TComparisonOperationDefaultColumnName = typeof comparisonOperationDefaultColumnName;
 
 class ColumnComparisonOperation<
     TDbType extends DbType,
     TComparing extends IComparable<TDbType, any, any, any, any, any, any>,
     TApplied extends readonly (TValueType | null | IComparable<TDbType, any, any, any, any, any, any>)[] | undefined,
     TValueType extends DbValueTypes = InferValueTypeFromComparable<TDbType, TComparing>,
-    TParams extends readonly QueryParam<TDbType, string, any, any, any, any>[] | undefined = UndefinedIfLengthZero<InferComparisonParams<TComparing, TApplied>>,
+    TParams extends readonly QueryParam<TDbType, string, any, any, any>[] | undefined = UndefinedIfLengthZero<InferComparisonParams<TComparing, TApplied>>,
     TAs extends string | undefined = undefined,
     TCastType extends PgColumnType | undefined = undefined
 > implements IComparable<
@@ -75,7 +73,7 @@ class ColumnComparisonOperation<
     TParams,
     DetermineValueType<TCastType, boolean>,
     DetermineValueType<TCastType, boolean>,
-    TComparisonOperationDefaultColumnName,
+    undefined,
     TAs,
     TCastType
 > {
@@ -84,7 +82,7 @@ class ColumnComparisonOperation<
     params?: TParams;
     [IComparableValueDummySymbol]?: DetermineValueType<TCastType, boolean>;
     [IComparableFinalValueDummySymbol]?: DetermineValueType<TCastType, boolean>;
-    defaultFieldKey: TComparisonOperationDefaultColumnName = comparisonOperationDefaultColumnName;
+    fieldName: undefined = undefined;
     asName?: TAs;
     castType?: TCastType;
 
@@ -155,7 +153,7 @@ class ColumnComparisonOperation<
         this.asName = asName;
         this.castType = castType;
 
-        let tmpParams: readonly QueryParam<TDbType, any, any, any, any, any>[] = [];
+        let tmpParams: readonly QueryParam<TDbType, any, any, any, any>[] = [];
         if (comparing.params !== undefined && comparing.params.length > 0) {
             tmpParams = [...tmpParams, ...comparing.params];
         }

@@ -28,7 +28,7 @@ QueryBuilder,
     type ResultShape
 } from "./queryBuilder.js";
 
-type MapQueryColumnsToRecord<TColumns extends readonly QueryColumn<any, any, any, any, any, any, any, any>[]> = {
+type MapQueryColumnsToRecord<TColumns extends readonly QueryColumn<any, any, any, any, any, any, any>[]> = {
     [C in TColumns[number]as C["column"]["name"]]: C
 }
 
@@ -37,7 +37,7 @@ class QueryTable<
     TColumns extends readonly Column<TDbType, any, any, any, any, any, any>[],
     TTableName extends string,
     TTable extends Table<TDbType, TColumns, TTableName>,
-    TQColumns extends readonly QueryColumn<TDbType, any, any, any, any, any, any, any>[],
+    TQColumns extends readonly QueryColumn<TDbType, any, any, any, any, any, any>[],
     TAsName extends string | undefined = undefined
 > implements
     IDbType<TDbType>,
@@ -65,7 +65,7 @@ class QueryTable<
             prev[curr.column.name] = curr;
 
             return prev;
-        }, {} as { [key: string]: QueryColumn<TDbType, any, any, any, any, any, any, any> }) as typeof this.columns;
+        }, {} as { [key: string]: QueryColumn<TDbType, any, any, any, any, any, any> }) as typeof this.columns;
     }
 
     buildSQL(context?: QueryBuilderContext) {
@@ -154,8 +154,8 @@ class QueryTable<
         TJoinTable extends QueryBuilder<TDbType, any, any, any, any, any, string, any> ? MapToSubQueryObject<TDbType, TJoinTable> :
         TJoinTable extends CTEObject<TDbType, any, any, any, any, any> ? TJoinTable :
         TJoinTable,
-        TJoinParams extends QueryParam<TDbType, any, any, any, any, any>[] = AccumulateSubQueryParams<TDbType, [TJoinResult], AccumulateComparisonParams<TCbResult>>,
-        TJoinParamsResult extends QueryParam<TDbType, any, any, any, any, any>[] | undefined = TJoinParams["length"] extends 0 ? undefined : TJoinParams,
+        TJoinParams extends QueryParam<TDbType, any, any, any, any>[] = AccumulateSubQueryParams<TDbType, [TJoinResult], AccumulateComparisonParams<TCbResult>>,
+        TJoinParamsResult extends QueryParam<TDbType, any, any, any, any>[] | undefined = TJoinParams["length"] extends 0 ? undefined : TJoinParams,
         const TJoinAccumulated extends JoinSpecsType<TDbType> = [{ joinType: TJoinType, table: TJoinResult, comparison: ComparisonType<TDbType> }]
     >(
         type: TJoinType,

@@ -9,8 +9,8 @@ const joinWithParams = customersTable
     .select();
 type typeof_JoinWithParams = typeof joinWithParams;
 type typeof_JoinWithParams_Params = typeof joinWithParams extends QueryBuilder<any, any, any, any, any, infer TParams, any, any> ? TParams : never;
-type typeof_JoinWithParams_Param1Name = typeof_JoinWithParams_Params[0] extends QueryParam<any, infer TName, any, any, any, any> ? TName : never;
-type typeof_JoinWithParams_Param1Type = typeof_JoinWithParams_Params[0] extends QueryParam<any, any, infer TType, any, any, any> ? TType : never;
+type typeof_JoinWithParams_Param1Name = typeof_JoinWithParams_Params[0] extends QueryParam<any, infer TName, any, any, any> ? TName : never;
+type typeof_JoinWithParams_Param1Type = typeof_JoinWithParams_Params[0] extends QueryParam<any, any, infer TType, any, any> ? TType : never;
 type typeof_JoinWithParams_ResultCols = typeof joinWithParams extends QueryBuilder<any, any, any, any, infer TResult, any, any, any> ? TResult : never;
 type typeof_JoinWithParams_ResultType = ColumnsToResultMap<any, typeof_JoinWithParams_ResultCols>;
 type typeof_JoinWithParams_ResultType_Expected = { id: number; name: string; customerTypeId: number; createdBy: number; }[];

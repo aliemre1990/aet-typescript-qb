@@ -25,23 +25,21 @@ type CalculateSQLParams<
     ExtractParams<First> :
     [];
 
-const sqlOperatorDefaultColumnName = '';
-type TSQLOperatorDefaultColumnName = typeof sqlOperatorDefaultColumnName;
 
 class SQLOperator<
     TDbType extends DbType,
     TValues extends readonly (IComparable<TDbType, any, any, any, any, any, any> | ColumnComparisonOperation<TDbType, any, any, any, any, any, any> | ColumnLogicalOperation<TDbType, any, any, any, any> | DbValueTypes | null)[],
     TValueType extends DbValueTypes | null = any,
+    TFieldName extends string | undefined = undefined,
     TAs extends string | undefined = undefined,
     TCastType extends PgColumnType | undefined = undefined,
-    TName extends string = TSQLOperatorDefaultColumnName,
-    TParams extends readonly QueryParam<TDbType, any, any, any, any, any>[] | undefined = UndefinedIfLengthZero<CalculateSQLParams<TValues>>
+    TParams extends readonly QueryParam<TDbType, any, any, any, any>[] | undefined = UndefinedIfLengthZero<CalculateSQLParams<TValues>>
 > implements IComparable<
     TDbType,
     TParams,
     IsExact<TValueType, null> extends true ? null : DetermineValueType<TCastType, NonNullable<TValueType>>,
     DetermineFinalValueType<TValueType, DetermineValueType<TCastType, TValueType>>,
-    TName,
+    TFieldName,
     TAs,
     TCastType
 
@@ -51,7 +49,7 @@ class SQLOperator<
     [IComparableValueDummySymbol]?: IsExact<TValueType, null> extends true ? null : DetermineValueType<TCastType, NonNullable<TValueType>>;
     [IComparableFinalValueDummySymbol]?: DetermineFinalValueType<TValueType, DetermineValueType<TCastType, TValueType>>;
     params?: TParams;
-    defaultFieldKey: TName;
+    fieldName: TFieldName;
     asName?: TAs;
     castType?: TCastType;
 
@@ -78,17 +76,17 @@ class SQLOperator<
         this.strs = strs;
         this.values = values;
 
-        this.defaultFieldKey = 'the value does not matter, try to match TName parameter with sql query result.' as TName;
+        this.fieldName = 'Any Value' as TFieldName;
     }
 
     as<TAs extends string>(asName: TAs) {
-        return new SQLOperator<TDbType, TValues, TValueType, TAs, TCastType, TName, TParams>(this.dbType, this.strs, this.values, asName, this.castType);
+        return new SQLOperator<TDbType, TValues, TValueType, TFieldName, TAs, TCastType, TParams>(this.dbType, this.strs, this.values, asName, this.castType);
     }
     cast<TCastType extends PgColumnType>(type: TCastType) {
-        return new SQLOperator<TDbType, TValues, TValueType, TAs, TCastType, TName, TParams>(this.dbType, this.strs, this.values, this.asName, type);
+        return new SQLOperator<TDbType, TValues, TValueType, TFieldName, TAs, TCastType, TParams>(this.dbType, this.strs, this.values, this.asName, type);
     }
-    specs<TValueType extends DbValueTypes | null, TName extends string = ''>() {
-        return new SQLOperator<TDbType, TValues, TValueType, TAs, TCastType, TName, TParams>(this.dbType, this.strs, this.values, this.asName, this.castType);
+    specs<TValueType extends DbValueTypes | null, TFieldName extends string = ''>() {
+        return new SQLOperator<TDbType, TValues, TValueType, TFieldName, TAs, TCastType, TParams>(this.dbType, this.strs, this.values, this.asName, this.castType);
     }
 
     buildSQL(context?: QueryBuilderContext): { query: string, params: string[] } {

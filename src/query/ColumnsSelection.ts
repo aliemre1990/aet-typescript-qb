@@ -12,7 +12,7 @@ type ColumnsSelection<
         [ColumnsSelectionQueryObjectSymbol]: TQItem;
     } &
     {
-        [K in TColumns[number]as K["defaultFieldKey"]]: K;
+        [K in TColumns[number]as K["fieldName"]]: K;
     };
 
 function columnsSelectionFactory<TDbType extends DbType>(
@@ -25,7 +25,7 @@ function columnsSelectionFactory<TDbType extends DbType>(
     }
 
     for (const col of columns) {
-        res[col.defaultFieldKey] = col;
+        res[col.fieldName] = col;
     }
 
     return res;

@@ -10,7 +10,7 @@ import type { AssertEqual, AssertTrue } from "../_typeTestingUtilities.js";
 const simpleSQL_WithParams = sqlTester`Round(${paramTester("param")})`;
 type typeof_SimpleSQL_WithParams = typeof simpleSQL_WithParams;
 type typeof_SimpleSQL_WithParams_Params = typeof_SimpleSQL_WithParams extends IComparable<any, infer TParams, any, any, any, any, any> ? TParams : never;
-type typeof_SimpleSQL_WithParams_Param1Name = typeof_SimpleSQL_WithParams_Params[0] extends QueryParam<any, infer TName, any, any, any, any> ? TName : never;
+type typeof_SimpleSQL_WithParams_Param1Name = typeof_SimpleSQL_WithParams_Params[0] extends QueryParam<any, infer TName, any, any, any> ? TName : never;
 type simpleSQL_WithParams_ParamLength_Test = AssertTrue<AssertEqual<typeof_SimpleSQL_WithParams_Params["length"], 1>>;
 type simpleSQL_WithParams_Param1Name_Test = AssertTrue<AssertEqual<typeof_SimpleSQL_WithParams_Param1Name, "param">>;
 
@@ -52,7 +52,7 @@ type simpleSQL_WithTypeObj_CastJSONB_FinalValueType_Test = AssertTrue<AssertEqua
 const simpleSQL_WithComparison = sqlTester`${customerIdQC.gt(paramTester("param"))}`;
 type typeof_SimpleSQL_WithComparison = typeof simpleSQL_WithComparison;
 type typeof_SimpleSQL_WithComparison_Params = typeof_SimpleSQL_WithComparison extends IComparable<any, infer TParams, any, any, any, any, any> ? TParams : never;
-type typeof_SimpleSQL_WithComparison_Param1Name = typeof_SimpleSQL_WithComparison_Params[0] extends QueryParam<any, infer TName, any, any, any, any> ? TName : never;
+type typeof_SimpleSQL_WithComparison_Param1Name = typeof_SimpleSQL_WithComparison_Params[0] extends QueryParam<any, infer TName, any, any, any> ? TName : never;
 type simpleSQL_WithComparison_ParamLength_Test = AssertTrue<AssertEqual<typeof_SimpleSQL_WithComparison_Params["length"], 1>>;
 type simpleSQL_WithComparison_Param1Name_Test = AssertTrue<AssertEqual<typeof_SimpleSQL_WithComparison_Param1Name, "param">>;
 
@@ -61,7 +61,7 @@ type typeof_SimpleSQL_InSelectQuery = typeof simpleSQL_InSelectQuery;
 type typeof_SimpleSQL_InSelectQuery_ResultCols = typeof_SimpleSQL_InSelectQuery extends QueryBuilder<any, any, any, any, infer TResultCols, any, any, any> ? TResultCols : never;
 type typeof_SimpleSQL_InSelectQuery_ResultType = ColumnsToResultMap<any, typeof_SimpleSQL_InSelectQuery_ResultCols>;
 type typeof_SimpleSQL_InSelectQuery_Params = typeof_SimpleSQL_InSelectQuery extends QueryBuilder<any, any, any, any, any, infer TParams, any, any> ? TParams : never;
-type typeof_SimpleSQL_InSelectQuery_Param1Name = typeof_SimpleSQL_InSelectQuery_Params[0] extends QueryParam<any, infer TName, any, any, any, any> ? TName : never;
+type typeof_SimpleSQL_InSelectQuery_Param1Name = typeof_SimpleSQL_InSelectQuery_Params[0] extends QueryParam<any, infer TName, any, any, any> ? TName : never;
 type simpleSQL_InSelectQuery_ResultType_Expected = { round: number }[];
 type simpleSQL_InSelectQuery_ResultType_Test = AssertTrue<AssertEqual<typeof_SimpleSQL_InSelectQuery_ResultType, simpleSQL_InSelectQuery_ResultType_Expected>>;
 type simpleSQL_InSelectQuery_ParamLength_Test = AssertTrue<AssertEqual<typeof_SimpleSQL_InSelectQuery_Params["length"], 1>>;

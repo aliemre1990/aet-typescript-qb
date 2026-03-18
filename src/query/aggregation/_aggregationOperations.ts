@@ -57,16 +57,15 @@ class BasicColumnAggregationOperation<
         IComparable<TDbType, any, any, any, any, any, any>
     )[],
     TReturnType extends DbValueTypes | null,
-    TParams extends QueryParam<TDbType, string, any, any, any, any>[] | undefined = InferParamsFromFnArgs<TArgs>,
+    TParams extends QueryParam<TDbType, string, any, any, any>[] | undefined = InferParamsFromFnArgs<TArgs>,
     TAs extends string | undefined = undefined,
-    TDefaultFieldKey extends string = `${Lowercase<TAggregationOperation["name"]>}`,
     TCastType extends PgColumnType | undefined = undefined
 > implements IComparable<
     TDbType,
     TParams,
     DetermineValueType<TCastType, NonNullable<TReturnType>>,
     DetermineFinalValueType<TReturnType, DetermineValueType<TCastType, NonNullable<TReturnType>>>,
-    TDefaultFieldKey,
+    undefined,
     TAs,
     TCastType
 > {
@@ -80,7 +79,7 @@ class BasicColumnAggregationOperation<
     params?: TParams;
     asName?: TAs;
     castType?: TCastType;
-    defaultFieldKey: TDefaultFieldKey;
+    fieldName: undefined = undefined;
 
     eq: typeof eq = eq;
     notEq: typeof notEq = notEq;
@@ -92,10 +91,10 @@ class BasicColumnAggregationOperation<
     between: typeof between = between;
 
     as<TAs extends string>(asName: TAs) {
-        return new BasicColumnAggregationOperation<TDbType, TAggregationOperation, TArgs, TReturnType, TParams, TAs, TDefaultFieldKey, TCastType>(this.dbType, this.args, this.operation, asName, this.castType);
+        return new BasicColumnAggregationOperation<TDbType, TAggregationOperation, TArgs, TReturnType, TParams, TAs, TCastType>(this.dbType, this.args, this.operation, asName, this.castType);
     }
     cast<TCastType extends PgColumnType>(type: TCastType) {
-        return new BasicColumnAggregationOperation<TDbType, TAggregationOperation, TArgs, TReturnType, TParams, TAs, TDefaultFieldKey, TCastType>(this.dbType, this.args, this.operation, this.asName, type);
+        return new BasicColumnAggregationOperation<TDbType, TAggregationOperation, TArgs, TReturnType, TParams, TAs, TCastType>(this.dbType, this.args, this.operation, this.asName, type);
     }
 
     buildSQL(context?: QueryBuilderContext) {
@@ -121,10 +120,9 @@ class BasicColumnAggregationOperation<
         this.args = args;
         this.operation = operation;
         this.asName = asName;
-        this.defaultFieldKey = `${operation.name.toLowerCase()}` as TDefaultFieldKey;
         this.castType = castType;
 
-        let tmpParams: QueryParam<TDbType, any, any, any, any, any>[] = [];
+        let tmpParams: QueryParam<TDbType, any, any, any, any>[] = [];
 
         for (const arg of args) {
             if (

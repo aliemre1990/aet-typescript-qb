@@ -65,8 +65,8 @@ type typeof_GroupBy_Having = typeof groupBy_Having;
 type typeof_GroupBy_Having_ResultCols = typeof_GroupBy_Having extends QueryBuilder<any, any, any, any, infer TResult, any, any, any> ? TResult : never;
 type typeof_GroupBy_Having_ResultType = ColumnsToResultMap<any, typeof_GroupBy_Having_ResultCols>;
 type typeof_GroupBy_Having_Params = typeof_GroupBy_Having extends QueryBuilder<any, any, any, any, any, infer TParams, any, any> ? TParams : never;
-type typeof_GroupBy_Having_Param1Name = typeof_GroupBy_Having_Params[0] extends QueryParam<any, infer TName, any, any, any, any> ? TName : never;
-type typeof_GroupBy_Having_Param2Name = typeof_GroupBy_Having_Params[1] extends QueryParam<any, infer TName, any, any, any, any> ? TName : never;
+type typeof_GroupBy_Having_Param1Name = typeof_GroupBy_Having_Params[0] extends QueryParam<any, infer TName, any, any, any> ? TName : never;
+type typeof_GroupBy_Having_Param2Name = typeof_GroupBy_Having_Params[1] extends QueryParam<any, infer TName, any, any, any> ? TName : never;
 type typeof_GroupBy_Having_ResultType_Expected = {
     id: number;
     customerTypeId: number;

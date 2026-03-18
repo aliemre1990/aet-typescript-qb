@@ -32,16 +32,15 @@ class ColumnSQLFunction<
         IComparable<TDbType, any, any, any, any, any, any>
     )[],
     TReturnType extends DbValueTypes | null,
-    TParams extends QueryParam<TDbType, string, any, any, any, any>[] | undefined = InferParamsFromFnArgs<TArgs>,
+    TParams extends QueryParam<TDbType, string, any, any, any>[] | undefined = InferParamsFromFnArgs<TArgs>,
     TAs extends string | undefined = undefined,
-    TDefaultFieldKey extends string = `${Lowercase<TSQLFunction["name"]>}`,
     TCastType extends PgColumnType | undefined = undefined
 > implements IComparable<
     TDbType,
     TParams,
     DetermineValueType<TCastType, NonNullable<TReturnType>>,
     DetermineFinalValueType<TReturnType, DetermineValueType<TCastType, NonNullable<TReturnType>>>,
-    TDefaultFieldKey,
+    undefined,
     TAs,
     TCastType
 > {
@@ -54,9 +53,9 @@ class ColumnSQLFunction<
     [IComparableFinalValueDummySymbol]?: DetermineFinalValueType<TReturnType, DetermineValueType<TCastType, NonNullable<TReturnType>>>;
 
     params?: TParams;
-    defaultFieldKey: TDefaultFieldKey;
 
     asName?: TAs;
+    fieldName: undefined = undefined;
     castType?: TCastType;
 
     eq: typeof eq = eq;
@@ -69,10 +68,10 @@ class ColumnSQLFunction<
     between: typeof between = between;
 
     as<TAs extends string>(asName: TAs) {
-        return new ColumnSQLFunction<TDbType, TSQLFunction, TArgs, TReturnType, TParams, TAs, TDefaultFieldKey, TCastType>(this.dbType, this.args, this.sqlFunction, asName, this.castType);
+        return new ColumnSQLFunction<TDbType, TSQLFunction, TArgs, TReturnType, TParams, TAs, TCastType>(this.dbType, this.args, this.sqlFunction, asName, this.castType);
     }
     cast<TCastType extends PgColumnType>(type: TCastType) {
-        return new ColumnSQLFunction<TDbType, TSQLFunction, TArgs, TReturnType, TParams, TAs, TDefaultFieldKey, TCastType>(this.dbType, this.args, this.sqlFunction, this.asName, type);
+        return new ColumnSQLFunction<TDbType, TSQLFunction, TArgs, TReturnType, TParams, TAs, TCastType>(this.dbType, this.args, this.sqlFunction, this.asName, type);
     }
 
     buildSQL(context?: QueryBuilderContext) {
@@ -99,9 +98,8 @@ class ColumnSQLFunction<
         this.sqlFunction = sqlFunction;
         this.asName = asName;
         this.castType = castType;
-        this.defaultFieldKey = `${sqlFunction.name.toLowerCase()}` as TDefaultFieldKey;
 
-        let tmpParams: QueryParam<TDbType, any, any, any, any, any>[] = [];
+        let tmpParams: QueryParam<TDbType, any, any, any, any>[] = [];
 
         for (const arg of args) {
             if (

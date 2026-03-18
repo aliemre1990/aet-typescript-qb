@@ -45,9 +45,6 @@ const arithmeticOperations = {
 
 type ArithmeticOperation = typeof arithmeticOperations[keyof typeof arithmeticOperations];
 
-const arithmeticDefaultColumnName = '?column?';
-type TArithmeticDefaultColumnName = typeof arithmeticDefaultColumnName;
-
 class SQLArithmeticOperation<
     TDbType extends DbType,
     TArithmeticOperation extends ArithmeticOperation,
@@ -57,15 +54,14 @@ class SQLArithmeticOperation<
     )[],
     TReturnType extends DbValueTypes | null,
     TAs extends string | undefined = undefined,
-    TDefaultFieldKey extends string = TArithmeticDefaultColumnName,
-    TParams extends QueryParam<TDbType, string, any, any, any, any>[] | undefined = InferParamsFromFnArgs<TArgs>,
+    TParams extends QueryParam<TDbType, string, any, any, any>[] | undefined = InferParamsFromFnArgs<TArgs>,
     TCastType extends PgColumnType | undefined = undefined
 > implements IComparable<
     TDbType,
     TParams,
     DetermineValueType<TCastType, NonNullable<TReturnType>>,
     DetermineFinalValueType<TReturnType, DetermineValueType<TCastType, NonNullable<TReturnType>>>,
-    TDefaultFieldKey,
+    undefined,
     TAs,
     TCastType
 > {
@@ -78,9 +74,9 @@ class SQLArithmeticOperation<
     [IComparableFinalValueDummySymbol]?: DetermineFinalValueType<TReturnType, DetermineValueType<TCastType, NonNullable<TReturnType>>>;
 
     params?: TParams;
+    fieldName: undefined = undefined
     asName?: TAs;
     castType?: TCastType;
-    defaultFieldKey: TDefaultFieldKey;
 
     eq: typeof eq = eq;
     notEq: typeof notEq = notEq;
@@ -92,10 +88,10 @@ class SQLArithmeticOperation<
     between: typeof between = between;
 
     as<TAs extends string>(asName: TAs) {
-        return new SQLArithmeticOperation<TDbType, TArithmeticOperation, TArgs, TReturnType, TAs, TDefaultFieldKey, TParams, TCastType>(this.dbType, this.args, this.operation, asName, this.castType);
+        return new SQLArithmeticOperation<TDbType, TArithmeticOperation, TArgs, TReturnType, TAs, TParams, TCastType>(this.dbType, this.args, this.operation, asName, this.castType);
     }
     cast<TCastType extends PgColumnType>(type: TCastType) {
-        return new SQLArithmeticOperation<TDbType, TArithmeticOperation, TArgs, TReturnType, TAs, TDefaultFieldKey, TParams, TCastType>(this.dbType, this.args, this.operation, this.asName, type);
+        return new SQLArithmeticOperation<TDbType, TArithmeticOperation, TArgs, TReturnType, TAs, TParams, TCastType>(this.dbType, this.args, this.operation, this.asName, type);
     }
 
     buildSQL(context?: QueryBuilderContext) {
@@ -127,7 +123,6 @@ class SQLArithmeticOperation<
         this.args = args;
         this.operation = operation;
         this.asName = asName;
-        this.defaultFieldKey = arithmeticDefaultColumnName as TDefaultFieldKey;
         this.castType = castType;
     }
 }

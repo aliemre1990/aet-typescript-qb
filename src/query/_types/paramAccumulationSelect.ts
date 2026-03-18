@@ -3,10 +3,10 @@ import type { IComparable } from "../_interfaces/IComparable.js";
 import type { ExtractParams } from "../param.js";
 import type QueryParam from "../param.js";
 
-type AccumulateColumnParams<TParams extends readonly QueryParam<any, any, any, any, any, any>[] | undefined, TResult extends readonly any[]> =
+type AccumulateColumnParams<TParams extends readonly QueryParam<any, any, any, any, any>[] | undefined, TResult extends readonly any[]> =
     TParams extends undefined ?
     InferParamsFromColumns<TResult> :
-    TParams extends QueryParam<any, any, any, any, any, any>[] ? [...TParams, ...InferParamsFromColumns<TResult>] :
+    TParams extends QueryParam<any, any, any, any, any>[] ? [...TParams, ...InferParamsFromColumns<TResult>] :
     never;
 
 

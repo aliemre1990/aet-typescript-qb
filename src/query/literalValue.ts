@@ -20,9 +20,6 @@ import lte from "./comparisons/lte.js";
 import notEq from "./comparisons/notEq.js";
 import { convertValueToQueryString } from "./uitlity/common.js";
 
-const literalValueDefaultColumnName = '?column?';
-type TLiteralValueDefaultColumnName = typeof literalValueDefaultColumnName;
-
 class LiteralValue<
     TDbType extends DbType,
     TValue extends DbValueTypes | null,
@@ -33,7 +30,7 @@ class LiteralValue<
     undefined,
     DetermineValueType<TCastType, TValue>,
     DetermineFinalValueType<TValue, DetermineValueType<TCastType, TValue>>,
-    TLiteralValueDefaultColumnName,
+    undefined,
     TAs,
     TCastType
 > {
@@ -42,8 +39,8 @@ class LiteralValue<
 
 
     dbType: TDbType;
-    defaultFieldKey: TLiteralValueDefaultColumnName;
     params?: undefined;
+    fieldName: undefined = undefined;
     asName?: TAs;
     castType?: TCastType;
 
@@ -79,7 +76,6 @@ class LiteralValue<
     constructor(dbType: TDbType, value: TValue, asName?: TAs, castType?: TCastType) {
         this.dbType = dbType;
         this.value = value;
-        this.defaultFieldKey = literalValueDefaultColumnName;
         this.asName = asName;
         this.castType = castType;
     }
