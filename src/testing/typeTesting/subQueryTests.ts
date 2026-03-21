@@ -26,7 +26,7 @@ const selectSubQuery = customersTable
         tables.customers.id,
         ordersTable
             .select((tabInner, { sum }) => [
-                sum(tabInner.orders.customerId)
+                sum(tabInner.orders.customerId).as("totalAmount")
             ])
             .where((tabInner) => tables.customers.id.eq(tabInner.orders.customerId))
             .as("sqSelect")

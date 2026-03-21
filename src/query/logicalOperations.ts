@@ -52,7 +52,7 @@ class ColumnLogicalOperation<
     [IComparableValueDummySymbol]?: DetermineValueType<TCastType, boolean>;
     [IComparableFinalValueDummySymbol]?: DetermineValueType<TCastType, boolean>;
     fieldName: undefined = undefined;
-    asName?: TAs;
+    asName: TAs;
     castType?: TCastType;
 
     operator: LogicalOperation;
@@ -78,7 +78,7 @@ class ColumnLogicalOperation<
         dbType: TDbType,
         operator: LogicalOperation,
         comparisons: TComparisons,
-        asName?: TAs,
+        asName: TAs,
         castType?: TCastType
     ) {
         this.dbType = dbType;
@@ -130,7 +130,7 @@ function generateAndFn<TDbType extends DbType>(
     return function <
         TComparisons extends (ColumnComparisonOperation<TDbType, any, any, any, any, any, any> | ColumnLogicalOperation<TDbType, any, any, any, any>)[]
     >(...ops: TComparisons) {
-        return new ColumnLogicalOperation<TDbType, TComparisons>(dbType, logicalOperations.and, ops);
+        return new ColumnLogicalOperation<TDbType, TComparisons>(dbType, logicalOperations.and, ops, undefined);
     }
 }
 
@@ -141,7 +141,7 @@ function generateOrFn<TDbType extends DbType>(
     return function <
         TComparisons extends (ColumnComparisonOperation<TDbType, any, any, any, any, any, any> | ColumnLogicalOperation<TDbType, any, any, any, any>)[]
     >(...ops: TComparisons) {
-        return new ColumnLogicalOperation<TDbType, TComparisons>(dbType, logicalOperations.or, ops);
+        return new ColumnLogicalOperation<TDbType, TComparisons>(dbType, logicalOperations.or, ops, undefined);
     }
 }
 

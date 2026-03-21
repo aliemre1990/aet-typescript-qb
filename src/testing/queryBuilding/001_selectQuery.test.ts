@@ -6,11 +6,11 @@ import { customersTable, ordersTable } from "../_tables.js";
 test.suite("SIMPLE SELECT TESTS", () => {
 
     test("Select literal value from customers.", () => {
-        const qb = customersTable.select((tables, { literal }) => [literal(10)]);
+        const qb = customersTable.select((tables, { literal }) => [literal(10).as("literal")]);
         const buildRes = qb.buildSQL();
         const query = buildRes.query;
 
-        assert.equal(`SELECT 10 FROM "customers"`, query);
+        assert.equal(`SELECT 10 AS "literal" FROM "customers"`, query);
     });
 
     test("Select literal value using alias from customers.", () => {

@@ -41,7 +41,7 @@ class LiteralValue<
     dbType: TDbType;
     params?: undefined;
     fieldName: undefined = undefined;
-    asName?: TAs;
+    asName: TAs;
     castType?: TCastType;
 
     value: TValue;
@@ -73,7 +73,7 @@ class LiteralValue<
         return { query, params: context.params };
     }
 
-    constructor(dbType: TDbType, value: TValue, asName?: TAs, castType?: TCastType) {
+    constructor(dbType: TDbType, value: TValue, asName: TAs, castType?: TCastType) {
         this.dbType = dbType;
         this.value = value;
         this.asName = asName;
@@ -89,7 +89,7 @@ function generateLiteralValueFn<TDbType extends DbType>(dbType: TDbType) {
     return <const TValue extends DbValueTypes | null>(
         value: TValue
     ) => {
-        return new LiteralValue<TDbType, TValue>(dbType, value);
+        return new LiteralValue<TDbType, TValue>(dbType, value, undefined);
     }
 }
 

@@ -50,7 +50,7 @@ class SQLOperator<
     [IComparableFinalValueDummySymbol]?: DetermineFinalValueType<TValueType, DetermineValueType<TCastType, TValueType>>;
     params?: TParams;
     fieldName: TFieldName;
-    asName?: TAs;
+    asName: TAs;
     castType?: TCastType;
 
     strs: TemplateStringsArray;
@@ -68,7 +68,7 @@ class SQLOperator<
 
 
 
-    constructor(dbType: TDbType, strs: TemplateStringsArray, values: TValues, asName?: TAs, castType?: TCastType) {
+    constructor(dbType: TDbType, strs: TemplateStringsArray, values: TValues, asName: TAs, castType?: TCastType) {
         this.dbType = dbType;
         this.asName = asName;
         this.castType = castType;
@@ -129,7 +129,7 @@ function generateSqlOperatorFn<
     return function <
         TValues extends readonly (IComparable<TDbType, any, any, any, any, any, any> | ColumnComparisonOperation<TDbType, any, any, any, any, any, any> | ColumnLogicalOperation<TDbType, any, any, any, any> | DbValueTypes | null)[]
     >(strs: TemplateStringsArray, ...values: TValues): SQLOperator<TDbType, TValues> {
-        return new SQLOperator(dbType, strs, values);
+        return new SQLOperator(dbType, strs, values, undefined);
     }
 }
 

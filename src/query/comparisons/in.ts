@@ -114,7 +114,8 @@ function sqlIn<
             dbType,
             comparisonOperations.in,
             this,
-            [val[0]]
+            [val[0]],
+            undefined
         );
     }
 
@@ -122,7 +123,8 @@ function sqlIn<
         dbType,
         comparisonOperations.in,
         this,
-        [...val]
+        [...val],
+        undefined
     )
 
 }

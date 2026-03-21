@@ -54,7 +54,7 @@ class ColumnSQLFunction<
 
     params?: TParams;
 
-    asName?: TAs;
+    asName: TAs;
     fieldName: undefined = undefined;
     castType?: TCastType;
 
@@ -90,13 +90,13 @@ class ColumnSQLFunction<
         dbType: TDbType,
         args: TArgs,
         sqlFunction: TSQLFunction,
-        asName?: TAs,
+        asName: TAs,
         castType?: TCastType
     ) {
         this.dbType = dbType;
         this.args = args;
         this.sqlFunction = sqlFunction;
-        this.asName = asName;
+        this.asName = asName as TAs;
         this.castType = castType;
 
         let tmpParams: QueryParam<TDbType, any, any, any, any>[] = [];

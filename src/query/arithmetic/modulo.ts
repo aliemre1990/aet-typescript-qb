@@ -17,7 +17,7 @@ function generateArithmeticModulo<
             typeof arithmeticOperations.modulo,
             TArgs,
             IsContainsNull<TDbType, TArgs> extends true ? number | null : number
-        >(dbType, args, arithmeticOperations.modulo);
+        >(dbType, args, arithmeticOperations.modulo, undefined);
     }
 }
 

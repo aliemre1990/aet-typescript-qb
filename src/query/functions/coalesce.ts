@@ -41,7 +41,7 @@ function generateCoalesceFn<
             typeof sqlFunctions.coalesce,
             ConvertMediansInArray<TArgs, TDbType, FirstType | null>,
             IsContainsNonNull<TDbType, TArgs> extends true ? NonNullable<FirstType> : FirstType | null
-        >(dbType, args as ConvertMediansInArray<TArgs, TDbType, FirstType | null>, sqlFunctions.coalesce);
+        >(dbType, args as ConvertMediansInArray<TArgs, TDbType, FirstType | null>, sqlFunctions.coalesce, undefined);
     }
 }
 

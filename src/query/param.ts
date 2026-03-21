@@ -41,11 +41,11 @@ class QueryParam<
     [IComparableFinalValueDummySymbol]?: DetermineFinalValueType<IsAny<TValueType> extends true ? DetermineValueType<TCastType, TValueType> | null : TValueType, DetermineValueType<TCastType, NonNullable<TValueType>>>;
 
     name: TName;
-    asName?: TAs;
+    asName: TAs;
     fieldName: undefined = undefined;
     castType?: TCastType;
 
-    constructor(dbType: TDbType, name: TName, asName?: TAs, ownerName?: string, castType?: TCastType) {
+    constructor(dbType: TDbType, name: TName, asName: TAs, ownerName?: string, castType?: TCastType) {
         this.dbType = dbType;
         this.name = name;
         this.asName = asName;
@@ -105,7 +105,7 @@ function generateParamFn<
     >(
         name: TName
     ) => {
-        return new QueryParam<TDbType, TName, any>(dbType, name);
+        return new QueryParam<TDbType, TName, any>(dbType, name, undefined);
     }
 }
 

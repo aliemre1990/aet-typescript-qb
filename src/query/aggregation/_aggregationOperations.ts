@@ -77,7 +77,7 @@ class BasicColumnAggregationOperation<
     [IComparableValueDummySymbol]?: DetermineValueType<TCastType, NonNullable<TReturnType>>;
     [IComparableFinalValueDummySymbol]?: DetermineFinalValueType<TReturnType, DetermineValueType<TCastType, NonNullable<TReturnType>>>;
     params?: TParams;
-    asName?: TAs;
+    asName: TAs;
     castType?: TCastType;
     fieldName: undefined = undefined;
 
@@ -113,7 +113,7 @@ class BasicColumnAggregationOperation<
         dbType: TDbType,
         args: TArgs,
         operation: TAggregationOperation,
-        asName?: TAs,
+        asName: TAs,
         castType?: TCastType
     ) {
         this.dbType = dbType;

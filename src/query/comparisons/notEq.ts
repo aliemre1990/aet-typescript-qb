@@ -56,13 +56,14 @@ function notEq<
             TDbType,
             TParamName extends string ? TParamName : never,
             IsAny<TParamValue> extends true ? TValueType | null : TParamValue
-        >(value.dbType, value.name);
+        >(value.dbType, value.name, undefined);
 
         return new ColumnComparisonOperation(
             dbType,
             comparisonOperations.notEq,
             this,
-            [param]
+            [param],
+            undefined
         )
     }
 
@@ -74,7 +75,8 @@ function notEq<
         dbType,
         comparisonOperations.notEq,
         this,
-        [value]
+        [value],
+        undefined
     );
 }
 

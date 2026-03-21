@@ -77,7 +77,7 @@ class JSONBuildObjectFunction<
     isJsonB: boolean;
 
     params?: TParams;
-    asName?: TAs;
+    asName: TAs;
     fieldName: undefined = undefined;
     castType?: TCastType;
 
@@ -109,7 +109,7 @@ class JSONBuildObjectFunction<
         this.dbType = dbType;
         this.obj = obj;
         this.isJsonB = isJsonB;
-        this.asName = asName;
+        this.asName = asName as TAs;
         this.castType = castType;
 
 

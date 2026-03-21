@@ -51,7 +51,7 @@ interface IComparable<
 
     params?: TParams;
     fieldName: TFieldName;
-    asName?: TAs;
+    asName: TAs;
     castType?: TCastType;
 
     eq: typeof eq;

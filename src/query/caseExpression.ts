@@ -188,7 +188,7 @@ class SQLCaseExpression<
 
     dbType: TDbType;
     params?: TParams;
-    asName?: TAs;
+    asName: TAs;
     fieldName: undefined = undefined;
     castType?: TCastType;
 
@@ -217,14 +217,14 @@ class SQLCaseExpression<
 
     constructor(
         dbType: TDbType,
-        asName?: TAs,
+        asName: TAs,
         castType?: TCastType,
         mainExpression?: TMainExpression,
         elseExpression?: TElseExpression,
         whenExpressions?: TWhenExpressions
     ) {
         this.dbType = dbType;
-        this.asName = asName;
+        this.asName = asName as TAs;
         this.castType = castType;
 
         this.mainExpression = mainExpression;
@@ -323,7 +323,7 @@ function generateSQLCaseFn<
         TExpression extends IComparable<TDbType, any, any, any, any, any, any>
     >(expression?: TExpression) {
         if (expression === undefined) {
-            return new SQLCaseExpression(dbType);
+            return new SQLCaseExpression(dbType, undefined);
         }
 
         return new SQLCaseExpression<

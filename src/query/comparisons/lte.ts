@@ -56,13 +56,14 @@ function lte<
             TDbType,
             TParamName extends string ? TParamName : never,
             IsAny<TParamValue> extends true ? TValueType | null : TParamValue
-        >(value.dbType, value.name);
+        >(value.dbType, value.name, undefined);
 
         return new ColumnComparisonOperation(
             dbType,
             comparisonOperations.lte,
             this,
-            [param]
+            [param],
+            undefined
         )
     }
 
@@ -74,7 +75,8 @@ function lte<
         dbType,
         comparisonOperations.lte,
         this,
-        [value]
+        [value],
+        undefined
     );
 }
 

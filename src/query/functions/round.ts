@@ -42,7 +42,7 @@ function generateRoundFn<TDbType extends DbType>(dbType: TDbType) {
             number :
             number :
             number
-        >(dbType, [firstArgValue as TFirstArgFormatted, secondArgValue as TSecondArgFormatted], sqlFunctions.round);
+        >(dbType, [firstArgValue as TFirstArgFormatted, secondArgValue as TSecondArgFormatted], sqlFunctions.round, undefined);
 
     }
 }

@@ -17,7 +17,7 @@ function generateArithmeticMultiplication<
             typeof arithmeticOperations.multiplication,
             TArgs,
             IsContainsNull<TDbType, TArgs> extends true ? number | null : number
-        >(dbType, args, arithmeticOperations.multiplication);
+        >(dbType, args, arithmeticOperations.multiplication, undefined);
     }
 }
 

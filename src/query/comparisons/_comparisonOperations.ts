@@ -83,12 +83,12 @@ class ColumnComparisonOperation<
     [IComparableValueDummySymbol]?: DetermineValueType<TCastType, boolean>;
     [IComparableFinalValueDummySymbol]?: DetermineValueType<TCastType, boolean>;
     fieldName: undefined = undefined;
-    asName?: TAs;
+    asName: TAs;
     castType?: TCastType;
 
     operation: ComparisonOperation;
     comparing: TComparing;
-    value?: TApplied
+    value: TApplied
 
     eq: typeof eq = eq;
     notEq: typeof notEq = notEq;
@@ -142,8 +142,8 @@ class ColumnComparisonOperation<
         dbType: TDbType,
         operation: ComparisonOperation,
         comparing: TComparing,
-        value?: TApplied,
-        asName?: TAs,
+        value: TApplied,
+        asName: TAs,
         castType?: TCastType
     ) {
         this.dbType = dbType;

@@ -35,7 +35,7 @@ class QueryColumn<
     qTableSpecs: TQTableSpecs;
 
     dbType: TDbType;
-    asName?: TAsName;
+    asName: TAsName;
     fieldName: TColumn["name"];
     castType?: TCastType;
 
@@ -50,7 +50,13 @@ class QueryColumn<
     sqlIn: typeof sqlIn = sqlIn;
     between: typeof between = between;
 
-    constructor(dbType: TDbType, public column: TColumn, qTableSpecs: TQTableSpecs, asName?: TAsName, castType?: TCastType) {
+    constructor(
+        dbType: TDbType,
+        public column: TColumn,
+        qTableSpecs: TQTableSpecs,
+        asName: TAsName,
+        castType?: TCastType
+    ) {
         this.asName = asName;
         this.dbType = dbType;
         this.qTableSpecs = qTableSpecs;

@@ -1,6 +1,7 @@
 import type { ColumnsToResultMap } from "../../query/_types/result.js";
 import type QueryParam from "../../query/param.js";
 import type QueryBuilder from "../../query/queryBuilder.js";
+import { from } from "../../query/queryBuilder.js";
 import { customersTable, employeesTable, ordersTable, shipmentsTable, usersTable } from "../_tables.js";
 import type { AssertEqual, AssertTrue } from "../_typeTestingUtilities.js";
 
@@ -112,4 +113,22 @@ type typeof_selectLogical = typeof selectLogical;
 type typeof_selectLogical_ResultCols = typeof_selectLogical extends QueryBuilder<any, any, any, any, infer TResult, any, any, any> ? TResult : never;
 type typeof_selectLogical_ResultType = ColumnsToResultMap<any, typeof_selectLogical_ResultCols>;
 type typeof_selectLogical_ResultType_Expected = { "idEquals1AndNameEqualsJane": boolean }[];
-type selectLogical_ResultType_Test = AssertTrue<AssertEqual<typeof_selectLogical_ResultType, typeof_selectLogical_ResultType_Expected>>
+type selectLogical_ResultType_Test = AssertTrue<AssertEqual<typeof_selectLogical_ResultType, typeof_selectLogical_ResultType_Expected>>;
+
+const selectInvalid_WithoutAliasOrName = customersTable.select((cols) =>
+    [
+        // @ts-expect-error
+        cols.customers.id.eq(1)
+    ]);
+
+const selectInvalid_WithoutAliasOrName_QueryTable = customersTable.as("cst").select((cols) =>
+    [
+        // @ts-expect-error
+        cols.cst.id.eq(1)
+    ]);
+
+const selectInvalid_WithoutAliasOrName_SubQuery = from(customersTable.select().as("sub")).select((cols) =>
+    [
+        // @ts-expect-error
+        cols.sub.id.eq(1)
+    ]);

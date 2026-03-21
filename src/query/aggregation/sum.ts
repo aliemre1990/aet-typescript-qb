@@ -11,7 +11,7 @@ function generateSumFn<TDbType extends DbType>(dbType: TDbType) {
             typeof aggregationOperations.sum,
             [TAggColumn],
             TAggColumn extends IComparable<TDbType, any, any, infer TFinalType, any, any, any> ? TFinalType : never
-        >(dbType, [arg], aggregationOperations.sum);
+        >(dbType, [arg], aggregationOperations.sum, undefined);
 
     }
 }

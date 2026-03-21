@@ -11,7 +11,7 @@ function generateAvgFn<TDbType extends DbType>(dbType: TDbType) {
             typeof aggregationOperations.avg,
             [TAggColumn],
             TAggColumn extends IComparable<TDbType, any, any, infer TFinalType, any, any, any> ? TFinalType : never
-        >(dbType, [arg], aggregationOperations.avg);
+        >(dbType, [arg], aggregationOperations.avg, undefined);
 
     }
 }

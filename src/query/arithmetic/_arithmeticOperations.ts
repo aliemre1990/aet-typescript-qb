@@ -75,7 +75,7 @@ class SQLArithmeticOperation<
 
     params?: TParams;
     fieldName: undefined = undefined
-    asName?: TAs;
+    asName: TAs;
     castType?: TCastType;
 
     eq: typeof eq = eq;
@@ -116,7 +116,7 @@ class SQLArithmeticOperation<
         dbType: TDbType,
         args: TArgs,
         operation: TArithmeticOperation,
-        asName?: TAs,
+        asName: TAs,
         castType?: TCastType
     ) {
         this.dbType = dbType;

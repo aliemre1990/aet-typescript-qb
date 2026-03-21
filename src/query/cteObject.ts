@@ -51,7 +51,7 @@ class CTEObjectEntry<
 
 
     params?: undefined;
-    asName?: TAsName;
+    asName: TAsName;
     fieldName: TFieldName;
     castType?: TCastType;
 
@@ -89,7 +89,7 @@ class CTEObjectEntry<
     constructor(
         dbType: TDbType,
         comparable: TComparable,
-        asName?: TAsName,
+        asName: TAsName,
         ownerName?: string,
         fieldName?: TFieldName,
         castType?: TCastType
@@ -199,6 +199,7 @@ function withAs<
     >(
         qb.dbType,
         undefined,
+        undefined,
         {
             params: params as TParams,
             cteSpecs
@@ -297,6 +298,7 @@ function withRecursiveAs<
         TParamsResult
     >(
         anchorQb.dbType,
+        undefined,
         undefined,
         {
             params: params as TParamsResult,

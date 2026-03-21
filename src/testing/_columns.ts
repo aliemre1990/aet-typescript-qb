@@ -11,7 +11,8 @@ const customerIdQC = new QueryColumn<
 >(
     dbTypes.postgresql,
     customersTable.columns.id,
-    { tableName: customersTable.name }
+    { tableName: customersTable.name },
+    undefined
 );
 const createdByQC = new QueryColumn<
     PgDbType,
@@ -21,7 +22,8 @@ const createdByQC = new QueryColumn<
 >(
     dbTypes.postgresql,
     customersTable.columns.createdBy,
-    { tableName: customersTable.name }
+    { tableName: customersTable.name },
+    undefined
 );
 const customerCreatedByQC = new QueryColumn<
     PgDbType,
@@ -31,7 +33,8 @@ const customerCreatedByQC = new QueryColumn<
 >(
     dbTypes.postgresql,
     customersTable.columns.createdBy,
-    { tableName: customersTable.name }
+    { tableName: customersTable.name },
+    undefined
 );
 const customerNameQC = new QueryColumn<
     PgDbType,
@@ -41,7 +44,8 @@ const customerNameQC = new QueryColumn<
 >(
     dbTypes.postgresql,
     customersTable.columns.name,
-    { tableName: customersTable.name }
+    { tableName: customersTable.name },
+    undefined
 );
 const empSalaryQC = new QueryColumn<
     PgDbType,
@@ -51,7 +55,8 @@ const empSalaryQC = new QueryColumn<
 >(
     dbTypes.postgresql,
     employeesTable.columns.salary,
-    { tableName: employeesTable.name }
+    { tableName: employeesTable.name },
+    undefined
 );
 
 export {

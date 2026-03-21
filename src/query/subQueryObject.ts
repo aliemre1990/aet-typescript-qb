@@ -48,7 +48,7 @@ class SubQueryEntry<
     [IComparableFinalValueDummySymbol]?: DetermineFinalValueType<TFinalValueType, DetermineValueType<TCastType, TValueType>>;
 
     params?: undefined;
-    asName?: TAsName;
+    asName: TAsName;
     castType?: TCastType;
     fieldName: TFieldName;
 
@@ -86,7 +86,7 @@ class SubQueryEntry<
     constructor(
         dbType: TDbType,
         comparable: TComparable,
-        asName?: TAsName,
+        asName: TAsName,
         ownerName?: string,
         castType?: TCastType
     ) {

@@ -53,7 +53,8 @@ function sqlNotIn<
             dbType,
             comparisonOperations.notIn,
             this,
-            [val[0]]
+            [val[0]],
+            undefined
         );
     }
 
@@ -61,7 +62,8 @@ function sqlNotIn<
         dbType,
         comparisonOperations.notIn,
         this,
-        [...val]
+        [...val],
+        undefined
     )
 
 }

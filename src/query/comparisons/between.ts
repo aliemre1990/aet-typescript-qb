@@ -181,20 +181,21 @@ function between<
             TDbType,
             TLParamName extends string ? TLParamName : never,
             IsAny<TLParamValue> extends true ? TValueType | null : TLParamValue
-        >(leftValue.dbType, leftValue.name);
+        >(leftValue.dbType, leftValue.name, undefined);
 
         if (rightValue instanceof QueryParam) {
             const rParam = new QueryParam<
                 TDbType,
                 TRParamName extends string ? TRParamName : never,
                 IsAny<TRParamValue> extends true ? TValueType | null : TRParamValue
-            >(leftValue.dbType, rightValue.name);
+            >(leftValue.dbType, rightValue.name, undefined);
 
             return new ColumnComparisonOperation(
                 dbType,
                 comparisonOperations.between,
                 this,
-                [lParam, rParam]
+                [lParam, rParam],
+                undefined
             )
         }
 
@@ -206,7 +207,8 @@ function between<
             dbType,
             comparisonOperations.between,
             this,
-            [lParam, rightValue]
+            [lParam, rightValue],
+            undefined
         )
 
     }
@@ -216,20 +218,21 @@ function between<
             TDbType,
             TRParamName extends string ? TRParamName : never,
             IsAny<TRParamValue> extends true ? TValueType | null : TRParamValue
-        >(leftValue.dbType, rightValue.name);
+        >(leftValue.dbType, rightValue.name, undefined);
 
         if (leftValue instanceof QueryParam) {
             const lParam = new QueryParam<
                 TDbType,
                 TLParamName extends string ? TLParamName : never,
                 IsAny<TLParamValue> extends true ? TValueType | null : TLParamValue
-            >(leftValue.dbType, leftValue.name);
+            >(leftValue.dbType, leftValue.name, undefined);
 
             return new ColumnComparisonOperation(
                 dbType,
                 comparisonOperations.between,
                 this,
-                [lParam, rParam]
+                [lParam, rParam],
+                undefined
             );
         }
 
@@ -241,7 +244,8 @@ function between<
             dbType,
             comparisonOperations.between,
             this,
-            [leftValue, rParam]
+            [leftValue, rParam],
+            undefined
         );
 
     }
@@ -254,7 +258,8 @@ function between<
         dbType,
         comparisonOperations.between,
         this,
-        [leftValue, rightValue]
+        [leftValue, rightValue],
+        undefined
     );
 }
 
