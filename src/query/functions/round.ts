@@ -29,12 +29,12 @@ function generateRoundFn<TDbType extends DbType>(dbType: TDbType) {
 
     >(firstArg: TFirstArg & (IsArgAnyOrNumber<TDbType, TFirstArg>), secondArg: TSecondArg & (IsArgAnyOrNumber<TDbType, TSecondArg>)) => {
 
-        type TFirstArgFormatted = TFirstArg extends QueryParam<TDbType, infer TParamName, infer TValueType, any, any> ?
-            IsAny<TValueType> extends true ? QueryParam<TDbType, TParamName, number | null, any, any> : QueryParam<TDbType, TParamName, TValueType, any, any> :
+        type TFirstArgFormatted = TFirstArg extends QueryParam<TDbType, infer TParamName, infer TValueType, infer TAs, infer TCastType> ?
+            IsAny<TValueType> extends true ? QueryParam<TDbType, TParamName, number | null, TAs, TCastType> : QueryParam<TDbType, TParamName, TValueType, TAs, TCastType> :
             TFirstArg;
 
-        type TSecondArgFormatted = TSecondArg extends QueryParam<TDbType, infer TParamName, infer TValueType, any, any> ?
-            IsAny<TValueType> extends true ? QueryParam<TDbType, TParamName, number | null, any, any> : QueryParam<TDbType, TParamName, TValueType, any, any> :
+        type TSecondArgFormatted = TSecondArg extends QueryParam<TDbType, infer TParamName, infer TValueType, infer TAs, infer TCastType> ?
+            IsAny<TValueType> extends true ? QueryParam<TDbType, TParamName, number | null, TAs, TCastType> : QueryParam<TDbType, TParamName, TValueType, TAs, TCastType> :
             TSecondArg;
 
         let firstArgValue: TFirstArg = firstArg;
