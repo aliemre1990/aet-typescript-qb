@@ -10,6 +10,7 @@ import gte from "./comparisons/gte.js";
 import sqlIn from "./comparisons/in.js";
 import lt from "./comparisons/lt.js";
 import lte from "./comparisons/lte.js";
+import notBetween from "./comparisons/notBetween.js";
 import notEq from "./comparisons/notEq.js";
 import QueryParam from "./param.js";
 
@@ -66,6 +67,7 @@ class ColumnLogicalOperation<
     lte: typeof lte = lte;
     sqlIn: typeof sqlIn = sqlIn;
     between: typeof between = between;
+    notBetween: typeof notBetween = notBetween;
 
     as<TAs extends string>(asName: TAs) {
         return new ColumnLogicalOperation<TDbType, TComparisons, TParams, TAs, TCastType>(this.dbType, this.operator, this.comparisons, asName, this.castType);
@@ -87,7 +89,7 @@ class ColumnLogicalOperation<
 
         this.asName = asName;
         this.castType = castType;
-        
+
         this[IComparableValueDummySymbol] = undefined as any;
         this[IComparableFinalValueDummySymbol] = undefined as any;
 

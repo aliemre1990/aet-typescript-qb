@@ -17,6 +17,7 @@ import gte from "./comparisons/gte.js";
 import sqlIn from "./comparisons/in.js";
 import lt from "./comparisons/lt.js";
 import lte from "./comparisons/lte.js";
+import notBetween from "./comparisons/notBetween.js";
 import notEq from "./comparisons/notEq.js";
 import { convertValueToQueryString } from "./uitlity/common.js";
 
@@ -54,6 +55,7 @@ class LiteralValue<
     lte: typeof lte = lte;
     sqlIn: typeof sqlIn = sqlIn;
     between: typeof between = between;
+    notBetween: typeof notBetween = notBetween;
 
     as<TAs extends string>(asName: TAs) {
         return new LiteralValue<TDbType, TValue, TAs, TCastType>(this.dbType, this.value, asName, this.castType);
@@ -78,7 +80,7 @@ class LiteralValue<
         this.value = value;
         this.asName = asName;
         this.castType = castType;
-        
+
         this[IComparableValueDummySymbol] = undefined as any;
         this[IComparableFinalValueDummySymbol] = undefined as any;
     }

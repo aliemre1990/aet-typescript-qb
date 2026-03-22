@@ -14,6 +14,7 @@ import lt from "../../comparisons/lt.js";
 import lte from "../../comparisons/lte.js";
 import type { PgColumnType } from "../../../table/columnTypes.js";
 import type { ExtractParams } from "../../param.js";
+import notBetween from "../../comparisons/notBetween.js";
 
 type InferParamsFromJsonBuildObjectArg<TDbType extends DbType, TObj extends JSONBuildObjectParam<TDbType>> =
     InferParamsFromObj<TDbType, TObj>["length"] extends 0 ? undefined :
@@ -145,6 +146,7 @@ class JSONBuildObjectFunction<
     lte: typeof lte = lte;
     sqlIn: typeof sqlIn = sqlIn;
     between: typeof between = between;
+    notBetween: typeof notBetween = notBetween;
 }
 
 function jsonBuildObjectFn<

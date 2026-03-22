@@ -13,6 +13,7 @@ import lt from "../comparisons/lt.js";
 import lte from "../comparisons/lte.js";
 import { convertArgsToQueryString } from "../uitlity/common.js";
 import type { PgColumnType } from "../../table/columnTypes.js";
+import notBetween from "../comparisons/notBetween.js";
 
 const sqlFunctions = {
     coalesce: { name: 'COALESCE' },
@@ -66,6 +67,7 @@ class ColumnSQLFunction<
     lte: typeof lte = lte;
     sqlIn: typeof sqlIn = sqlIn;
     between: typeof between = between;
+    notBetween: typeof notBetween = notBetween;
 
     as<TAs extends string>(asName: TAs) {
         return new ColumnSQLFunction<TDbType, TSQLFunction, TArgs, TReturnType, TParams, TAs, TCastType>(this.dbType, this.args, this.sqlFunction, asName, this.castType);
@@ -98,7 +100,7 @@ class ColumnSQLFunction<
         this.sqlFunction = sqlFunction;
         this.asName = asName as TAs;
         this.castType = castType;
-        
+
         this[IComparableValueDummySymbol] = undefined as any;
         this[IComparableFinalValueDummySymbol] = undefined as any;
 

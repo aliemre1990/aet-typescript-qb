@@ -10,6 +10,7 @@ import gte from "./comparisons/gte.js";
 import sqlIn from "./comparisons/in.js";
 import lt from "./comparisons/lt.js";
 import lte from "./comparisons/lte.js";
+import notBetween from "./comparisons/notBetween.js";
 import notEq from "./comparisons/notEq.js";
 import type QueryParam from "./param.js";
 import type { ResultShape } from "./queryBuilder.js";
@@ -62,6 +63,7 @@ class SubQueryEntry<
     lte: typeof lte = lte;
     sqlIn: typeof sqlIn = sqlIn;
     between: typeof between = between;
+    notBetween: typeof notBetween = notBetween;
 
     as<TAsName extends string>(val: TAsName) {
         return new SubQueryEntry<TDbType, TComparable, TValueType, TFinalValueType, TFieldName, TAsName, TCastType>(this.dbType, this.comparable, val, this.ownerName, this.castType);
@@ -97,7 +99,7 @@ class SubQueryEntry<
         this.castType = castType;
 
         this.fieldName = comparable.asName === undefined ? comparable.fieldName : comparable.asName;
-        
+
         this[IComparableValueDummySymbol] = undefined as any;
         this[IComparableFinalValueDummySymbol] = undefined as any;
     }

@@ -14,6 +14,7 @@ import gte from "./gte.js";
 import sqlIn from "./in.js";
 import lt from "./lt.js";
 import lte from "./lte.js";
+import notBetween from "./notBetween.js";
 import notEq from "./notEq.js";
 
 type InferAppliedParams<
@@ -98,6 +99,7 @@ class ColumnComparisonOperation<
     lte: typeof lte = lte;
     sqlIn: typeof sqlIn = sqlIn;
     between: typeof between = between;
+    notBetween: typeof notBetween = notBetween;
 
     as<TAs extends string>(asName: TAs) {
         return new ColumnComparisonOperation<TDbType, TComparing, TApplied, TValueType, TParams, TAs, TCastType>(this.dbType, this.operation, this.comparing, this.value, asName, this.castType);
@@ -152,7 +154,7 @@ class ColumnComparisonOperation<
         this.value = value;
         this.asName = asName;
         this.castType = castType;
-        
+
         this[IComparableValueDummySymbol] = undefined as any;
         this[IComparableFinalValueDummySymbol] = undefined as any;
 

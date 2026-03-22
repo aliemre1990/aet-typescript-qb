@@ -11,6 +11,7 @@ import gte from "./comparisons/gte.js";
 import sqlIn from "./comparisons/in.js";
 import lt from "./comparisons/lt.js";
 import lte from "./comparisons/lte.js";
+import notBetween from "./comparisons/notBetween.js";
 import notEq from "./comparisons/notEq.js";
 import type ColumnLogicalOperation from "./logicalOperations.js";
 import type { ExtractParams } from "./param.js";
@@ -65,6 +66,7 @@ class SQLOperator<
     lte: typeof lte = lte;
     sqlIn: typeof sqlIn = sqlIn;
     between: typeof between = between;
+    notBetween: typeof notBetween = notBetween;
 
 
 
@@ -77,7 +79,7 @@ class SQLOperator<
         this.values = values;
 
         this.fieldName = 'Any Value' as TFieldName;
-        
+
         this[IComparableValueDummySymbol] = undefined as any;
         this[IComparableFinalValueDummySymbol] = undefined as any;
     }

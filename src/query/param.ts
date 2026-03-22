@@ -10,6 +10,7 @@ import gte from "./comparisons/gte.js";
 import sqlIn from "./comparisons/in.js";
 import lt from "./comparisons/lt.js";
 import lte from "./comparisons/lte.js";
+import notBetween from "./comparisons/notBetween.js";
 import notEq from "./comparisons/notEq.js";
 
 type ExtractParams<T> =
@@ -51,7 +52,7 @@ class QueryParam<
         this.asName = asName;
         this.castType = castType;
         this.ownerName = ownerName;
-        
+
         this[IComparableValueDummySymbol] = undefined as any;
         this[IComparableFinalValueDummySymbol] = undefined as any;
     }
@@ -93,6 +94,7 @@ class QueryParam<
     lte: typeof lte = lte;
     sqlIn: typeof sqlIn = sqlIn;
     between: typeof between = between;
+    notBetween: typeof notBetween = notBetween;
 }
 
 

@@ -12,6 +12,7 @@ import type lt from "../comparisons/lt.js";
 import type lte from "../comparisons/lte.js";
 import type { PgColumnType, PgTypeToJsType } from "../../table/columnTypes.js";
 import type { IsAny } from "../../utility/common.js";
+import type notBetween from "../comparisons/notBetween.js";
 
 type DetermineValueType<TCastType extends PgColumnType | undefined, TValueType extends DbValueTypes | null> =
     TCastType extends undefined ?
@@ -62,6 +63,7 @@ interface IComparable<
     lte: typeof lte;
     sqlIn: typeof sqlIn;
     between: typeof between;
+    notBetween: typeof notBetween;
 
     as<TAs extends string>(asName: TAs): IComparable<TDbType, TParams, TValueType, TFinalValueType, TFieldName, TAs, TCastType>
     cast<TCastType extends PgColumnType>(type: TCastType): IComparable<TDbType, TParams, any, any, TFieldName, TAs, TCastType>
