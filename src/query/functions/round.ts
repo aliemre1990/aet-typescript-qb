@@ -13,6 +13,14 @@ type IsArgAnyOrNumber<TDbType extends DbType, TFirstArg extends QueryParam<TDbTy
     {}
     ;
 
+type DetermineReturnType<TFirstArg, TSecondArg> =
+    [TFirstArg, TSecondArg] extends [null, any] | [any, null] | [null, null] ? number | null :
+    TFirstArg extends IComparable<any, any, any, infer TFinalType, any, any, any> ? number | null extends TFinalType ? number | null :
+    TSecondArg extends IComparable<any, any, any, infer TFinalType, any, any, any> ? number | null extends TFinalType ? number | null :
+    number :
+    number :
+    number
+
 
 function generateRoundFn<TDbType extends DbType>(dbType: TDbType) {
     return <
@@ -36,12 +44,7 @@ function generateRoundFn<TDbType extends DbType>(dbType: TDbType) {
             TDbType,
             typeof sqlFunctions.round,
             [TFirstArgFormatted, TSecondArgFormatted],
-            [TFirstArgFormatted, TSecondArgFormatted] extends [null, any] | [any, null] | [null, null] ? number | null :
-            TFirstArgFormatted extends IComparable<TDbType, any, any, infer TFinalType, any, any, any> ? number | null extends TFinalType ? number | null :
-            TSecondArgFormatted extends IComparable<TDbType, any, any, infer TFinalType, any, any, any> ? number | null extends TFinalType ? number | null :
-            number :
-            number :
-            number
+            DetermineReturnType<TFirstArgFormatted, TSecondArgFormatted>
         >(dbType, [firstArgValue as TFirstArgFormatted, secondArgValue as TSecondArgFormatted], sqlFunctions.round, undefined);
 
     }
