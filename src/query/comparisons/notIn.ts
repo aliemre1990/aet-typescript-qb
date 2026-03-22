@@ -1,7 +1,10 @@
 import type { DbType } from "../../db.js";
 import ColumnComparisonOperation, { comparisonOperations, type InferValueTypeFromComparable } from "./_comparisonOperations.js";
 import type { IComparable } from "../_interfaces/IComparable.js";
+import type { IsAny, IsExactAlt, LiteralToBase } from "../../utility/common.js";
+import QueryParam from "../param.js";
 import QueryBuilder from "../queryBuilder.js";
+import type { DbValueTypes } from "../../table/column.js";
 import type { MapParamsToTypeRecursively } from "./in.js";
 
 function sqlNotIn<
@@ -11,7 +14,7 @@ function sqlNotIn<
     TDbType extends DbType = TComparing extends IComparable<infer DbType, any, any, any, any, any, any> ? DbType : never
 >(
     this: TComparing,
-    val: TQb
+    val: TQb & IComparable<TDbType, any, LiteralToBase<TValueType>, any, any, any, any>
 ): ColumnComparisonOperation<
     TDbType,
     TComparing,
@@ -20,8 +23,8 @@ function sqlNotIn<
 function sqlNotIn<
     TComparing extends IComparable<TDbType, any, any, any, any, any, any>,
     TValueType extends InferValueTypeFromComparable<TDbType, TComparing>,
-    const TValues extends readonly (TValueType | IComparable<TDbType, any, TValueType, any, any, any, any>)[],
-    const TFinalValues extends readonly (TValueType | IComparable<TDbType, any, TValueType, any, any, any, any>)[] = MapParamsToTypeRecursively<TValueType, TValues>,
+    const TValues extends readonly (LiteralToBase<TValueType> | IComparable<TDbType, any, LiteralToBase<TValueType>, any, any, any, any>)[],
+    const TFinalValues extends readonly (LiteralToBase<TValueType> | IComparable<TDbType, any, LiteralToBase<TValueType>, any, any, any, any>)[] = MapParamsToTypeRecursively<LiteralToBase<TValueType>, TValues>,
     TDbType extends DbType = TComparing extends IComparable<infer DbType, any, any, any, any, any, any> ? DbType : never
 >(
     this: TComparing,
@@ -29,7 +32,7 @@ function sqlNotIn<
 ): ColumnComparisonOperation<
     TDbType,
     TComparing,
-    [...TFinalValues] // Helper type to extract only the columns as tuple
+    [...TFinalValues]
 >
 
 
@@ -37,7 +40,7 @@ function sqlNotIn<
     TComparing extends IComparable<TDbType, any, any, any, any, any, any>,
     TValueType extends InferValueTypeFromComparable<TDbType, TComparing>,
     TQb extends QueryBuilder<TDbType, any, any, any, any, any, any, any>,
-    TValues extends TValueType | IComparable<TDbType, any, TValueType, any, any, any, any>,
+    TValues extends LiteralToBase<TValueType> | IComparable<TDbType, any, LiteralToBase<TValueType>, any, any, any, any>,
     TDbType extends DbType = TComparing extends IComparable<infer DbType, any, any, any, any, any, any> ? DbType : never
 >
     (

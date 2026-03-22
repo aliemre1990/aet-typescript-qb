@@ -6,45 +6,6 @@ import QueryParam from "../param.js";
 import QueryBuilder from "../queryBuilder.js";
 import type { DbValueTypes } from "../../table/column.js";
 
-type InferFirstValidType<
-    TArgs extends readonly (DbValueTypes | null | IComparable<any, any, any, any, any, any, any>)[]
-> = TArgs extends readonly [infer First, ...infer Rest] ?
-
-    First extends IComparable<any, any, infer TValueType, any, any, any, any> ?
-
-    IsExactAlt<TValueType, null> extends true ?
-
-    Rest extends readonly [any, ...any] ?
-    InferFirstValidType<Rest> :
-    never :
-
-    IsAny<TValueType> extends true ?
-
-    Rest extends readonly [any, ...any] ?
-    InferFirstValidType<Rest> :
-    never :
-    TValueType :
-
-    First extends DbValueTypes | null ?
-
-    First extends null ?
-
-    Rest extends readonly [any, ...any] ?
-    InferFirstValidType<Rest> :
-    never :
-
-    First :
-    never :
-    never;
-
-// Helper type to extract only QueryColumns from the mixed tuple
-type ExtractComparables<T extends readonly unknown[]> =
-    T extends readonly [infer First, ...infer Rest] ?
-    First extends IComparable<any, any, any, any, any, any, any> ?
-    [First, ...ExtractComparables<Rest>] :
-    ExtractComparables<Rest> :
-    [];
-
 type MapParamsToTypeRecursively<
     TValueType extends DbValueTypes,
     T extends readonly (TValueType | IComparable<any, any, TValueType, any, any, any, any>)[]
