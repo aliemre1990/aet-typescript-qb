@@ -36,6 +36,8 @@ import type { MapToCTEObjectForRecursive } from "./_types/cteUtility.js";
 import type { UndefinedIfLengthZero } from "../utility/common.js";
 import type { ExtractParams } from "./param.js";
 import notBetween from "./comparisons/notBetween.js";
+import isNull from "./comparisons/isNull.js";
+import isNotNull from "./comparisons/isNotNull.js";
 
 type CombineComparableItems<
     TLeft extends ResultShapeItem<any>,
@@ -242,6 +244,8 @@ class QueryBuilder<
     sqlIn: typeof sqlIn = sqlIn;
     between: typeof between = between;
     notBetween: typeof notBetween = notBetween;
+    isNull: typeof isNull = isNull;
+    isNotNull: typeof isNotNull = isNotNull;
 
     cteSpecs?: TCTESpecs;
     fromSpecs: TFrom;

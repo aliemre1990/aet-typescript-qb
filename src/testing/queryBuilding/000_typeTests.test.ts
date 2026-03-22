@@ -2,6 +2,7 @@
 import '../typeTesting/comparisons/eq.js';
 import '../typeTesting/comparisons/between.js';
 import '../typeTesting/comparisons/in.js';
+import '../typeTesting/comparisons/isNull.js';
 
 // functions
 import '../typeTesting/sqlFunctions/coalesceTests.js';

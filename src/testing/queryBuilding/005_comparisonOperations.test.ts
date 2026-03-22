@@ -3,8 +3,49 @@ import assert from "node:assert";
 
 import { customersTable, ordersTable } from "../_tables.js";
 import type { IComparable } from "../../query/_interfaces/IComparable.js";
+import { customerIdQC } from "../_columns.js";
 
 test.suite("COMPARISON OPERATIONS TESTS", () => {
+    test("Basic eq comparison.", () => {
+        const comp = customerIdQC.eq(10);
+        const buildRes = comp.buildSQL();
+        const query = buildRes.query;
+
+        assert.equal(`"customers"."id"=10`, query);
+    });
+
+    test("Basic between comparison.", () => {
+        const comp = customerIdQC.between(10, 15);
+        const buildRes = comp.buildSQL();
+        const query = buildRes.query;
+
+        assert.equal(`"customers"."id" BETWEEN 10 AND 15`, query);
+    });
+
+    test("Basic in comparison.", () => {
+        const comp = customerIdQC.sqlIn(10, 20, 30);
+        const buildRes = comp.buildSQL();
+        const query = buildRes.query;
+
+        assert.equal(`"customers"."id" IN (10, 20, 30)`, query);
+    });
+
+    test("In comparison with query.", () => {
+        const comp = customerIdQC.sqlIn(ordersTable.select((tables) => [tables.orders.customerId]));
+        const buildRes = comp.buildSQL();
+        const query = buildRes.query;
+
+        assert.equal(`"customers"."id" IN (SELECT "orders"."customerId" FROM "orders")`, query);
+    });
+
+    test("Basic is null comparison.", () => {
+        const comp = customerIdQC.isNull();
+        const buildRes = comp.buildSQL();
+        const query = buildRes.query;
+
+        assert.equal(`"customers"."id" IS NULL`, query);
+    });
+
     test("Literal at left side of basic eq comparison.", () => {
         const qb = customersTable.select()
             .where((tables, { literal }) => literal(10).eq(tables.customers.id));

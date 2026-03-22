@@ -12,6 +12,8 @@ import eq from "./eq.js";
 import gt from "./gt.js";
 import gte from "./gte.js";
 import sqlIn from "./in.js";
+import isNotNull from "./isNotNull.js";
+import isNull from "./isNull.js";
 import lt from "./lt.js";
 import lte from "./lte.js";
 import notBetween from "./notBetween.js";
@@ -100,6 +102,8 @@ class ColumnComparisonOperation<
     sqlIn: typeof sqlIn = sqlIn;
     between: typeof between = between;
     notBetween: typeof notBetween = notBetween;
+    isNull: typeof isNull = isNull;
+    isNotNull:typeof isNotNull = isNotNull;
 
     as<TAs extends string>(asName: TAs) {
         return new ColumnComparisonOperation<TDbType, TComparing, TApplied, TValueType, TParams, TAs, TCastType>(this.dbType, this.operation, this.comparing, this.value, asName, this.castType);
@@ -113,7 +117,10 @@ class ColumnComparisonOperation<
             context = queryBuilderContextFactory();
         }
 
-        if (this.value === undefined) {
+        if (
+            [comparisonOperations.isNull, comparisonOperations.isNotNull].findIndex(op => op === this.operation) < 0 &&
+            this.value === undefined
+        ) {
             throw Error('No applied value provided for comparison operation.');
         }
 
@@ -122,18 +129,27 @@ class ColumnComparisonOperation<
             comparingStr = `(${comparingStr})`;
         }
 
-        const appliedStrArr = convertArgsToQueryString(this.value, context);
+        let appliedStrArr: string[] = [];
+        if (this.value) {
+            appliedStrArr = convertArgsToQueryString(this.value, context);
+        }
 
         let queryRes;
         if ([comparisonOperations.in, comparisonOperations.notIn].some(op => op === this.operation)) {
             queryRes = `${comparingStr} ${this.operation.symbol} (${appliedStrArr.join(', ')})`;
         } else if ([comparisonOperations.between, comparisonOperations.notBetween].some(op => op === this.operation)) {
-            if (appliedStrArr.length !== 2) {
+            if (appliedStrArr.length !== 2 || !this.value || this.value.length !== 2) {
                 throw Error(`Invalid argument count for 'between' comparison.`);
             }
 
             queryRes = `${comparingStr} ${this.operation.symbol} ${this.value[0] instanceof QueryBuilder ? `(${appliedStrArr[0]})` : appliedStrArr[0]} AND ${this.value[1] instanceof QueryBuilder ? `(${appliedStrArr[1]})` : appliedStrArr[1]}`;
+        } else if ([comparisonOperations.isNull, comparisonOperations.isNotNull].some(op => op === this.operation)) {
+            queryRes = `${comparingStr} ${this.operation.symbol}`;
         } else {
+            if (appliedStrArr.length !== 1 || !this.value || this.value.length !== 1) {
+                throw Error(`Invalid argument count for '${this.operation.name}' comparison.`);
+            }
+
             queryRes = `${comparingStr}${this.operation.symbol}${this.value[0] instanceof QueryBuilder ? `(${appliedStrArr[0]})` : appliedStrArr[0]}`;
         }
 

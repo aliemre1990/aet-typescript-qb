@@ -12,6 +12,8 @@ import lt from "./comparisons/lt.js";
 import lte from "./comparisons/lte.js";
 import type { PgColumnType } from "../table/columnTypes.js";
 import notBetween from "./comparisons/notBetween.js";
+import isNull from "./comparisons/isNull.js";
+import isNotNull from "./comparisons/isNotNull.js";
 
 class QueryColumn<
     TDbType extends DbType,
@@ -51,6 +53,8 @@ class QueryColumn<
     sqlIn: typeof sqlIn = sqlIn;
     between: typeof between = between;
     notBetween: typeof notBetween = notBetween;
+    isNull: typeof isNull = isNull;
+    isNotNull: typeof isNotNull = isNotNull;
 
     constructor(
         dbType: TDbType,

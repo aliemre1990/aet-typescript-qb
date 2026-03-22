@@ -8,6 +8,8 @@ import eq from "./comparisons/eq.js";
 import gt from "./comparisons/gt.js";
 import gte from "./comparisons/gte.js";
 import sqlIn from "./comparisons/in.js";
+import isNotNull from "./comparisons/isNotNull.js";
+import isNull from "./comparisons/isNull.js";
 import lt from "./comparisons/lt.js";
 import lte from "./comparisons/lte.js";
 import notBetween from "./comparisons/notBetween.js";
@@ -68,6 +70,8 @@ class ColumnLogicalOperation<
     sqlIn: typeof sqlIn = sqlIn;
     between: typeof between = between;
     notBetween: typeof notBetween = notBetween;
+    isNull: typeof isNull = isNull;
+    isNotNull: typeof isNotNull = isNotNull;
 
     as<TAs extends string>(asName: TAs) {
         return new ColumnLogicalOperation<TDbType, TComparisons, TParams, TAs, TCastType>(this.dbType, this.operator, this.comparisons, asName, this.castType);

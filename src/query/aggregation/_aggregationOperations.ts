@@ -14,6 +14,8 @@ import lte from "../comparisons/lte.js";
 import { convertArgsToQueryString } from "../uitlity/common.js";
 import type { PgColumnType } from "../../table/columnTypes.js";
 import notBetween from "../comparisons/notBetween.js";
+import isNull from "../comparisons/isNull.js";
+import isNotNull from "../comparisons/isNotNull.js";
 
 
 const aggregationOperations = {
@@ -91,6 +93,8 @@ class BasicColumnAggregationOperation<
     sqlIn: typeof sqlIn = sqlIn;
     between: typeof between = between;
     notBetween: typeof notBetween = notBetween;
+    isNull: typeof isNull = isNull;
+    isNotNull: typeof isNotNull = isNotNull;
 
     as<TAs extends string>(asName: TAs) {
         return new BasicColumnAggregationOperation<TDbType, TAggregationOperation, TArgs, TReturnType, TParams, TAs, TCastType>(this.dbType, this.args, this.operation, asName, this.castType);
