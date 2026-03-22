@@ -1,8 +1,9 @@
 import type { DbType } from "../../db.js";
-import ColumnComparisonOperation, { comparisonOperations, type ConvertComparisonParamToTyped, type InferValueTypeFromComparable } from "./_comparisonOperations.js";
+import { BetweenComparisonOperation, type ConvertComparisonParamToTyped, type InferValueTypeFromComparable } from "./_comparisonOperations.js";
 import type { IComparable } from "../_interfaces/IComparable.js";
-import type { IsAny, LiteralToBase } from "../../utility/common.js";
+import type { LiteralToBase } from "../../utility/common.js";
 import QueryParam from "../param.js";
+import { betweenComparisonOperations } from "../_interfaces/IComparisonOperation.js";
 
 
 
@@ -19,13 +20,12 @@ function between<
     this: TComparing,
     leftValue: TLParamValue extends (LiteralToBase<TValueType> | null) ? TLParamMedian : never,
     rightValue: TRParamValue extends (LiteralToBase<TValueType> | null) ? TRParamMedian : never
-): ColumnComparisonOperation<
+): BetweenComparisonOperation<
     TDbType,
+    typeof betweenComparisonOperations.between,
     TComparing,
-    [
-        ConvertComparisonParamToTyped<TLParamMedian, TValueType>,
-        ConvertComparisonParamToTyped<TRParamMedian, TValueType>
-    ]
+    ConvertComparisonParamToTyped<TLParamMedian, TValueType>,
+    ConvertComparisonParamToTyped<TRParamMedian, TValueType>
 >
 function between<
     TComparing extends IComparable<TDbType, any, any, any, any, any, any>,
@@ -37,13 +37,13 @@ function between<
     this: TComparing,
     leftValue: TLParamValue extends (LiteralToBase<TValueType> | null) ? TLParamMedian : never,
     rightValue: LiteralToBase<TValueType> | null
-): ColumnComparisonOperation<
+): BetweenComparisonOperation<
     TDbType,
+    typeof betweenComparisonOperations.between,
     TComparing,
-    [
-        ConvertComparisonParamToTyped<TLParamMedian, TValueType>,
-        TValueType | null
-    ]
+    ConvertComparisonParamToTyped<TLParamMedian, TValueType>,
+    TValueType | null
+
 >
 function between<
     TComparing extends IComparable<TDbType, any, any, any, any, any, any>,
@@ -55,13 +55,12 @@ function between<
     this: TComparing,
     leftValue: LiteralToBase<TValueType> | null,
     rightValue: TRParamValue extends (LiteralToBase<TValueType> | null) ? TRParamMedian : never
-): ColumnComparisonOperation<
+): BetweenComparisonOperation<
     TDbType,
+    typeof betweenComparisonOperations.between,
     TComparing,
-    [
-        TValueType | null,
-        ConvertComparisonParamToTyped<TRParamMedian, TValueType>,
-    ]
+    TValueType | null,
+    ConvertComparisonParamToTyped<TRParamMedian, TValueType>
 >
 function between<
     TComparing extends IComparable<TDbType, any, any, any, any, any, any>,
@@ -74,13 +73,12 @@ function between<
     this: TComparing,
     leftValue: TLParamValue extends (LiteralToBase<TValueType> | null) ? TLParamMedian : never,
     rightValue: TRApplied
-): ColumnComparisonOperation<
+): BetweenComparisonOperation<
     TDbType,
+    typeof betweenComparisonOperations.between,
     TComparing,
-    [
-        ConvertComparisonParamToTyped<TLParamMedian, TValueType>,
-        TRApplied
-    ]
+    ConvertComparisonParamToTyped<TLParamMedian, TValueType>,
+    TRApplied
 >
 function between<
     TComparing extends IComparable<TDbType, any, any, any, any, any, any>,
@@ -93,13 +91,12 @@ function between<
     this: TComparing,
     leftValue: TLApplied,
     rightValue: TRParamValue extends (LiteralToBase<TValueType> | null) ? TRParamMedian : never
-): ColumnComparisonOperation<
+): BetweenComparisonOperation<
     TDbType,
+    typeof betweenComparisonOperations.between,
     TComparing,
-    [
-        TLApplied,
-        ConvertComparisonParamToTyped<TRParamMedian, TValueType>,
-    ]
+    TLApplied,
+    ConvertComparisonParamToTyped<TRParamMedian, TValueType>
 >
 
 
@@ -108,22 +105,28 @@ function between<
     TComparing extends IComparable<TDbType, any, any, any, any, any, any>,
     TValueType extends InferValueTypeFromComparable<TDbType, TComparing>,
     TDbType extends DbType = TComparing extends IComparable<infer DbType, any, any, any, any, any, any> ? DbType : never
->(this: TComparing, leftValue: LiteralToBase<TValueType> | null, rightValue: LiteralToBase<TValueType> | null): ColumnComparisonOperation<
-    TDbType,
-    TComparing,
-    [TValueType | null, TValueType | null]
->
+>(this: TComparing, leftValue: LiteralToBase<TValueType> | null, rightValue: LiteralToBase<TValueType> | null):
+    BetweenComparisonOperation<
+        TDbType,
+        typeof betweenComparisonOperations.between,
+        TComparing,
+        TValueType | null,
+        TValueType | null
+    >
 function between<
     TComparing extends IComparable<TDbType, any, any, any, any, any, any>,
     TValueType extends InferValueTypeFromComparable<TDbType, TComparing>,
     TLApplied extends IComparable<TDbType, any, LiteralToBase<TValueType>, any, any, any, any>,
     TRApplied extends IComparable<TDbType, any, LiteralToBase<TValueType>, any, any, any, any>,
     TDbType extends DbType = TComparing extends IComparable<infer DbType, any, any, any, any, any, any> ? DbType : never
->(this: TComparing, leftValue: TLApplied, rightValue: TRApplied): ColumnComparisonOperation<
-    TDbType,
-    TComparing,
-    [TLApplied, TRApplied]
->
+>(this: TComparing, leftValue: TLApplied, rightValue: TRApplied):
+    BetweenComparisonOperation<
+        TDbType,
+        typeof betweenComparisonOperations.between,
+        TComparing,
+        TLApplied,
+        TRApplied
+    >
 
 
 
@@ -140,21 +143,27 @@ function between<
     TValueType extends InferValueTypeFromComparable<TDbType, TComparing>,
     TLApplied extends IComparable<TDbType, any, LiteralToBase<TValueType>, any, any, any, any>,
     TDbType extends DbType = TComparing extends IComparable<infer DbType, any, any, any, any, any, any> ? DbType : never
->(this: TComparing, leftValue: TLApplied, rightValue: LiteralToBase<TValueType> | null): ColumnComparisonOperation<
-    TDbType,
-    TComparing,
-    [TLApplied, TValueType | null]
->
+>(this: TComparing, leftValue: TLApplied, rightValue: LiteralToBase<TValueType> | null):
+    BetweenComparisonOperation<
+        TDbType,
+        typeof betweenComparisonOperations.between,
+        TComparing,
+        TLApplied,
+        TValueType | null
+    >
 function between<
     TComparing extends IComparable<TDbType, any, any, any, any, any, any>,
     TValueType extends InferValueTypeFromComparable<TDbType, TComparing>,
     TRApplied extends IComparable<TDbType, any, LiteralToBase<TValueType>, any, any, any, any>,
     TDbType extends DbType = TComparing extends IComparable<infer DbType, any, any, any, any, any, any> ? DbType : never
->(this: TComparing, leftValue: LiteralToBase<TValueType> | null, rightValue: TRApplied): ColumnComparisonOperation<
-    TDbType,
-    TComparing,
-    [TValueType | null, TRApplied]
->
+>(this: TComparing, leftValue: LiteralToBase<TValueType> | null, rightValue: TRApplied):
+    BetweenComparisonOperation<
+        TDbType,
+        typeof betweenComparisonOperations.between,
+        TComparing,
+        TValueType | null,
+        TRApplied
+    >
 
 
 //Implementation
@@ -166,11 +175,12 @@ function between<TComparing extends IComparable<any, any, any, any, any, any, an
 
     const dbType = this.dbType;
 
-    return new ColumnComparisonOperation(
+    return new BetweenComparisonOperation(
         dbType,
-        comparisonOperations.between,
+        betweenComparisonOperations.between,
         this,
-        [leftValue, rightValue],
+        leftValue,
+        rightValue,
         undefined
     );
 }

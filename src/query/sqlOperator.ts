@@ -3,7 +3,7 @@ import type { DbValueTypes } from "../table/column.js";
 import type { PgColumnType } from "../table/columnTypes.js";
 import type { IsExact, UndefinedIfLengthZero } from "../utility/common.js";
 import { IComparableFinalValueDummySymbol, IComparableValueDummySymbol, queryBuilderContextFactory, type DetermineFinalValueType, type DetermineValueType, type IComparable, type QueryBuilderContext } from "./_interfaces/IComparable.js";
-import type ColumnComparisonOperation from "./comparisons/_comparisonOperations.js";
+import type { IComparisonOperation } from "./_interfaces/IComparisonOperation.js";
 import between from "./comparisons/between.js";
 import eq from "./comparisons/eq.js";
 import gt from "./comparisons/gt.js";
@@ -23,7 +23,7 @@ import type QueryParam from "./param.js";
 import { convertValueToQueryString } from "./uitlity/common.js";
 
 type CalculateSQLParams<
-    TValues extends readonly (IComparable<any, any, any, any, any, any, any> | ColumnComparisonOperation<any, any, any, any, any, any, any> | ColumnLogicalOperation<any, any, any, any, any> | DbValueTypes | null)[],
+    TValues extends readonly (IComparable<any, any, any, any, any, any, any> | IComparisonOperation<any, any, any, any, any, any> | ColumnLogicalOperation<any, any, any, any, any> | DbValueTypes | null)[],
 > = TValues extends readonly [infer First, ...infer Rest] ?
     Rest extends readonly [any, ...any[]] ?
     [...ExtractParams<First>, ...CalculateSQLParams<Rest>] :
@@ -33,7 +33,7 @@ type CalculateSQLParams<
 
 class SQLOperator<
     TDbType extends DbType,
-    TValues extends readonly (IComparable<TDbType, any, any, any, any, any, any> | ColumnComparisonOperation<TDbType, any, any, any, any, any, any> | ColumnLogicalOperation<TDbType, any, any, any, any> | DbValueTypes | null)[],
+    TValues extends readonly (IComparable<TDbType, any, any, any, any, any, any> | IComparisonOperation<TDbType, any, any, any, any, any> | ColumnLogicalOperation<TDbType, any, any, any, any> | DbValueTypes | null)[],
     TValueType extends DbValueTypes | null = any,
     TFieldName extends string | undefined = undefined,
     TAs extends string | undefined = undefined,
@@ -138,7 +138,7 @@ function generateSqlOperatorFn<
     TDbType extends DbType
 >(dbType: TDbType) {
     return function <
-        TValues extends readonly (IComparable<TDbType, any, any, any, any, any, any> | ColumnComparisonOperation<TDbType, any, any, any, any, any, any> | ColumnLogicalOperation<TDbType, any, any, any, any> | DbValueTypes | null)[]
+        TValues extends readonly (IComparable<TDbType, any, any, any, any, any, any> | IComparisonOperation<TDbType, any, any, any, any, any> | ColumnLogicalOperation<TDbType, any, any, any, any> | DbValueTypes | null)[]
     >(strs: TemplateStringsArray, ...values: TValues): SQLOperator<TDbType, TValues> {
         return new SQLOperator(dbType, strs, values, undefined);
     }

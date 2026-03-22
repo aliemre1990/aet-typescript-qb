@@ -2,7 +2,6 @@ import { DbType, dbTypes } from "../db.js";
 import QueryColumn from "./queryColumn.js";
 import Table, { type MapToQueryColumns } from "../table/table.js";
 import { isNullOrUndefined } from "../utility/guards.js";
-import type ColumnComparisonOperation from "./comparisons/_comparisonOperations.js";
 import type ColumnLogicalOperation from "./logicalOperations.js";
 import type { MapCtesToSelectionType, TablesToObject, TableToColumnsMap } from "./_types/miscellaneous.js";
 import type { ColumnsToResultMap, QueryParamsToObject, SelectToAllColumnsMapRecursively, SelectToResultMapRecursively } from "./_types/result.js";
@@ -40,6 +39,7 @@ import isNull from "./comparisons/isNull.js";
 import isNotNull from "./comparisons/isNotNull.js";
 import like from "./comparisons/like.js";
 import notLike from "./comparisons/notLike.js";
+import type { IComparisonOperation } from "./_interfaces/IComparisonOperation.js";
 
 type CombineComparableItems<
     TLeft extends ResultShapeItem<any>,
@@ -136,7 +136,7 @@ type JoinSpecsType<TDbType extends DbType> = readonly JoinSpecsItemType<TDbType>
 type GroupBySpecs<TDbType extends DbType> = readonly (ColumnsSelection<TDbType, any, any> | IComparable<TDbType, any, any, any, any, any, any>)[];
 
 type ColumnsSelectionListType<TDbType extends DbType> = { [key: string]: ColumnsSelection<TDbType, any, any> }
-type ComparisonType<TDbType extends DbType> = ColumnComparisonOperation<TDbType, any, any, any, any, any, any> | ColumnLogicalOperation<TDbType, any, any, any, any>;
+type ComparisonType<TDbType extends DbType> = IComparisonOperation<TDbType, any, any, any, any, any> | ColumnLogicalOperation<TDbType, any, any, any, any>;
 
 
 const cteTypes = {

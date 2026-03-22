@@ -1,4 +1,4 @@
-import type ColumnComparisonOperation from "../../../query/comparisons/_comparisonOperations.js";
+import type { BasicComparisonOperation } from "../../../query/comparisons/_comparisonOperations.js";
 import type QueryParam from "../../../query/param.js";
 import { customerIdQC, empSalaryQC } from "../../_columns.js";
 import { literalTester, paramTester, roundTester } from "../../_functions.js";
@@ -11,9 +11,9 @@ const eqToInvalidValue = customerIdQC.eq("ali");
 //
 const eqToParam = customerIdQC.eq(paramTester("num"));
 type typeof_EqToParam = typeof eqToParam;
-type typeof_EqToParam_Applied = typeof_EqToParam extends ColumnComparisonOperation<any, any, infer TApplied, any, any, any, any> ? TApplied : never;
-type typeof_EqToParam_AppliedParam = typeof_EqToParam_Applied[0] extends QueryParam<any, any, infer TVal, any, any> ? TVal : never;
-type eqToParam_Test = AssertTrue<AssertEqual<typeof_EqToParam_AppliedParam, number | null>>;
+type typeof_EqToParam_Value = typeof_EqToParam extends BasicComparisonOperation<any, any, any, infer TValue, any, any, any> ? TValue : never;
+type typeof_EqToParam_ParamType = typeof_EqToParam_Value extends QueryParam<any, any, infer TVal, any, any> ? TVal : never;
+type eqToParam_Test = AssertTrue<AssertEqual<typeof_EqToParam_ParamType, number | null>>;
 //
 const eqToComparable = customerIdQC.eq(empSalaryQC);
 //
@@ -21,9 +21,9 @@ const eqToLiteral = customerIdQC.eq(literalTester(1));
 //
 const eqToParamTyped = customerIdQC.eq(paramTester("num").type<number>());
 type typeof_EqToParamTyped = typeof eqToParamTyped;
-type typeof_EqToParamTyped_Applied = typeof_EqToParamTyped extends ColumnComparisonOperation<any, any, infer TApplied, any, any, any, any> ? TApplied : never;
-type typeof_EqToParamTyped_AppliedParam = typeof_EqToParamTyped_Applied[0] extends QueryParam<any, any, infer TVal, any, any> ? TVal : never;
-type EqToParamTypedTest = AssertTrue<AssertEqual<typeof_EqToParamTyped_AppliedParam, number>>;
+type typeof_EqToParamTyped_Value = typeof_EqToParamTyped extends BasicComparisonOperation<any, any, any, infer TValue, any, any, any> ? TValue : never;
+type typeof_EqToParamTyped_ParamType = typeof_EqToParamTyped_Value extends QueryParam<any, any, infer TVal, any, any> ? TVal : never;
+type EqToParamTypedTest = AssertTrue<AssertEqual<typeof_EqToParamTyped_ParamType, number>>;
 // @ts-expect-error
 const eqToInvalidParam = customerIdQC.eq(paramTester("num").type<string>());
 
@@ -39,15 +39,15 @@ const literalEqToLiteral = literalTester(1).eq(literalTester(2));
 //
 const literalEqToParam = literalTester(1).eq(paramTester("num"));
 type typeof_LiteralEqToParam = typeof literalEqToParam;
-type typeof_LiteralEqToParam_Applied = typeof_LiteralEqToParam extends ColumnComparisonOperation<any, any, infer TApplied, any, any, any, any> ? TApplied : never;
-type typeof_LiteralEqToParam_AppliedParam = typeof_LiteralEqToParam_Applied[0] extends QueryParam<any, any, infer TVal, any, any> ? TVal : never;
-type literalEqToParam_Test = AssertTrue<AssertEqual<typeof_LiteralEqToParam_AppliedParam, number | null>>;
+type typeof_LiteralEqToParam_Value = typeof_LiteralEqToParam extends BasicComparisonOperation<any, any, any, infer TValue, any, any, any> ? TValue : never;
+type typeof_LiteralEqToParam_ParamType = typeof_LiteralEqToParam_Value extends QueryParam<any, any, infer TVal, any, any> ? TVal : never;
+type literalEqToParam_Test = AssertTrue<AssertEqual<typeof_LiteralEqToParam_ParamType, number | null>>;
 //
 const literalEqToParamTyped = literalTester(1).eq(paramTester("num").type<number>());
 type typeof_LiteralEqToParamTyped = typeof literalEqToParamTyped;
-type typeof_LiteralEqToParamTyped_Applied = typeof_LiteralEqToParamTyped extends ColumnComparisonOperation<any, any, infer TApplied, any, any, any, any> ? TApplied : never;
-type typeof_LiteralEqToParamTyped_AppliedParam = typeof_LiteralEqToParamTyped_Applied[0] extends QueryParam<any, any, infer TVal, any, any> ? TVal : never;
-type literalEqToParamTyped_Test = AssertTrue<AssertEqual<typeof_LiteralEqToParamTyped_AppliedParam, number>>;
+type typeof_LiteralEqToParamTyped_Value = typeof_LiteralEqToParamTyped extends BasicComparisonOperation<any, any, any, infer TValue, any, any, any> ? TValue : never;
+type typeof_LiteralEqToParamTyped_ParamType = typeof_LiteralEqToParamTyped_Value extends QueryParam<any, any, infer TVal, any, any> ? TVal : never;
+type literalEqToParamTyped_Test = AssertTrue<AssertEqual<typeof_LiteralEqToParamTyped_ParamType, number>>;
 // @ts-expect-error
 const literalEqToInvalidParam = literalTester(1).eq(paramTester("num").type<string>());
 
@@ -59,8 +59,8 @@ const functionEqToVal_Invalid = roundTester(1, 2).eq("ali");
 
 const colEqToParam_WithCast = customerIdQC.eq(paramTester("num").type<number>().cast("VARCHAR"));
 type typeof_ColEqToParam_WithCast = typeof colEqToParam_WithCast;
-type typeof_ColEqToParam_WithCast_Applied = typeof_ColEqToParam_WithCast extends ColumnComparisonOperation<any, any, infer TApplied, any, any, any, any> ? TApplied : never;
-type typeof_ColEqToParam_WithCast_ParamType = typeof_ColEqToParam_WithCast_Applied[0] extends QueryParam<any, any, infer TVal, any, any> ? TVal : never;
-type typeof_ColEqToParam_WithCast_ParamCastType = typeof_ColEqToParam_WithCast_Applied[0] extends QueryParam<any, any, any, any, infer TCastType> ? TCastType : never;
+type typeof_ColEqToParam_WithCast_Value = typeof_ColEqToParam_WithCast extends BasicComparisonOperation<any, any, any, infer TValue, any, any, any> ? TValue : never;
+type typeof_ColEqToParam_WithCast_ParamType = typeof_ColEqToParam_WithCast_Value extends QueryParam<any, any, infer TVal, any, any> ? TVal : never;
+type typeof_ColEqToParam_WithCast_ParamCastType = typeof_ColEqToParam_WithCast_Value extends QueryParam<any, any, any, any, infer TCastType> ? TCastType : never;
 type colEqToParam_WithCast_ParamType_Test = AssertTrue<AssertEqual<typeof_ColEqToParam_WithCast_ParamType, number>>;
 type colEqToParam_WithCast_ParamCastType_Test = AssertTrue<AssertEqual<typeof_ColEqToParam_WithCast_ParamCastType, "VARCHAR">>;

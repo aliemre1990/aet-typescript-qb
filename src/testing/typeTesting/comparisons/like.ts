@@ -1,4 +1,5 @@
-import type ColumnComparisonOperation from "../../../query/comparisons/_comparisonOperations.js";
+import type { IComparable } from "../../../query/_interfaces/IComparable.js";
+import type { LikeComparisonOperation } from "../../../query/comparisons/_comparisonOperations.js";
 import type QueryParam from "../../../query/param.js";
 import { customerIdQC, customerNameQC, empSalaryQC } from "../../_columns.js";
 import { literalTester, paramTester, roundTester } from "../../_functions.js";
@@ -26,12 +27,16 @@ const likeQueryBuilder_Nullable = customerNameQC.like(employeesTable.select((col
 
 const likeParam = customerNameQC.like(paramTester("name"));
 type typeof_LikeParam = typeof likeParam;
-type typeof_LikeParam_Applied = typeof_LikeParam extends ColumnComparisonOperation<any, any, infer TApplied, any, any, any, any> ? TApplied : never;
-type typeof_LikeParam_Applied_ParamType = typeof_LikeParam_Applied[0] extends QueryParam<any, any, infer TVal, any, any> ? TVal : never;
+type typeof_LikeParam_Applied = typeof_LikeParam extends LikeComparisonOperation<any, any, any, infer TApplied, any, any, any> ? TApplied : never;
+type typeof_LikeParam_Applied_ReturnType = typeof_LikeParam extends IComparable<any, any, any, infer TFinalValueType, any, any, any> ? TFinalValueType : never;
+type typeof_LikeParam_Applied_ParamType = typeof_LikeParam_Applied extends QueryParam<any, any, infer TVal, any, any> ? TVal : never;
 type likeParam_Test = AssertTrue<AssertEqual<typeof_LikeParam_Applied_ParamType, string>>;
+type likeParam_ReturnTypeTest = AssertTrue<AssertEqual<typeof_LikeParam_Applied_ReturnType, boolean>>;
 
 const likeNullableParam = customerNameQC.like(paramTester("name").type<string | null>());
 type typeof_LikeNullableParam = typeof likeNullableParam;
-type typeof_LikeNullableParam_Applied = typeof_LikeNullableParam extends ColumnComparisonOperation<any, any, infer TApplied, any, any, any, any> ? TApplied : never;
-type typeof_LikeNullableParam_Applied_ParamType = typeof_LikeNullableParam_Applied[0] extends QueryParam<any, any, infer TVal, any, any> ? TVal : never;
+type typeof_LikeNullableParam_Applied = typeof_LikeNullableParam extends LikeComparisonOperation<any, any, any, infer TApplied, any, any, any> ? TApplied : never;
+type typeof_LikeNullableParam_ReturnType = typeof_LikeNullableParam extends IComparable<any, any, any, infer TFinalValueType, any, any, any> ? TFinalValueType : never;
+type typeof_LikeNullableParam_Applied_ParamType = typeof_LikeNullableParam_Applied extends QueryParam<any, any, infer TVal, any, any> ? TVal : never;
 type likeNullableParam_Test = AssertTrue<AssertEqual<typeof_LikeNullableParam_Applied_ParamType, string | null>>;
+type likeNullableParam_ReturnTypeTest = AssertTrue<AssertEqual<typeof_LikeNullableParam_ReturnType, boolean | null>>;

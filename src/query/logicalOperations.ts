@@ -2,7 +2,7 @@ import { type DbType } from "../db.js";
 import type { PgColumnType } from "../table/columnTypes.js";
 import type { UndefinedIfLengthZero } from "../utility/common.js";
 import { IComparableFinalValueDummySymbol, IComparableValueDummySymbol, queryBuilderContextFactory, type DetermineFinalValueType, type DetermineValueType, type IComparable, type QueryBuilderContext } from "./_interfaces/IComparable.js";
-import ColumnComparisonOperation from "./comparisons/_comparisonOperations.js";
+import type { IComparisonOperation } from "./_interfaces/IComparisonOperation.js";
 import between from "./comparisons/between.js";
 import eq from "./comparisons/eq.js";
 import gt from "./comparisons/gt.js";
@@ -19,7 +19,7 @@ import notLike from "./comparisons/notLike.js";
 import QueryParam from "./param.js";
 
 type InferLogicalOperationParams<
-    TComparisons extends readonly (ColumnComparisonOperation<any, any, any, any, any, any, any> | ColumnLogicalOperation<any, any, any, any, any>)[],
+    TComparisons extends readonly (IComparisonOperation<any, any, any, any, any, any> | ColumnLogicalOperation<any, any, any, any, any>)[],
 > = TComparisons extends readonly [infer First, ...infer Rest] ?
     First extends { params?: infer TParams extends readonly QueryParam<any, any, any, any, any>[] | undefined } ?
     Rest extends readonly [any, ...any[]] ?
@@ -39,7 +39,7 @@ type LogicalOperation = (typeof logicalOperations[keyof typeof logicalOperations
 
 class ColumnLogicalOperation<
     TDbType extends DbType,
-    TComparisons extends readonly (ColumnComparisonOperation<TDbType, any, any, any, any, any, any> | ColumnLogicalOperation<TDbType, any, any, any, any>)[],
+    TComparisons extends readonly (IComparisonOperation<TDbType, any, any, any, any, any> | ColumnLogicalOperation<TDbType, any, any, any, any>)[],
     TParams extends readonly QueryParam<TDbType, string, any, any, any>[] | undefined = UndefinedIfLengthZero<InferLogicalOperationParams<TComparisons>>,
     TAs extends string | undefined = undefined,
     TCastType extends PgColumnType | undefined = undefined
@@ -141,7 +141,7 @@ function generateAndFn<TDbType extends DbType>(
     dbType: TDbType
 ) {
     return function <
-        TComparisons extends (ColumnComparisonOperation<TDbType, any, any, any, any, any, any> | ColumnLogicalOperation<TDbType, any, any, any, any>)[]
+        TComparisons extends (IComparisonOperation<TDbType, any, any, any, any, any> | ColumnLogicalOperation<TDbType, any, any, any, any>)[]
     >(...ops: TComparisons) {
         return new ColumnLogicalOperation<TDbType, TComparisons>(dbType, logicalOperations.and, ops, undefined);
     }
@@ -152,7 +152,7 @@ function generateOrFn<TDbType extends DbType>(
     dbType: TDbType
 ) {
     return function <
-        TComparisons extends (ColumnComparisonOperation<TDbType, any, any, any, any, any, any> | ColumnLogicalOperation<TDbType, any, any, any, any>)[]
+        TComparisons extends (IComparisonOperation<TDbType, any, any, any, any, any> | ColumnLogicalOperation<TDbType, any, any, any, any>)[]
     >(...ops: TComparisons) {
         return new ColumnLogicalOperation<TDbType, TComparisons>(dbType, logicalOperations.or, ops, undefined);
     }
