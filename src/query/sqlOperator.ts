@@ -46,8 +46,8 @@ class SQLOperator<
 > {
     dbType: TDbType;
 
-    [IComparableValueDummySymbol]?: IsExact<TValueType, null> extends true ? null : DetermineValueType<TCastType, NonNullable<TValueType>>;
-    [IComparableFinalValueDummySymbol]?: DetermineFinalValueType<TValueType, DetermineValueType<TCastType, TValueType>>;
+    [IComparableValueDummySymbol]: IsExact<TValueType, null> extends true ? null : DetermineValueType<TCastType, NonNullable<TValueType>>;
+    [IComparableFinalValueDummySymbol]: DetermineFinalValueType<TValueType, DetermineValueType<TCastType, TValueType>>;
     params?: TParams;
     fieldName: TFieldName;
     asName: TAs;
@@ -77,6 +77,9 @@ class SQLOperator<
         this.values = values;
 
         this.fieldName = 'Any Value' as TFieldName;
+        
+        this[IComparableValueDummySymbol] = undefined as any;
+        this[IComparableFinalValueDummySymbol] = undefined as any;
     }
 
     as<TAs extends string>(asName: TAs) {

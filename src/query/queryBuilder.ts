@@ -224,8 +224,8 @@ class QueryBuilder<
 
     dbType: TDbType;
 
-    [IComparableValueDummySymbol]?: GetFirstTypeFromResult<TDbType, TResult>;
-    [IComparableFinalValueDummySymbol]?: GetFirstFinalTypeFromResult<TDbType, TResult>;
+    [IComparableValueDummySymbol]: DetermineValueType<TCastType, GetFirstTypeFromResult<TDbType, TResult>>;
+    [IComparableFinalValueDummySymbol]: DetermineFinalValueType<GetFirstFinalTypeFromResult<TDbType, TResult>, DetermineValueType<TCastType, GetFirstTypeFromResult<TDbType, TResult>>>;
 
     params?: TParams;
     fieldName: GetFirstDefaultKeyFromResult<TDbType, TResult>;
@@ -293,6 +293,9 @@ class QueryBuilder<
         this.queryType = data?.queryType;
 
         this.fieldName = data?.selectResult !== undefined && data.selectResult.length > 0 ? data.selectResult[0].asName || data.selectResult[0].fieldName : "";
+
+        this[IComparableValueDummySymbol] = undefined as any;
+        this[IComparableFinalValueDummySymbol] = undefined as any;
     }
 
     as<TAs extends string>(asName: TAs) {

@@ -34,8 +34,8 @@ class LiteralValue<
     TAs,
     TCastType
 > {
-    [IComparableValueDummySymbol]?: DetermineValueType<TCastType, TValue>;
-    [IComparableFinalValueDummySymbol]?: DetermineFinalValueType<TValue, DetermineValueType<TCastType, TValue>>;
+    [IComparableValueDummySymbol]: DetermineValueType<TCastType, TValue>;
+    [IComparableFinalValueDummySymbol]: DetermineFinalValueType<TValue, DetermineValueType<TCastType, TValue>>;
 
 
     dbType: TDbType;
@@ -78,6 +78,9 @@ class LiteralValue<
         this.value = value;
         this.asName = asName;
         this.castType = castType;
+        
+        this[IComparableValueDummySymbol] = undefined as any;
+        this[IComparableFinalValueDummySymbol] = undefined as any;
     }
 }
 

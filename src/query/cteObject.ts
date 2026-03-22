@@ -46,8 +46,8 @@ class CTEObjectEntry<
 > {
     dbType: TDbType;
 
-    [IComparableValueDummySymbol]?: DetermineValueType<TCastType, TValueType>;
-    [IComparableFinalValueDummySymbol]?: DetermineFinalValueType<TFinalValueType, DetermineValueType<TCastType, TValueType>>;
+    [IComparableValueDummySymbol]: DetermineValueType<TCastType, TValueType>;
+    [IComparableFinalValueDummySymbol]: DetermineFinalValueType<TFinalValueType, DetermineValueType<TCastType, TValueType>>;
 
 
     params?: undefined;
@@ -101,6 +101,9 @@ class CTEObjectEntry<
         this.castType = castType;
 
         this.fieldName = fieldName || (comparable.asName === undefined ? comparable.fieldName : comparable.asName);
+        
+        this[IComparableValueDummySymbol] = undefined as any;
+        this[IComparableFinalValueDummySymbol] = undefined as any;
     }
 }
 

@@ -29,8 +29,8 @@ class QueryColumn<
     TAsName,
     TCastType
 > {
-    [IComparableValueDummySymbol]?: DetermineValueType<TCastType, TValueType>;
-    [IComparableFinalValueDummySymbol]?: DetermineFinalValueType<TFinalValueType, DetermineValueType<TCastType, TValueType>>
+    [IComparableValueDummySymbol]: DetermineValueType<TCastType, TValueType>;
+    [IComparableFinalValueDummySymbol]: DetermineFinalValueType<TFinalValueType, DetermineValueType<TCastType, TValueType>>
 
     qTableSpecs: TQTableSpecs;
 
@@ -62,13 +62,16 @@ class QueryColumn<
         this.qTableSpecs = qTableSpecs;
         this.fieldName = column.name;
         this.castType = castType;
+
+        this[IComparableValueDummySymbol] = undefined as any;
+        this[IComparableFinalValueDummySymbol] = undefined as any;
     }
 
     as<TAsName extends string>(val: TAsName) {
-        return new QueryColumn<TDbType, TColumn, TQTableSpecs, TAsName, TCastType>(this.dbType, this.column, this.qTableSpecs, val, this.castType);
+        return new QueryColumn<TDbType, TColumn, TQTableSpecs, TAsName, TCastType, TValueType, TFinalValueType>(this.dbType, this.column, this.qTableSpecs, val, this.castType);
     }
     cast<TCastType extends PgColumnType>(type: TCastType) {
-        return new QueryColumn<TDbType, TColumn, TQTableSpecs, TAsName, TCastType>(this.dbType, this.column, this.qTableSpecs, this.asName, type);
+        return new QueryColumn<TDbType, TColumn, TQTableSpecs, TAsName, TCastType, TValueType, TFinalValueType>(this.dbType, this.column, this.qTableSpecs, this.asName, type);
     }
 
     buildSQL(context?: QueryBuilderContext) {

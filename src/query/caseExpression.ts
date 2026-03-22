@@ -181,8 +181,8 @@ class SQLCaseExpression<
     TAs,
     TCastType
 > {
-    [IComparableValueDummySymbol]?: DetermineValueType<TCastType, NonNullable<TResult>>;
-    [IComparableFinalValueDummySymbol]?: DetermineFinalValueType<TResult, DetermineValueType<TCastType, NonNullable<TResult>>>;
+    [IComparableValueDummySymbol]: DetermineValueType<TCastType, NonNullable<TResult>>;
+    [IComparableFinalValueDummySymbol]: DetermineFinalValueType<TResult, DetermineValueType<TCastType, NonNullable<TResult>>>;
 
 
 
@@ -230,6 +230,9 @@ class SQLCaseExpression<
         this.mainExpression = mainExpression;
         this.elseExpression = elseExpression;
         this.whenExpressions = whenExpressions;
+        
+        this[IComparableValueDummySymbol] = undefined as any;
+        this[IComparableFinalValueDummySymbol] = undefined as any;
 
         let tmpParams: readonly QueryParam<TDbType, any, any, any, any>[] = [];
         if (mainExpression?.params !== undefined && mainExpression.params.length > 0) {

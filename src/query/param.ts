@@ -37,8 +37,8 @@ class QueryParam<
     dbType: TDbType;
 
     params?: undefined;
-    [IComparableValueDummySymbol]?: DetermineValueType<TCastType, NonNullable<TValueType>>;
-    [IComparableFinalValueDummySymbol]?: DetermineFinalValueType<IsAny<TValueType> extends true ? DetermineValueType<TCastType, TValueType> | null : TValueType, DetermineValueType<TCastType, NonNullable<TValueType>>>;
+    [IComparableValueDummySymbol]: DetermineValueType<TCastType, NonNullable<TValueType>>;
+    [IComparableFinalValueDummySymbol]: DetermineFinalValueType<IsAny<TValueType> extends true ? DetermineValueType<TCastType, TValueType> | null : TValueType, DetermineValueType<TCastType, NonNullable<TValueType>>>;
 
     name: TName;
     asName: TAs;
@@ -51,6 +51,9 @@ class QueryParam<
         this.asName = asName;
         this.castType = castType;
         this.ownerName = ownerName;
+        
+        this[IComparableValueDummySymbol] = undefined as any;
+        this[IComparableFinalValueDummySymbol] = undefined as any;
     }
 
     as<TAs extends string>(asName: TAs) {

@@ -80,8 +80,8 @@ class ColumnComparisonOperation<
 
     dbType: TDbType;
     params?: TParams;
-    [IComparableValueDummySymbol]?: DetermineValueType<TCastType, boolean>;
-    [IComparableFinalValueDummySymbol]?: DetermineValueType<TCastType, boolean>;
+    [IComparableValueDummySymbol]: DetermineValueType<TCastType, boolean>;
+    [IComparableFinalValueDummySymbol]: DetermineValueType<TCastType, boolean>;
     fieldName: undefined = undefined;
     asName: TAs;
     castType?: TCastType;
@@ -152,6 +152,9 @@ class ColumnComparisonOperation<
         this.value = value;
         this.asName = asName;
         this.castType = castType;
+        
+        this[IComparableValueDummySymbol] = undefined as any;
+        this[IComparableFinalValueDummySymbol] = undefined as any;
 
         let tmpParams: readonly QueryParam<TDbType, any, any, any, any>[] = [];
         if (comparing.params !== undefined && comparing.params.length > 0) {

@@ -70,8 +70,8 @@ class SQLArithmeticOperation<
     args: TArgs;
     operation: TArithmeticOperation;
 
-    [IComparableValueDummySymbol]?: DetermineValueType<TCastType, NonNullable<TReturnType>>;
-    [IComparableFinalValueDummySymbol]?: DetermineFinalValueType<TReturnType, DetermineValueType<TCastType, NonNullable<TReturnType>>>;
+    [IComparableValueDummySymbol]: DetermineValueType<TCastType, NonNullable<TReturnType>>;
+    [IComparableFinalValueDummySymbol]: DetermineFinalValueType<TReturnType, DetermineValueType<TCastType, NonNullable<TReturnType>>>;
 
     params?: TParams;
     fieldName: undefined = undefined
@@ -124,6 +124,9 @@ class SQLArithmeticOperation<
         this.operation = operation;
         this.asName = asName;
         this.castType = castType;
+        
+        this[IComparableValueDummySymbol] = undefined as any;
+        this[IComparableFinalValueDummySymbol] = undefined as any;
     }
 }
 

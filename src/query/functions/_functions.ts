@@ -49,8 +49,8 @@ class ColumnSQLFunction<
     args: TArgs;
     sqlFunction: TSQLFunction;
 
-    [IComparableValueDummySymbol]?: DetermineValueType<TCastType, NonNullable<TReturnType>>;
-    [IComparableFinalValueDummySymbol]?: DetermineFinalValueType<TReturnType, DetermineValueType<TCastType, NonNullable<TReturnType>>>;
+    [IComparableValueDummySymbol]: DetermineValueType<TCastType, NonNullable<TReturnType>>;
+    [IComparableFinalValueDummySymbol]: DetermineFinalValueType<TReturnType, DetermineValueType<TCastType, NonNullable<TReturnType>>>;
 
     params?: TParams;
 
@@ -98,6 +98,9 @@ class ColumnSQLFunction<
         this.sqlFunction = sqlFunction;
         this.asName = asName as TAs;
         this.castType = castType;
+        
+        this[IComparableValueDummySymbol] = undefined as any;
+        this[IComparableFinalValueDummySymbol] = undefined as any;
 
         let tmpParams: QueryParam<TDbType, any, any, any, any>[] = [];
 

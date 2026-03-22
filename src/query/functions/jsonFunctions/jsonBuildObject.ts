@@ -69,8 +69,8 @@ class JSONBuildObjectFunction<
     TAs,
     TCastType
 > {
-    [IComparableValueDummySymbol]?: DetermineValueType<TCastType, NonNullable<TReturnType>>;
-    [IComparableFinalValueDummySymbol]?: DetermineFinalValueType<TReturnType, DetermineValueType<TCastType, NonNullable<TReturnType>>>;
+    [IComparableValueDummySymbol]: DetermineValueType<TCastType, NonNullable<TReturnType>>;
+    [IComparableFinalValueDummySymbol]: DetermineFinalValueType<TReturnType, DetermineValueType<TCastType, NonNullable<TReturnType>>>;
 
     dbType: TDbType;
     obj: TObj;
@@ -112,6 +112,8 @@ class JSONBuildObjectFunction<
         this.asName = asName as TAs;
         this.castType = castType;
 
+        this[IComparableValueDummySymbol] = undefined as any;
+        this[IComparableFinalValueDummySymbol] = undefined as any;
 
         const tmpParams: QueryParam<TDbType, any, any, any, any>[] = [];
         let entries = Object.entries(this.obj);

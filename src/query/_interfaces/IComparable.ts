@@ -46,8 +46,8 @@ interface IComparable<
 > extends IDbType<TDbType> {
     dbType: TDbType;
 
-    [IComparableValueDummySymbol]?: TValueType;
-    [IComparableFinalValueDummySymbol]?: TFinalValueType;
+    [IComparableValueDummySymbol]: TValueType;
+    [IComparableFinalValueDummySymbol]: TFinalValueType;
 
     params?: TParams;
     fieldName: TFieldName;
