@@ -1,7 +1,7 @@
 import type { DbType } from "../../db.js";
 import type { DbValueTypes } from "../../table/column.js";
 import type { PgColumnType } from "../../table/columnTypes.js";
-import type { UndefinedIfLengthZero } from "../../utility/common.js";
+import type { IsAny, LiteralToBase, UndefinedIfLengthZero } from "../../utility/common.js";
 import { IComparableFinalValueDummySymbol, IComparableValueDummySymbol, queryBuilderContextFactory, type DetermineValueType, type IComparable, type QueryBuilderContext } from "../_interfaces/IComparable.js";
 import type { ExtractParams } from "../param.js";
 import QueryParam from "../param.js";
@@ -18,6 +18,11 @@ import lt from "./lt.js";
 import lte from "./lte.js";
 import notBetween from "./notBetween.js";
 import notEq from "./notEq.js";
+
+type ConvertComparisonParamToTyped<TIntermediate extends QueryParam<any, any, any, any, any>, TValueType extends DbValueTypes | null> =
+    TIntermediate extends QueryParam<infer TDbType, infer TName, infer TVal, infer TAs, infer TCastType> ?
+    QueryParam<TDbType, TName, IsAny<TVal> extends true ? LiteralToBase<TValueType> | null : TVal, TAs, TCastType> :
+    never;
 
 type InferAppliedParams<
     TApplied extends readonly (DbValueTypes | null | IComparable<any, any, any, any, any, any, any>)[] | undefined
@@ -103,7 +108,7 @@ class ColumnComparisonOperation<
     between: typeof between = between;
     notBetween: typeof notBetween = notBetween;
     isNull: typeof isNull = isNull;
-    isNotNull:typeof isNotNull = isNotNull;
+    isNotNull: typeof isNotNull = isNotNull;
 
     as<TAs extends string>(asName: TAs) {
         return new ColumnComparisonOperation<TDbType, TComparing, TApplied, TValueType, TParams, TAs, TCastType>(this.dbType, this.operation, this.comparing, this.value, asName, this.castType);
@@ -210,5 +215,6 @@ export {
 
 export type {
     ComparisonOperation,
-    InferValueTypeFromComparable
+    InferValueTypeFromComparable,
+    ConvertComparisonParamToTyped
 }

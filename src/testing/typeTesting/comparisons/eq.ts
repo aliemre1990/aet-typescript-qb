@@ -56,3 +56,11 @@ const functionEqToCol_Valid = roundTester(1, 2).eq(empSalaryQC);
 const functionEqToFunction_Valid = roundTester(1, 2).eq(roundTester(1, paramTester("param")));
 // @ts-expect-error
 const functionEqToVal_Invalid = roundTester(1, 2).eq("ali");
+
+const colEqToParam_WithCast = customerIdQC.eq(paramTester("num").type<number>().cast("VARCHAR"));
+type typeof_ColEqToParam_WithCast = typeof colEqToParam_WithCast;
+type typeof_ColEqToParam_WithCast_Applied = typeof_ColEqToParam_WithCast extends ColumnComparisonOperation<any, any, infer TApplied, any, any, any, any> ? TApplied : never;
+type typeof_ColEqToParam_WithCast_ParamType = typeof_ColEqToParam_WithCast_Applied[0] extends QueryParam<any, any, infer TVal, any, any> ? TVal : never;
+type typeof_ColEqToParam_WithCast_ParamCastType = typeof_ColEqToParam_WithCast_Applied[0] extends QueryParam<any, any, any, any, infer TCastType> ? TCastType : never;
+type colEqToParam_WithCast_ParamType_Test = AssertTrue<AssertEqual<typeof_ColEqToParam_WithCast_ParamType, number>>;
+type colEqToParam_WithCast_ParamCastType_Test = AssertTrue<AssertEqual<typeof_ColEqToParam_WithCast_ParamCastType, "VARCHAR">>;

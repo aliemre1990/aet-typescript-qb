@@ -1,9 +1,8 @@
 import type { DbType } from "../../db.js";
-import ColumnComparisonOperation, { comparisonOperations, type InferValueTypeFromComparable } from "./_comparisonOperations.js";
+import ColumnComparisonOperation, { comparisonOperations, type ConvertComparisonParamToTyped, type InferValueTypeFromComparable } from "./_comparisonOperations.js";
 import type { IComparable } from "../_interfaces/IComparable.js";
-import type { IsAny, LiteralToBase } from "../../utility/common.js";
+import type { LiteralToBase } from "../../utility/common.js";
 import QueryParam from "../param.js";
-
 
 
 // params
@@ -11,13 +10,9 @@ function notBetween<
     TComparing extends IComparable<TDbType, any, any, any, any, any, any>,
     TValueType extends InferValueTypeFromComparable<TDbType, TComparing>,
     TLParamMedian extends QueryParam<TDbType, string, any, any, any>,
-    TLParamName extends TLParamMedian extends QueryParam<any, infer U, any, any, any> ? U : never,
     TLParamValue extends TLParamMedian extends QueryParam<any, any, infer TVal, any, any> ? TVal : never,
-    TLParam extends QueryParam<TDbType, TLParamName, IsAny<TLParamValue> extends true ? LiteralToBase<TValueType> | null : TLParamValue, any, any>,
     TRParamMedian extends QueryParam<TDbType, string, any, any, any>,
-    TRParamName extends TRParamMedian extends QueryParam<any, infer U, any, any, any> ? U : never,
     TRParamValue extends TRParamMedian extends QueryParam<any, any, infer TVal, any, any> ? TVal : never,
-    TRParam extends QueryParam<TDbType, TRParamName, IsAny<TRParamValue> extends true ? LiteralToBase<TValueType> | null : TRParamValue, any, any>,
     TDbType extends DbType = TComparing extends IComparable<infer DbType, any, any, any, any, any, any> ? DbType : never
 >(
     this: TComparing,
@@ -26,15 +21,16 @@ function notBetween<
 ): ColumnComparisonOperation<
     TDbType,
     TComparing,
-    [TLParam, TRParam]
+    [
+        ConvertComparisonParamToTyped<TLParamMedian, TValueType>,
+        ConvertComparisonParamToTyped<TRParamMedian, TValueType>
+    ]
 >
 function notBetween<
     TComparing extends IComparable<TDbType, any, any, any, any, any, any>,
     TValueType extends InferValueTypeFromComparable<TDbType, TComparing>,
     TLParamMedian extends QueryParam<TDbType, string, any, any, any>,
-    TLParamName extends TLParamMedian extends QueryParam<any, infer U, any, any, any> ? U : never,
     TLParamValue extends TLParamMedian extends QueryParam<any, any, infer TVal, any, any> ? TVal : never,
-    TLParam extends QueryParam<TDbType, TLParamName, IsAny<TLParamValue> extends true ? LiteralToBase<TValueType> | null : TLParamValue, any, any>,
     TDbType extends DbType = TComparing extends IComparable<infer DbType, any, any, any, any, any, any> ? DbType : never
 >(
     this: TComparing,
@@ -43,15 +39,16 @@ function notBetween<
 ): ColumnComparisonOperation<
     TDbType,
     TComparing,
-    [TLParam, TValueType | null]
+    [
+        ConvertComparisonParamToTyped<TLParamMedian, TValueType>,
+        TValueType | null
+    ]
 >
 function notBetween<
     TComparing extends IComparable<TDbType, any, any, any, any, any, any>,
     TValueType extends InferValueTypeFromComparable<TDbType, TComparing>,
     TRParamMedian extends QueryParam<TDbType, string, any, any, any>,
-    TRParamName extends TRParamMedian extends QueryParam<any, infer U, any, any, any> ? U : never,
     TRParamValue extends TRParamMedian extends QueryParam<any, any, infer TVal, any, any> ? TVal : never,
-    TRParam extends QueryParam<TDbType, TRParamName, IsAny<TRParamValue> extends true ? LiteralToBase<TValueType> | null : TRParamValue, any, any>,
     TDbType extends DbType = TComparing extends IComparable<infer DbType, any, any, any, any, any, any> ? DbType : never
 >(
     this: TComparing,
@@ -60,15 +57,16 @@ function notBetween<
 ): ColumnComparisonOperation<
     TDbType,
     TComparing,
-    [TValueType | null, TRParam]
+    [
+        TValueType | null,
+        ConvertComparisonParamToTyped<TRParamMedian, TValueType>,
+    ]
 >
 function notBetween<
     TComparing extends IComparable<TDbType, any, any, any, any, any, any>,
     TValueType extends InferValueTypeFromComparable<TDbType, TComparing>,
     TLParamMedian extends QueryParam<TDbType, string, any, any, any>,
-    TLParamName extends TLParamMedian extends QueryParam<any, infer U, any, any, any> ? U : never,
     TLParamValue extends TLParamMedian extends QueryParam<any, any, infer TVal, any, any> ? TVal : never,
-    TLParam extends QueryParam<TDbType, TLParamName, IsAny<TLParamValue> extends true ? LiteralToBase<TValueType> | null : TLParamValue, any, any>,
     TRApplied extends IComparable<TDbType, any, LiteralToBase<TValueType>, any, any, any, any>,
     TDbType extends DbType = TComparing extends IComparable<infer DbType, any, any, any, any, any, any> ? DbType : never
 >(
@@ -78,15 +76,16 @@ function notBetween<
 ): ColumnComparisonOperation<
     TDbType,
     TComparing,
-    [TLParam, TRApplied]
+    [
+        ConvertComparisonParamToTyped<TLParamMedian, TValueType>,
+        TRApplied
+    ]
 >
 function notBetween<
     TComparing extends IComparable<TDbType, any, any, any, any, any, any>,
     TValueType extends InferValueTypeFromComparable<TDbType, TComparing>,
     TRParamMedian extends QueryParam<TDbType, string, any, any, any>,
-    TRParamName extends TRParamMedian extends QueryParam<any, infer U, any, any, any> ? U : never,
     TRParamValue extends TRParamMedian extends QueryParam<any, any, infer TVal, any, any> ? TVal : never,
-    TRParam extends QueryParam<TDbType, TRParamName, IsAny<TRParamValue> extends true ? LiteralToBase<TValueType> | null : TRParamValue, any, any>,
     TLApplied extends IComparable<TDbType, any, LiteralToBase<TValueType>, any, any, any, any>,
     TDbType extends DbType = TComparing extends IComparable<infer DbType, any, any, any, any, any, any> ? DbType : never
 >(
@@ -96,7 +95,10 @@ function notBetween<
 ): ColumnComparisonOperation<
     TDbType,
     TComparing,
-    [TLApplied, TRParam]
+    [
+        TLApplied,
+        ConvertComparisonParamToTyped<TRParamMedian, TValueType>,
+    ]
 >
 
 
@@ -155,104 +157,13 @@ function notBetween<
 
 
 //Implementation
-function notBetween<
-    TComparing extends IComparable<TDbType, any, any, any, any, any, any>,
-    TValueType extends InferValueTypeFromComparable<TDbType, TComparing>,
-    TLParamMedian extends QueryParam<TDbType, string, any, any, any> | undefined,
-    TLParamName extends (TLParamMedian extends QueryParam<any, infer U, any, any, any> ? U : never) | undefined,
-    TLParamValue extends TLParamMedian extends QueryParam<any, any, infer TVal, any, any> ? TVal : never,
-    TRParamMedian extends QueryParam<TDbType, string, any, any, any> | undefined,
-    TRParamName extends (TRParamMedian extends QueryParam<any, infer U, any, any, any> ? U : never) | undefined,
-    TRParamValue extends TRParamMedian extends QueryParam<any, any, infer TVal, any, any> ? TVal : never,
-    TLApplied extends IComparable<TDbType, any, LiteralToBase<TValueType>, any, any, any, any> | undefined,
-    TRApplied extends IComparable<TDbType, any, LiteralToBase<TValueType>, any, any, any, any> | undefined,
-    TDbType extends DbType = TComparing extends IComparable<infer DbType, any, any, any, any, any, any> ? DbType : never
->
-    (
-        this: TComparing,
-        leftValue: LiteralToBase<TValueType> | null | TLParamMedian | TLApplied,
-        rightValue: LiteralToBase<TValueType> | null | TRParamMedian | TRApplied
-    ) {
+function notBetween<TComparing extends IComparable<any, any, any, any, any, any, any>>(
+    this: TComparing,
+    leftValue: any,
+    rightValue: any
+) {
 
     const dbType = this.dbType;
-
-    if (leftValue instanceof QueryParam) {
-        const lParam = new QueryParam<
-            TDbType,
-            TLParamName extends string ? TLParamName : never,
-            IsAny<TLParamValue> extends true ? TValueType | null : TLParamValue
-        >(leftValue.dbType, leftValue.name, undefined);
-
-        if (rightValue instanceof QueryParam) {
-            const rParam = new QueryParam<
-                TDbType,
-                TRParamName extends string ? TRParamName : never,
-                IsAny<TRParamValue> extends true ? TValueType | null : TRParamValue
-            >(leftValue.dbType, rightValue.name, undefined);
-
-            return new ColumnComparisonOperation(
-                dbType,
-                comparisonOperations.notBetween,
-                this,
-                [lParam, rParam],
-                undefined
-            )
-        }
-
-        if (rightValue === undefined) {
-            throw Error('Invalid argument.');
-        }
-
-        return new ColumnComparisonOperation(
-            dbType,
-            comparisonOperations.notBetween,
-            this,
-            [lParam, rightValue],
-            undefined
-        )
-
-    }
-
-    if (rightValue instanceof QueryParam) {
-        const rParam = new QueryParam<
-            TDbType,
-            TRParamName extends string ? TRParamName : never,
-            IsAny<TRParamValue> extends true ? TValueType | null : TRParamValue
-        >(leftValue.dbType, rightValue.name, undefined);
-
-        if (leftValue instanceof QueryParam) {
-            const lParam = new QueryParam<
-                TDbType,
-                TLParamName extends string ? TLParamName : never,
-                IsAny<TLParamValue> extends true ? TValueType | null : TLParamValue
-            >(leftValue.dbType, leftValue.name, undefined);
-
-            return new ColumnComparisonOperation(
-                dbType,
-                comparisonOperations.notBetween,
-                this,
-                [lParam, rParam],
-                undefined
-            );
-        }
-
-        if (leftValue === undefined) {
-            throw Error('Invalid argument.');
-        }
-
-        return new ColumnComparisonOperation(
-            dbType,
-            comparisonOperations.notBetween,
-            this,
-            [leftValue, rParam],
-            undefined
-        );
-
-    }
-
-    if (rightValue === undefined || leftValue === undefined) {
-        throw Error('Invalid argument.');
-    }
 
     return new ColumnComparisonOperation(
         dbType,
