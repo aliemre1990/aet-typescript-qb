@@ -10,10 +10,12 @@ import gte from "./comparisons/gte.js";
 import sqlIn from "./comparisons/in.js";
 import isNotNull from "./comparisons/isNotNull.js";
 import isNull from "./comparisons/isNull.js";
+import like from "./comparisons/like.js";
 import lt from "./comparisons/lt.js";
 import lte from "./comparisons/lte.js";
 import notBetween from "./comparisons/notBetween.js";
 import notEq from "./comparisons/notEq.js";
+import notLike from "./comparisons/notLike.js";
 import QueryParam from "./param.js";
 
 type InferLogicalOperationParams<
@@ -72,6 +74,8 @@ class ColumnLogicalOperation<
     notBetween: typeof notBetween = notBetween;
     isNull: typeof isNull = isNull;
     isNotNull: typeof isNotNull = isNotNull;
+    like: typeof like = like;
+    notLike: typeof notLike = notLike;
 
     as<TAs extends string>(asName: TAs) {
         return new ColumnLogicalOperation<TDbType, TComparisons, TParams, TAs, TCastType>(this.dbType, this.operator, this.comparisons, asName, this.castType);

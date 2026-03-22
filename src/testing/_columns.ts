@@ -47,6 +47,19 @@ const customerNameQC = new QueryColumn<
     { tableName: customersTable.name },
     undefined
 );
+
+const empPositionQC = new QueryColumn<
+    PgDbType,
+    typeof employeesTable.columns.position,
+    NonNullable<typeof employeesTable.columns.position.tableSpecs>,
+    undefined
+>(
+    dbTypes.postgresql,
+    employeesTable.columns.position,
+    { tableName: employeesTable.name },
+    undefined
+);
+
 const empSalaryQC = new QueryColumn<
     PgDbType,
     typeof employeesTable.columns.salary,
@@ -63,6 +76,7 @@ export {
     customerIdQC,
     customerCreatedByQC,
     customerNameQC,
-    empSalaryQC
+    empSalaryQC,
+    empPositionQC
 }
 

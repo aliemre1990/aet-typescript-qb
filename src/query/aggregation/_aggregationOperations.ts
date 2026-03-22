@@ -16,6 +16,8 @@ import type { PgColumnType } from "../../table/columnTypes.js";
 import notBetween from "../comparisons/notBetween.js";
 import isNull from "../comparisons/isNull.js";
 import isNotNull from "../comparisons/isNotNull.js";
+import like from "../comparisons/like.js";
+import notLike from "../comparisons/notLike.js";
 
 
 const aggregationOperations = {
@@ -95,6 +97,8 @@ class BasicColumnAggregationOperation<
     notBetween: typeof notBetween = notBetween;
     isNull: typeof isNull = isNull;
     isNotNull: typeof isNotNull = isNotNull;
+    like: typeof like = like;
+    notLike: typeof notLike = notLike;
 
     as<TAs extends string>(asName: TAs) {
         return new BasicColumnAggregationOperation<TDbType, TAggregationOperation, TArgs, TReturnType, TParams, TAs, TCastType>(this.dbType, this.args, this.operation, asName, this.castType);

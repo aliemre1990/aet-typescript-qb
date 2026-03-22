@@ -17,10 +17,12 @@ import gte from "./comparisons/gte.js";
 import sqlIn from "./comparisons/in.js";
 import isNotNull from "./comparisons/isNotNull.js";
 import isNull from "./comparisons/isNull.js";
+import like from "./comparisons/like.js";
 import lt from "./comparisons/lt.js";
 import lte from "./comparisons/lte.js";
 import notBetween from "./comparisons/notBetween.js";
 import notEq from "./comparisons/notEq.js";
+import notLike from "./comparisons/notLike.js";
 import { convertValueToQueryString } from "./uitlity/common.js";
 
 class LiteralValue<
@@ -59,7 +61,9 @@ class LiteralValue<
     between: typeof between = between;
     notBetween: typeof notBetween = notBetween;
     isNull: typeof isNull = isNull;
-    isNotNull:typeof isNotNull = isNotNull;
+    isNotNull: typeof isNotNull = isNotNull;
+    like: typeof like = like;
+    notLike: typeof notLike = notLike;
 
     as<TAs extends string>(asName: TAs) {
         return new LiteralValue<TDbType, TValue, TAs, TCastType>(this.dbType, this.value, asName, this.castType);

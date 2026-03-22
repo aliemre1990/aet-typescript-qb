@@ -17,6 +17,7 @@ const employeesTable = pgTable(
         pgColumn('id', pgColumnTypes.serial, false),
         pgColumn('managerId', pgColumnTypes.int, true),
         pgColumn('name', pgColumnTypes.varchar, false),
+        pgColumn('position', pgColumnTypes.varchar, true),
         pgColumn('salary', pgColumnTypes.decimal, true),
         pgColumn('deptId', pgColumnTypes.int, false)
     ]

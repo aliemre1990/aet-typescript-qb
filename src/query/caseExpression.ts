@@ -12,10 +12,12 @@ import gte from "./comparisons/gte.js";
 import sqlIn from "./comparisons/in.js";
 import isNotNull from "./comparisons/isNotNull.js";
 import isNull from "./comparisons/isNull.js";
+import like from "./comparisons/like.js";
 import lt from "./comparisons/lt.js";
 import lte from "./comparisons/lte.js";
 import notBetween from "./comparisons/notBetween.js";
 import notEq from "./comparisons/notEq.js";
+import notLike from "./comparisons/notLike.js";
 import type ColumnLogicalOperation from "./logicalOperations.js";
 import type { ExtractParams } from "./param.js";
 import QueryParam from "./param.js";
@@ -206,6 +208,8 @@ class SQLCaseExpression<
     notBetween: typeof notBetween = notBetween;
     isNull: typeof isNull = isNull;
     isNotNull: typeof isNotNull = isNotNull;
+    like: typeof like = like;
+    notLike: typeof notLike = notLike;
 
     as<TAs extends string>(asName: TAs) {
         return new SQLCaseExpression<TDbType, TMainExpression, TElseExpression, TWhenExpressions, TResult, TParams, TAs, TCastType>(this.dbType, asName, this.castType, this.mainExpression);

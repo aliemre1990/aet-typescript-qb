@@ -12,10 +12,12 @@ import gte from "./comparisons/gte.js";
 import sqlIn from "./comparisons/in.js";
 import isNotNull from "./comparisons/isNotNull.js";
 import isNull from "./comparisons/isNull.js";
+import like from "./comparisons/like.js";
 import lt from "./comparisons/lt.js";
 import lte from "./comparisons/lte.js";
 import notBetween from "./comparisons/notBetween.js";
 import notEq from "./comparisons/notEq.js";
+import notLike from "./comparisons/notLike.js";
 import type QueryParam from "./param.js";
 import type { CTEType, MapQueryResultForCombine, ResultShape, UNION_TYPE } from "./queryBuilder.js";
 import QueryBuilder, { cteTypes } from "./queryBuilder.js";
@@ -71,6 +73,8 @@ class CTEObjectEntry<
     notBetween: typeof notBetween = notBetween;
     isNull: typeof isNull = isNull;
     isNotNull: typeof isNotNull = isNotNull;
+    like: typeof like = like;
+    notLike: typeof notLike = notLike;
 
     as<TAsName extends string>(val: TAsName) {
         return new CTEObjectEntry<TDbType, TComparable, TValueType, TFinalValueType, TFieldName, TAsName, TCastType>(this.dbType, this.comparable, val, this.ownerName, this.fieldName, this.castType);

@@ -34,6 +34,7 @@ type typeof_GroupBy_MultipleTable_ResultType_Expected = {
     createdAt: Date;
     orderId: number;
     managerId: number | null;
+    position: string | null;
     salary: number | null;
     deptId: number;
 }[];

@@ -19,7 +19,7 @@ const cteValid_Chaining = withAs("employeesCTE", employeesTable.select())
 type typeof_CTEValid_Chaining = typeof cteValid_Chaining;
 type typeof_CTEValid_Chaining_ResultCols = typeof_CTEValid_Chaining extends QueryBuilder<any, any, any, any, infer TResult, any, any, any> ? TResult : never;
 type typeof_CTEValid_Chaining_ResultType = ColumnsToResultMap<any, typeof_CTEValid_Chaining_ResultCols>;
-type typeof_CTEValid_Chaining_ResultType_Expected = { id: number; customerTypeId: number; name: string; managerId: number | null; salary: number | null; deptId: number; createdBy: number; }[];
+type typeof_CTEValid_Chaining_ResultType_Expected = { id: number; customerTypeId: number; name: string; managerId: number | null; position: string | null; salary: number | null; deptId: number; createdBy: number; }[];
 type cteValid_Chaining_ResultType_Test = AssertTrue<AssertEqual<typeof_CTEValid_Chaining_ResultType, typeof_CTEValid_Chaining_ResultType_Expected>>;
 
 const recursiveCTEValid_Regular = withRecursiveAs(
@@ -31,7 +31,7 @@ const recursiveCTEValid_Regular = withRecursiveAs(
     "UNION",
     (self) => {
 
-        type tp = typeof self extends { entries: infer  TEntries } ? TEntries : never;
+        type tp = typeof self extends { entries: infer TEntries } ? TEntries : never;
 
         return employeesTable
             .select((tables) => [tables.employees.id, tables.employees.name, tables.employees.id])

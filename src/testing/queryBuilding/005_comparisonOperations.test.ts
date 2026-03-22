@@ -3,7 +3,7 @@ import assert from "node:assert";
 
 import { customersTable, ordersTable } from "../_tables.js";
 import type { IComparable } from "../../query/_interfaces/IComparable.js";
-import { customerIdQC } from "../_columns.js";
+import { customerIdQC, customerNameQC } from "../_columns.js";
 
 test.suite("COMPARISON OPERATIONS TESTS", () => {
     test("Basic eq comparison.", () => {
@@ -46,6 +46,14 @@ test.suite("COMPARISON OPERATIONS TESTS", () => {
         assert.equal(`"customers"."id" IS NULL`, query);
     });
 
+    test("Basic like comparison", () => {
+        const comp = customerNameQC.like("A%");
+        const buildRes = comp.buildSQL();
+        const query = buildRes.query;
+
+        assert.equal(`"customers"."name" LIKE 'A%'`, query);
+    });
+    
     test("Literal at left side of basic eq comparison.", () => {
         const qb = customersTable.select()
             .where((tables, { literal }) => literal(10).eq(tables.customers.id));

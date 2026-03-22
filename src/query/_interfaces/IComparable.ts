@@ -15,6 +15,8 @@ import type { IsAny } from "../../utility/common.js";
 import type notBetween from "../comparisons/notBetween.js";
 import type isNull from "../comparisons/isNull.js";
 import type isNotNull from "../comparisons/isNotNull.js";
+import type like from "../comparisons/like.js";
+import type notLike from "../comparisons/notLike.js";
 
 type DetermineValueType<TCastType extends PgColumnType | undefined, TValueType extends DbValueTypes | null> =
     TCastType extends undefined ?
@@ -68,6 +70,8 @@ interface IComparable<
     notBetween: typeof notBetween;
     isNull: typeof isNull;
     isNotNull: typeof isNotNull;
+    like: typeof like;
+    notLike: typeof notLike;
 
     as<TAs extends string>(asName: TAs): IComparable<TDbType, TParams, TValueType, TFinalValueType, TFieldName, TAs, TCastType>
     cast<TCastType extends PgColumnType>(type: TCastType): IComparable<TDbType, TParams, any, any, TFieldName, TAs, TCastType>

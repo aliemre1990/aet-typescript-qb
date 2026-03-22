@@ -14,15 +14,23 @@ import gte from "./gte.js";
 import sqlIn from "./in.js";
 import isNotNull from "./isNotNull.js";
 import isNull from "./isNull.js";
+import like from "./like.js";
 import lt from "./lt.js";
 import lte from "./lte.js";
 import notBetween from "./notBetween.js";
 import notEq from "./notEq.js";
+import notLike from "./notLike.js";
 
 type ConvertComparisonParamToTyped<TIntermediate extends QueryParam<any, any, any, any, any>, TValueType extends DbValueTypes | null> =
     TIntermediate extends QueryParam<infer TDbType, infer TName, infer TVal, infer TAs, infer TCastType> ?
     QueryParam<TDbType, TName, IsAny<TVal> extends true ? LiteralToBase<TValueType> | null : TVal, TAs, TCastType> :
     never;
+
+type ConvertComparisonParamToNonNullTyped<TIntermediate extends QueryParam<any, any, any, any, any>, TValueType extends DbValueTypes | null> =
+    TIntermediate extends QueryParam<infer TDbType, infer TName, infer TVal, infer TAs, infer TCastType> ?
+    QueryParam<TDbType, TName, IsAny<TVal> extends true ? LiteralToBase<TValueType> : TVal, TAs, TCastType> :
+    never;
+
 
 type InferAppliedParams<
     TApplied extends readonly (DbValueTypes | null | IComparable<any, any, any, any, any, any, any>)[] | undefined
@@ -51,7 +59,9 @@ const comparisonOperations = {
     lt: { name: 'LT', symbol: "<" },
     lte: { name: 'LTE', symbol: "<=" },
     like: { name: 'LIKE', symbol: "LIKE" },
+    notLike: { name: 'NOT_LIKE', symbol: "NOT LIKE" },
     iLike: { name: 'ILIKE', symbol: "ILIKE" },
+    notILike: { name: 'NOT_ILIKE', symbol: "NOT ILIKE" },
     in: { name: 'IN', symbol: "IN" },
     notIn: { name: 'NOT_IN', symbol: "NOT IN" },
     isNull: { name: 'IS_NULL', symbol: "IS NULL" },
@@ -109,6 +119,8 @@ class ColumnComparisonOperation<
     notBetween: typeof notBetween = notBetween;
     isNull: typeof isNull = isNull;
     isNotNull: typeof isNotNull = isNotNull;
+    like: typeof like = like;
+    notLike: typeof notLike = notLike;
 
     as<TAs extends string>(asName: TAs) {
         return new ColumnComparisonOperation<TDbType, TComparing, TApplied, TValueType, TParams, TAs, TCastType>(this.dbType, this.operation, this.comparing, this.value, asName, this.castType);
@@ -155,7 +167,19 @@ class ColumnComparisonOperation<
                 throw Error(`Invalid argument count for '${this.operation.name}' comparison.`);
             }
 
-            queryRes = `${comparingStr}${this.operation.symbol}${this.value[0] instanceof QueryBuilder ? `(${appliedStrArr[0]})` : appliedStrArr[0]}`;
+            let applySpaceAroundOperator = false;
+            if (
+                [
+                    comparisonOperations.like,
+                    comparisonOperations.notLike,
+                    comparisonOperations.iLike,
+                    comparisonOperations.notILike
+                ].some(op => op === this.operation)
+            ) {
+                applySpaceAroundOperator = true;
+            }
+
+            queryRes = `${comparingStr}${applySpaceAroundOperator ? ' ' : ''}${this.operation.symbol}${applySpaceAroundOperator ? ' ' : ''}${this.value[0] instanceof QueryBuilder ? `(${appliedStrArr[0]})` : appliedStrArr[0]}`;
         }
 
         return { query: queryRes, params: [...(context?.params || [])] };
@@ -216,5 +240,6 @@ export {
 export type {
     ComparisonOperation,
     InferValueTypeFromComparable,
-    ConvertComparisonParamToTyped
+    ConvertComparisonParamToTyped,
+    ConvertComparisonParamToNonNullTyped
 }

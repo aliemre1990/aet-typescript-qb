@@ -38,6 +38,8 @@ import type { ExtractParams } from "./param.js";
 import notBetween from "./comparisons/notBetween.js";
 import isNull from "./comparisons/isNull.js";
 import isNotNull from "./comparisons/isNotNull.js";
+import like from "./comparisons/like.js";
+import notLike from "./comparisons/notLike.js";
 
 type CombineComparableItems<
     TLeft extends ResultShapeItem<any>,
@@ -246,6 +248,8 @@ class QueryBuilder<
     notBetween: typeof notBetween = notBetween;
     isNull: typeof isNull = isNull;
     isNotNull: typeof isNotNull = isNotNull;
+    like: typeof like = like;
+    notLike: typeof notLike = notLike;
 
     cteSpecs?: TCTESpecs;
     fromSpecs: TFrom;
