@@ -20,6 +20,8 @@ type CoalesceArg<TDbType extends DbType, TValueType extends DbValueTypes> =
     | QueryParam<TDbType, string, TValueType | null, any, any>
     | IComparable<TDbType, any, TValueType, any, any, any, any>;
 
+type DetermineReturnType<TDbType extends DbType, TArgs extends any[], TReturnType extends DbValueTypes | null> =
+    IsContainsNonNull<TDbType, TArgs> extends true ? NonNullable<TReturnType> : TReturnType | null
 
 function generateCoalesceFn<
     TDbType extends DbType
@@ -40,7 +42,7 @@ function generateCoalesceFn<
             TDbType,
             typeof sqlFunctions.coalesce,
             ConvertMediansInArray<TArgs, TDbType, FirstType | null>,
-            IsContainsNonNull<TDbType, TArgs> extends true ? NonNullable<FirstType> : FirstType | null
+            DetermineReturnType<TDbType, TArgs, FirstType>
         >(dbType, args as ConvertMediansInArray<TArgs, TDbType, FirstType | null>, sqlFunctions.coalesce, undefined);
     }
 }
