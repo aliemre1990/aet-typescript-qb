@@ -19,7 +19,7 @@ import notLike from "./comparisons/notLike.js";
 import QueryParam from "./param.js";
 
 type InferLogicalOperationParams<
-    TComparisons extends readonly (IComparisonOperation<any, any, any, any, any, any> | ColumnLogicalOperation<any, any, any, any, any>)[],
+    TComparisons extends readonly (IComparisonOperation<any, any, any, any, any, any, any> | ColumnLogicalOperation<any, any, any, any, any>)[],
 > = TComparisons extends readonly [infer First, ...infer Rest] ?
     First extends { params?: infer TParams extends readonly QueryParam<any, any, any, any, any>[] | undefined } ?
     Rest extends readonly [any, ...any[]] ?
@@ -39,7 +39,7 @@ type LogicalOperation = (typeof logicalOperations[keyof typeof logicalOperations
 
 class ColumnLogicalOperation<
     TDbType extends DbType,
-    TComparisons extends readonly (IComparisonOperation<TDbType, any, any, any, any, any> | ColumnLogicalOperation<TDbType, any, any, any, any>)[],
+    TComparisons extends readonly (IComparisonOperation<TDbType, any, any, any, any, any, any> | ColumnLogicalOperation<TDbType, any, any, any, any>)[],
     TParams extends readonly QueryParam<TDbType, string, any, any, any>[] | undefined = UndefinedIfLengthZero<InferLogicalOperationParams<TComparisons>>,
     TAs extends string | undefined = undefined,
     TCastType extends PgColumnType | undefined = undefined
@@ -141,7 +141,7 @@ function generateAndFn<TDbType extends DbType>(
     dbType: TDbType
 ) {
     return function <
-        TComparisons extends (IComparisonOperation<TDbType, any, any, any, any, any> | ColumnLogicalOperation<TDbType, any, any, any, any>)[]
+        TComparisons extends (IComparisonOperation<TDbType, any, any, any, any, any, any> | ColumnLogicalOperation<TDbType, any, any, any, any>)[]
     >(...ops: TComparisons) {
         return new ColumnLogicalOperation<TDbType, TComparisons>(dbType, logicalOperations.and, ops, undefined);
     }
@@ -152,7 +152,7 @@ function generateOrFn<TDbType extends DbType>(
     dbType: TDbType
 ) {
     return function <
-        TComparisons extends (IComparisonOperation<TDbType, any, any, any, any, any> | ColumnLogicalOperation<TDbType, any, any, any, any>)[]
+        TComparisons extends (IComparisonOperation<TDbType, any, any, any, any, any, any> | ColumnLogicalOperation<TDbType, any, any, any, any>)[]
     >(...ops: TComparisons) {
         return new ColumnLogicalOperation<TDbType, TComparisons>(dbType, logicalOperations.or, ops, undefined);
     }

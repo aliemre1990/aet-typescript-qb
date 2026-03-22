@@ -40,6 +40,7 @@ class LikeColumnComparisonOperation<
     TDbType,
     TOperation,
     TParams,
+    DetermineValueType<TCastType, boolean>,
     DetermineValueType<TCastType, InferLikeComparisonReturnType<InferFinalValueTypeFromComparable<TComparing>, InferFinalValueTypeFromApplied<TApplied>>>,
     TAs,
     TCastType
@@ -47,7 +48,7 @@ class LikeColumnComparisonOperation<
 
     dbType: TDbType;
     params?: TParams;
-    [IComparableValueDummySymbol]: DetermineValueType<TCastType, InferLikeComparisonReturnType<InferFinalValueTypeFromComparable<TComparing>, InferFinalValueTypeFromApplied<TApplied>>>;
+    [IComparableValueDummySymbol]: DetermineValueType<TCastType, boolean>;
     [IComparableFinalValueDummySymbol]: DetermineValueType<TCastType, InferLikeComparisonReturnType<InferFinalValueTypeFromComparable<TComparing>, InferFinalValueTypeFromApplied<TApplied>>>;
     fieldName: undefined = undefined;
     asName: TAs;

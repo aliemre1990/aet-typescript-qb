@@ -3,7 +3,7 @@ import type { DbValueTypes } from "../../table/column.js";
 import type { PgColumnType } from "../../table/columnTypes.js";
 import type { UndefinedIfLengthZero } from "../../utility/common.js";
 import { IComparableFinalValueDummySymbol, IComparableValueDummySymbol, queryBuilderContextFactory, type DetermineValueType, type IComparable, type QueryBuilderContext } from "../_interfaces/IComparable.js";
-import type { InComparisonOperationType, InferComparisonParams, InferValueTypeFromComparable } from "../_interfaces/IComparisonOperation.js";
+import type { IComparisonOperation, InComparisonOperationType, InferComparisonParams, InferValueTypeFromComparable } from "../_interfaces/IComparisonOperation.js";
 import QueryParam from "../param.js";
 import QueryBuilder from "../queryBuilder.js";
 import { convertArgsToQueryString } from "../uitlity/common.js";
@@ -30,12 +30,12 @@ class InColumnComparisonOperation<
     TParams extends readonly QueryParam<TDbType, string, any, any, any>[] | undefined = UndefinedIfLengthZero<InferComparisonParams<TComparing, TApplied>>,
     TAs extends string | undefined = undefined,
     TCastType extends PgColumnType | undefined = undefined
-> implements IComparable<
+> implements IComparisonOperation<
     TDbType,
+    TOperation,
     TParams,
     DetermineValueType<TCastType, boolean>,
     DetermineValueType<TCastType, boolean>,
-    undefined,
     TAs,
     TCastType
 > {

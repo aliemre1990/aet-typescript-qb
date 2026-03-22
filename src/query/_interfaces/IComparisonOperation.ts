@@ -97,14 +97,15 @@ interface IComparisonOperation<
     TDbType extends DbType,
     TOperation extends ComparisonOperationType,
     TParams extends readonly QueryParam<TDbType, string, any, any, any>[] | undefined,
-    TReturnType extends boolean | null,
+    TValueType extends DbValueTypes | null,
+    TFinalValueType extends DbValueTypes | null,
     TAs extends string | undefined,
     TCastType extends PgColumnType | undefined
 > extends IComparable<
     TDbType,
     TParams,
-    TReturnType,
-    TReturnType,
+    TValueType,
+    TFinalValueType,
     undefined,
     TAs,
     TCastType

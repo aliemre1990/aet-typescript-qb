@@ -31,6 +31,7 @@ class IsNullColumnComparisonOperation<
     TOperation,
     TParams,
     DetermineValueType<TCastType, boolean>,
+    DetermineValueType<TCastType, boolean>,
     TAs,
     TCastType
 > {
