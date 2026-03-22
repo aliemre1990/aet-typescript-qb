@@ -1,12 +1,11 @@
 import type { DbType } from "../../db.js";
 import type { IComparable } from "../_interfaces/IComparable.js";
 import { isNullComparisonOperations } from "../_interfaces/IComparisonOperation.js";
-import { IsNullComparisonOperation } from "./_comparisonOperations.js";
-
+import IsNullColumnComparisonOperation from "./_isNullColumnComparisonOperation.js";
 function isNotNull<
     TComparing extends IComparable<TDbType, any, any, any, any, any, any>,
     TDbType extends DbType = TComparing extends IComparable<infer DbType, any, any, any, any, any, any> ? DbType : never,
->(this: TComparing): IsNullComparisonOperation<
+>(this: TComparing): IsNullColumnComparisonOperation<
     TDbType,
     typeof isNullComparisonOperations.isNotNull,
     TComparing,
@@ -14,7 +13,7 @@ function isNotNull<
 > {
     const dbType = this.dbType;
 
-    return new IsNullComparisonOperation(
+    return new IsNullColumnComparisonOperation(
         dbType,
         isNullComparisonOperations.isNotNull,
         this,

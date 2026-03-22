@@ -2,8 +2,8 @@ import type { DbType } from "../../db.js";
 import type { IComparable } from "../_interfaces/IComparable.js";
 import type { LiteralToBase } from "../../utility/common.js";
 import QueryParam from "../param.js";
-import { BasicComparisonOperation, ConvertComparisonParamToTyped, InferValueTypeFromComparable } from "./_comparisonOperations.js";
-import { basicComparisonOperations } from "../_interfaces/IComparisonOperation.js";
+import { basicComparisonOperations, type ConvertComparisonParamToTyped, type InferValueTypeFromComparable } from "../_interfaces/IComparisonOperation.js";
+import BasicColumnComparisonOperation from "./_basicColumnComparisonOperation.js";
 
 function notEq<
     TComparing extends IComparable<TDbType, any, any, any, any, any, any>,
@@ -12,12 +12,11 @@ function notEq<
     TParamValue extends TParamMedian extends QueryParam<any, any, infer TVal, any, any> ? TVal : never,
     TDbType extends DbType = TComparing extends IComparable<infer DbType, any, any, any, any, any, any> ? DbType : never,
 >(this: TComparing, value: TParamValue extends (LiteralToBase<TValueType> | null) ? TParamMedian : never):
-    BasicComparisonOperation<
+    BasicColumnComparisonOperation<
         TDbType,
         typeof basicComparisonOperations.notEq,
         TComparing,
         ConvertComparisonParamToTyped<TParamMedian, TValueType>
-
     >
 function notEq<
     TComparing extends IComparable<TDbType, any, any, any, any, any, any>,
@@ -25,7 +24,7 @@ function notEq<
     TApplied extends IComparable<TDbType, any, LiteralToBase<TValueType>, any, any, any, any>,
     TDbType extends DbType = TComparing extends IComparable<infer DbType, any, any, any, any, any, any> ? DbType : never,
 >(this: TComparing, value: TApplied):
-    BasicComparisonOperation<
+    BasicColumnComparisonOperation<
         TDbType,
         typeof basicComparisonOperations.notEq,
         TComparing,
@@ -36,7 +35,7 @@ function notEq<
     TValueType extends InferValueTypeFromComparable<TDbType, TComparing>,
     TDbType extends DbType = TComparing extends IComparable<infer DbType, any, any, any, any, any, any> ? DbType : never,
 >(this: TComparing, value: LiteralToBase<TValueType> | null):
-    BasicComparisonOperation<
+    BasicColumnComparisonOperation<
         TDbType,
         typeof basicComparisonOperations.notEq,
         TComparing,
@@ -48,7 +47,7 @@ function notEq<TComparing extends IComparable<any, any, any, any, any, any, any>
 ) {
     const dbType = this.dbType;
 
-    return new BasicComparisonOperation(
+    return new BasicColumnComparisonOperation(
         dbType,
         basicComparisonOperations.notEq,
         this,

@@ -1,7 +1,7 @@
 import type { IComparable } from "../../../query/_interfaces/IComparable.js";
-import type { LikeComparisonOperation } from "../../../query/comparisons/_comparisonOperations.js";
+import type LikeColumnComparisonOperation from "../../../query/comparisons/_likeColumnComparisonOperation.js";
 import type QueryParam from "../../../query/param.js";
-import { customerIdQC, customerNameQC, empSalaryQC } from "../../_columns.js";
+import { customerNameQC, empSalaryQC } from "../../_columns.js";
 import { literalTester, paramTester, roundTester } from "../../_functions.js";
 import { customersTable, employeesTable } from "../../_tables.js";
 import type { AssertEqual, AssertTrue } from "../../_typeTestingUtilities.js";
@@ -23,11 +23,10 @@ const likeFunction = customerNameQC.like(roundTester(1, 2));
 
 const likeQueryBuilder = customerNameQC.like(customersTable.select((cols) => [cols.customers.name]));
 
-const likeQueryBuilder_Nullable = customerNameQC.like(employeesTable.select((cols) => [cols.employees.position]));
 
 const likeParam = customerNameQC.like(paramTester("name"));
 type typeof_LikeParam = typeof likeParam;
-type typeof_LikeParam_Applied = typeof_LikeParam extends LikeComparisonOperation<any, any, any, infer TApplied, any, any, any> ? TApplied : never;
+type typeof_LikeParam_Applied = typeof_LikeParam extends LikeColumnComparisonOperation<any, any, any, infer TApplied, any, any, any> ? TApplied : never;
 type typeof_LikeParam_Applied_ReturnType = typeof_LikeParam extends IComparable<any, any, any, infer TFinalValueType, any, any, any> ? TFinalValueType : never;
 type typeof_LikeParam_Applied_ParamType = typeof_LikeParam_Applied extends QueryParam<any, any, infer TVal, any, any> ? TVal : never;
 type likeParam_Test = AssertTrue<AssertEqual<typeof_LikeParam_Applied_ParamType, string>>;
@@ -35,8 +34,13 @@ type likeParam_ReturnTypeTest = AssertTrue<AssertEqual<typeof_LikeParam_Applied_
 
 const likeNullableParam = customerNameQC.like(paramTester("name").type<string | null>());
 type typeof_LikeNullableParam = typeof likeNullableParam;
-type typeof_LikeNullableParam_Applied = typeof_LikeNullableParam extends LikeComparisonOperation<any, any, any, infer TApplied, any, any, any> ? TApplied : never;
+type typeof_LikeNullableParam_Applied = typeof_LikeNullableParam extends LikeColumnComparisonOperation<any, any, any, infer TApplied, any, any, any> ? TApplied : never;
 type typeof_LikeNullableParam_ReturnType = typeof_LikeNullableParam extends IComparable<any, any, any, infer TFinalValueType, any, any, any> ? TFinalValueType : never;
 type typeof_LikeNullableParam_Applied_ParamType = typeof_LikeNullableParam_Applied extends QueryParam<any, any, infer TVal, any, any> ? TVal : never;
 type likeNullableParam_Test = AssertTrue<AssertEqual<typeof_LikeNullableParam_Applied_ParamType, string | null>>;
 type likeNullableParam_ReturnTypeTest = AssertTrue<AssertEqual<typeof_LikeNullableParam_ReturnType, boolean | null>>;
+
+const likeQueryBuilder_Nullable = customerNameQC.like(employeesTable.select((cols) => [cols.employees.position]));
+type typeof_LikeQueryBuilder_Nullable = typeof likeQueryBuilder_Nullable;
+type typeof_LikeQueryBuilder_Nullable_ReturnType = typeof_LikeQueryBuilder_Nullable extends IComparable<any, any, any, infer TFinalValueType, any, any, any> ? TFinalValueType : never;
+type likeQueryBuilder_Nullable_ReturnTypeTest = AssertTrue<AssertEqual<typeof_LikeQueryBuilder_Nullable_ReturnType, boolean | null>>;

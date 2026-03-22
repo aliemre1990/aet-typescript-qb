@@ -1,9 +1,8 @@
 import type { DbType } from "../../db.js";
 import type { IComparable } from "../_interfaces/IComparable.js";
-import type { LiteralToBase } from "../../utility/common.js";
 import QueryParam from "../param.js";
-import { ConvertComparisonParamToNonNullTyped, InferValueTypeFromComparable, LikeComparisonOperation } from "./_comparisonOperations.js";
-import { likeComparisonOperations } from "../_interfaces/IComparisonOperation.js";
+import { likeComparisonOperations, type ConvertComparisonParamToNonNullTyped, type InferValueTypeFromComparable } from "../_interfaces/IComparisonOperation.js";
+import LikeColumnComparisonOperation from "./_likeColumnComparisonOperation.js";
 
 function like<
     TComparing extends IComparable<TDbType, any, string, any, any, any, any>,
@@ -11,7 +10,7 @@ function like<
     TParamValue extends TParamMedian extends QueryParam<any, any, infer TVal, any, any> ? TVal : never,
     TDbType extends DbType = TComparing extends IComparable<infer DbType, any, any, any, any, any, any> ? DbType : never,
 >(this: TComparing, value: TParamValue extends string ? TParamMedian : never
-): LikeComparisonOperation<
+): LikeColumnComparisonOperation<
     TDbType,
     typeof likeComparisonOperations.like,
     TComparing,
@@ -23,7 +22,7 @@ function like<
     TApplied extends IComparable<TDbType, any, string, any, any, any, any>,
     TDbType extends DbType = TComparing extends IComparable<infer DbType, any, any, any, any, any, any> ? DbType : never,
 >(this: TComparing, value: TApplied):
-    LikeComparisonOperation<
+    LikeColumnComparisonOperation<
         TDbType,
         typeof likeComparisonOperations.like,
         TComparing,
@@ -33,7 +32,7 @@ function like<
     TComparing extends IComparable<TDbType, any, string, any, any, any, any>,
     TDbType extends DbType = TComparing extends IComparable<infer DbType, any, any, any, any, any, any> ? DbType : never,
 >(this: TComparing, value: string):
-    LikeComparisonOperation<
+    LikeColumnComparisonOperation<
         TDbType,
         typeof likeComparisonOperations.like,
         TComparing,
@@ -45,7 +44,7 @@ function like<TComparing extends IComparable<any, any, any, any, any, any, any>,
 ) {
     const dbType = this.dbType;
 
-    return new LikeComparisonOperation(
+    return new LikeColumnComparisonOperation(
         dbType,
         likeComparisonOperations.like,
         this,

@@ -1,7 +1,53 @@
 import type { DbType } from "../../db.js";
 import type QueryParam from "../param.js";
 import type { PgColumnType } from "../../table/columnTypes.js";
-import type { DetermineValueType, IComparable } from "./IComparable.js";
+import type { IComparable } from "./IComparable.js";
+import type { IsAny, LiteralToBase } from "../../utility/common.js";
+import type { DbValueTypes } from "../../table/column.js";
+import type { ExtractParams } from "../param.js";
+
+type ConvertComparisonParamToTyped<TIntermediate extends QueryParam<any, any, any, any, any>, TValueType extends DbValueTypes | null> =
+    TIntermediate extends QueryParam<infer TDbType, infer TName, infer TVal, infer TAs, infer TCastType> ?
+    QueryParam<TDbType, TName, IsAny<TVal> extends true ? LiteralToBase<TValueType> | null : TVal, TAs, TCastType> :
+    never;
+
+type ConvertComparisonParamToNonNullTyped<TIntermediate extends QueryParam<any, any, any, any, any>, TValueType extends DbValueTypes | null> =
+    TIntermediate extends QueryParam<infer TDbType, infer TName, infer TVal, infer TAs, infer TCastType> ?
+    QueryParam<TDbType, TName, IsAny<TVal> extends true ? LiteralToBase<TValueType> : TVal, TAs, TCastType> :
+    never;
+
+type InferValueTypeFromComparable<TDbType extends DbType, T> =
+    T extends IComparable<TDbType, any, infer TValueType, any, any, any, any> ? TValueType : never;
+
+
+type InferFinalValueTypeFromComparable<T> =
+    T extends IComparable<any, any, any, infer TFinalValueType, any, any, any> ? TFinalValueType : never;
+
+type InferFinalValueTypeFromApplied<T> =
+    T extends IComparable<any, any, any, infer TFinalValueType, any, any, any> ? TFinalValueType :
+    T extends DbValueTypes | null ?
+    T :
+    never;
+
+type InferComparisonParams<
+    TComparing extends IComparable<any, any, any, any, any, any, any>,
+    TApplied extends readonly (DbValueTypes | null | IComparable<any, any, any, any, any, any, any>)[] | undefined
+> = [
+        ...(TComparing extends IComparable<any, infer TParams, any, any, any, any, any> ? TParams extends undefined ? [] : TParams : []),
+        ...InferAppliedParams<TApplied>
+    ];
+
+type InferAppliedParams<
+    TApplied extends readonly (DbValueTypes | null | IComparable<any, any, any, any, any, any, any>)[] | undefined
+> = TApplied extends undefined ? [] :
+    TApplied extends readonly [infer First, ...infer Rest] ?
+
+    Rest extends readonly [any, ...any] ?
+    [...ExtractParams<First>, ...InferAppliedParams<Rest>] :
+    ExtractParams<First> :
+    [];
+
+
 
 const basicComparisonOperations = {
     eq: { name: 'EQ', symbol: "=" },
@@ -73,7 +119,15 @@ export type {
     InComparisonOperationType,
     IsNullComparisonOperationType,
     LikeComparisonOperationType,
-    ComparisonOperationType
+    ComparisonOperationType,
+
+    ConvertComparisonParamToTyped,
+    ConvertComparisonParamToNonNullTyped,
+    InferValueTypeFromComparable,
+    InferFinalValueTypeFromComparable,
+    InferFinalValueTypeFromApplied,
+    InferComparisonParams,
+    InferAppliedParams
 }
 
 export {

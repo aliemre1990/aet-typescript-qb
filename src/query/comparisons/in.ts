@@ -1,11 +1,11 @@
 import type { DbType } from "../../db.js";
 import type { IComparable } from "../_interfaces/IComparable.js";
-import type { IsAny, IsExactAlt, LiteralToBase } from "../../utility/common.js";
+import type { IsAny, LiteralToBase } from "../../utility/common.js";
 import QueryParam from "../param.js";
 import QueryBuilder from "../queryBuilder.js";
 import type { DbValueTypes } from "../../table/column.js";
-import { InComparisonOperation, InferValueTypeFromComparable } from "./_comparisonOperations.js";
-import { inComparisonOperations } from "../_interfaces/IComparisonOperation.js";
+import { inComparisonOperations, type InferValueTypeFromComparable } from "../_interfaces/IComparisonOperation.js";
+import InColumnComparisonOperation from "./_inColumnComparisonOperation.js";
 
 type MapParamsToTypeRecursively<
     TValueType extends DbValueTypes,
@@ -35,7 +35,7 @@ function sqlIn<
 >(
     this: TComparing,
     val: TQb & IComparable<TDbType, any, LiteralToBase<TValueType>, any, any, any, any>
-): InComparisonOperation<
+): InColumnComparisonOperation<
     TDbType,
     typeof inComparisonOperations.in,
     TComparing,
@@ -50,7 +50,7 @@ function sqlIn<
 >(
     this: TComparing,
     ...val: TValues
-): InComparisonOperation<
+): InColumnComparisonOperation<
     TDbType,
     typeof inComparisonOperations.in,
     TComparing,
@@ -69,7 +69,7 @@ function sqlIn<
 
     const dbType = this.dbType;
 
-    return new InComparisonOperation(
+    return new InColumnComparisonOperation(
         dbType,
         inComparisonOperations.in,
         this,

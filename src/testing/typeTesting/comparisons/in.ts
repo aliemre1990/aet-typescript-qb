@@ -1,4 +1,4 @@
-import type { InComparisonOperation } from "../../../query/comparisons/_comparisonOperations.js";
+import type InColumnComparisonOperation from "../../../query/comparisons/_inColumnComparisonOperation.js";
 import type QueryParam from "../../../query/param.js";
 import { customerIdQC } from "../../_columns.js";
 import { literalTester, paramTester } from "../../_functions.js";
@@ -18,7 +18,7 @@ const inInvalidQb = customerIdQC.sqlIn(customersTable.select((tables) => [tables
 //
 const inParam = customerIdQC.sqlIn(paramTester("num1"), paramTester("num2").type<number>(), paramTester("num3").type<number | null>());
 type typeof_InParam = typeof inParam;
-type typeof_InParam_Applied = typeof_InParam extends InComparisonOperation<any, any, any, infer TApplied, any, any, any> ? TApplied : never;
+type typeof_InParam_Applied = typeof_InParam extends InColumnComparisonOperation<any, any, any, infer TApplied, any, any, any> ? TApplied : never;
 type typeof_InParam_Param1 = typeof_InParam_Applied[0] extends QueryParam<any, any, infer TVal, any, any> ? TVal : never;
 type typeof_InParam_Param2 = typeof_InParam_Applied[1] extends QueryParam<any, any, infer TVal, any, any> ? TVal : never;
 type typeof_InParam_Param3 = typeof_InParam_Applied[2] extends QueryParam<any, any, infer TVal, any, any> ? TVal : never;

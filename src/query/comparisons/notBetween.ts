@@ -1,9 +1,9 @@
 import type { DbType } from "../../db.js";
-import { BetweenComparisonOperation, type ConvertComparisonParamToTyped, type InferValueTypeFromComparable } from "./_comparisonOperations.js";
 import type { IComparable } from "../_interfaces/IComparable.js";
 import type { LiteralToBase } from "../../utility/common.js";
 import QueryParam from "../param.js";
-import { betweenComparisonOperations } from "../_interfaces/IComparisonOperation.js";
+import { betweenComparisonOperations, type ConvertComparisonParamToTyped, type InferValueTypeFromComparable } from "../_interfaces/IComparisonOperation.js";
+import BetweenColumnComparisonOperation from "./_betweenColumnComparisonOperation.js";
 
 
 
@@ -20,7 +20,7 @@ function notBetween<
     this: TComparing,
     leftValue: TLParamValue extends (LiteralToBase<TValueType> | null) ? TLParamMedian : never,
     rightValue: TRParamValue extends (LiteralToBase<TValueType> | null) ? TRParamMedian : never
-): BetweenComparisonOperation<
+): BetweenColumnComparisonOperation<
     TDbType,
     typeof betweenComparisonOperations.notBetween,
     TComparing,
@@ -37,7 +37,7 @@ function notBetween<
     this: TComparing,
     leftValue: TLParamValue extends (LiteralToBase<TValueType> | null) ? TLParamMedian : never,
     rightValue: LiteralToBase<TValueType> | null
-): BetweenComparisonOperation<
+): BetweenColumnComparisonOperation<
     TDbType,
     typeof betweenComparisonOperations.notBetween,
     TComparing,
@@ -55,7 +55,7 @@ function notBetween<
     this: TComparing,
     leftValue: LiteralToBase<TValueType> | null,
     rightValue: TRParamValue extends (LiteralToBase<TValueType> | null) ? TRParamMedian : never
-): BetweenComparisonOperation<
+): BetweenColumnComparisonOperation<
     TDbType,
     typeof betweenComparisonOperations.notBetween,
     TComparing,
@@ -73,7 +73,7 @@ function notBetween<
     this: TComparing,
     leftValue: TLParamValue extends (LiteralToBase<TValueType> | null) ? TLParamMedian : never,
     rightValue: TRApplied
-): BetweenComparisonOperation<
+): BetweenColumnComparisonOperation<
     TDbType,
     typeof betweenComparisonOperations.notBetween,
     TComparing,
@@ -91,7 +91,7 @@ function notBetween<
     this: TComparing,
     leftValue: TLApplied,
     rightValue: TRParamValue extends (LiteralToBase<TValueType> | null) ? TRParamMedian : never
-): BetweenComparisonOperation<
+): BetweenColumnComparisonOperation<
     TDbType,
     typeof betweenComparisonOperations.notBetween,
     TComparing,
@@ -106,7 +106,7 @@ function notBetween<
     TValueType extends InferValueTypeFromComparable<TDbType, TComparing>,
     TDbType extends DbType = TComparing extends IComparable<infer DbType, any, any, any, any, any, any> ? DbType : never
 >(this: TComparing, leftValue: LiteralToBase<TValueType> | null, rightValue: LiteralToBase<TValueType> | null):
-    BetweenComparisonOperation<
+    BetweenColumnComparisonOperation<
         TDbType,
         typeof betweenComparisonOperations.notBetween,
         TComparing,
@@ -120,7 +120,7 @@ function notBetween<
     TRApplied extends IComparable<TDbType, any, LiteralToBase<TValueType>, any, any, any, any>,
     TDbType extends DbType = TComparing extends IComparable<infer DbType, any, any, any, any, any, any> ? DbType : never
 >(this: TComparing, leftValue: TLApplied, rightValue: TRApplied):
-    BetweenComparisonOperation<
+    BetweenColumnComparisonOperation<
         TDbType,
         typeof betweenComparisonOperations.notBetween,
         TComparing,
@@ -144,7 +144,7 @@ function notBetween<
     TLApplied extends IComparable<TDbType, any, LiteralToBase<TValueType>, any, any, any, any>,
     TDbType extends DbType = TComparing extends IComparable<infer DbType, any, any, any, any, any, any> ? DbType : never
 >(this: TComparing, leftValue: TLApplied, rightValue: LiteralToBase<TValueType> | null):
-    BetweenComparisonOperation<
+    BetweenColumnComparisonOperation<
         TDbType,
         typeof betweenComparisonOperations.notBetween,
         TComparing,
@@ -157,7 +157,7 @@ function notBetween<
     TRApplied extends IComparable<TDbType, any, LiteralToBase<TValueType>, any, any, any, any>,
     TDbType extends DbType = TComparing extends IComparable<infer DbType, any, any, any, any, any, any> ? DbType : never
 >(this: TComparing, leftValue: LiteralToBase<TValueType> | null, rightValue: TRApplied):
-    BetweenComparisonOperation<
+    BetweenColumnComparisonOperation<
         TDbType,
         typeof betweenComparisonOperations.notBetween,
         TComparing,
@@ -175,7 +175,7 @@ function notBetween<TComparing extends IComparable<any, any, any, any, any, any,
 
     const dbType = this.dbType;
 
-    return new BetweenComparisonOperation(
+    return new BetweenColumnComparisonOperation(
         dbType,
         betweenComparisonOperations.notBetween,
         this,
