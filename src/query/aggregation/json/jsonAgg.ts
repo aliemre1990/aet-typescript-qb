@@ -37,7 +37,7 @@ function jsonAggFn<
         typeof aggregationOperations.jsonAgg,
         [TArg],
         InferReturnTypeFromArg<TArg>
-    >(dbTypes.postgresql, [arg], aggregationOperations.jsonAgg, undefined);
+    >(dbTypes.postgresql, [arg], aggregationOperations.jsonAgg, undefined, undefined);
 }
 
 
@@ -51,7 +51,7 @@ function jsonbAggFn<
         typeof aggregationOperations.jsonbAgg,
         [TArg],
         InferReturnTypeFromArg<TArg>
-    >(dbTypes.postgresql, [arg], aggregationOperations.jsonbAgg, undefined);
+    >(dbTypes.postgresql, [arg], aggregationOperations.jsonbAgg, undefined, undefined);
 }
 
 export { jsonAggFn, jsonbAggFn };

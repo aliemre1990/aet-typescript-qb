@@ -17,7 +17,7 @@ function generateArithmeticSubtraction<
             typeof arithmeticOperations.subtraction,
             TArgs,
             IsContainsNull<TDbType, TArgs> extends true ? number | null : number
-        >(dbType, args, arithmeticOperations.subtraction, undefined);
+        >(dbType, args, arithmeticOperations.subtraction, undefined, undefined);
     }
 }
 

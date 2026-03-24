@@ -1,28 +1,15 @@
 import type { DbType } from "../db.js";
 import type { DbValueTypes } from "../table/column.js";
 import type { PgColumnType } from "../table/columnTypes.js";
+import BaseQueryExpression from "./_baseClasses/BaseQueryExpression.js";
 import {
     IComparableFinalValueDummySymbol,
     IComparableValueDummySymbol,
     queryBuilderContextFactory,
     type DetermineFinalValueType,
     type DetermineValueType,
-    type IComparable,
     type QueryBuilderContext
 } from "./_interfaces/IComparable.js";
-import between from "./comparisons/between.js";
-import eq from "./comparisons/eq.js";
-import gt from "./comparisons/gt.js";
-import gte from "./comparisons/gte.js";
-import sqlIn from "./comparisons/in.js";
-import isNotNull from "./comparisons/isNotNull.js";
-import isNull from "./comparisons/isNull.js";
-import like from "./comparisons/like.js";
-import lt from "./comparisons/lt.js";
-import lte from "./comparisons/lte.js";
-import notBetween from "./comparisons/notBetween.js";
-import notEq from "./comparisons/notEq.js";
-import notLike from "./comparisons/notLike.js";
 import { convertValueToQueryString } from "./uitlity/common.js";
 
 class LiteralValue<
@@ -30,7 +17,7 @@ class LiteralValue<
     TValue extends DbValueTypes | null,
     TAs extends string | undefined = undefined,
     TCastType extends PgColumnType | undefined = undefined
-> implements IComparable<
+> extends BaseQueryExpression<
     TDbType,
     undefined,
     DetermineValueType<TCastType, TValue>,
@@ -39,31 +26,7 @@ class LiteralValue<
     TAs,
     TCastType
 > {
-    [IComparableValueDummySymbol]: DetermineValueType<TCastType, TValue>;
-    [IComparableFinalValueDummySymbol]: DetermineFinalValueType<TValue, DetermineValueType<TCastType, TValue>>;
-
-
-    dbType: TDbType;
-    params?: undefined;
-    fieldName: undefined = undefined;
-    asName: TAs;
-    castType?: TCastType;
-
     value: TValue;
-
-    eq: typeof eq = eq;
-    notEq: typeof notEq = notEq;
-    gt: typeof gt = gt;
-    gte: typeof gte = gte;
-    lt: typeof lt = lt;
-    lte: typeof lte = lte;
-    sqlIn: typeof sqlIn = sqlIn;
-    between: typeof between = between;
-    notBetween: typeof notBetween = notBetween;
-    isNull: typeof isNull = isNull;
-    isNotNull: typeof isNotNull = isNotNull;
-    like: typeof like = like;
-    notLike: typeof notLike = notLike;
 
     as<TAs extends string>(asName: TAs) {
         return new LiteralValue<TDbType, TValue, TAs, TCastType>(this.dbType, this.value, asName, this.castType);
@@ -83,14 +46,9 @@ class LiteralValue<
         return { query, params: context.params };
     }
 
-    constructor(dbType: TDbType, value: TValue, asName: TAs, castType?: TCastType) {
-        this.dbType = dbType;
+    constructor(dbType: TDbType, value: TValue, asName: TAs, castType: TCastType) {
+        super(dbType, undefined, undefined, asName, castType);
         this.value = value;
-        this.asName = asName;
-        this.castType = castType;
-
-        this[IComparableValueDummySymbol] = undefined as any;
-        this[IComparableFinalValueDummySymbol] = undefined as any;
     }
 }
 
@@ -102,7 +60,7 @@ function generateLiteralValueFn<TDbType extends DbType>(dbType: TDbType) {
     return <const TValue extends DbValueTypes | null>(
         value: TValue
     ) => {
-        return new LiteralValue<TDbType, TValue>(dbType, value, undefined);
+        return new LiteralValue<TDbType, TValue>(dbType, value, undefined, undefined);
     }
 }
 

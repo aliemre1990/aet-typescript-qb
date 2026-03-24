@@ -1,22 +1,9 @@
 import type { DbType } from "../db.js";
 import type { DbValueTypes } from "../table/column.js";
 import type { PgColumnType } from "../table/columnTypes.js";
+import BaseQueryExpression from "./_baseClasses/BaseQueryExpression.js";
 import { IComparableFinalValueDummySymbol, IComparableValueDummySymbol, queryBuilderContextFactory, type DetermineFinalValueType, type DetermineValueType, type IComparable, type QueryBuilderContext } from "./_interfaces/IComparable.js";
 import type { IName } from "./_interfaces/IName.js";
-import between from "./comparisons/between.js";
-import eq from "./comparisons/eq.js";
-import gt from "./comparisons/gt.js";
-import gte from "./comparisons/gte.js";
-import sqlIn from "./comparisons/in.js";
-import isNotNull from "./comparisons/isNotNull.js";
-import isNull from "./comparisons/isNull.js";
-import like from "./comparisons/like.js";
-import lt from "./comparisons/lt.js";
-import lte from "./comparisons/lte.js";
-import notBetween from "./comparisons/notBetween.js";
-import notEq from "./comparisons/notEq.js";
-import notLike from "./comparisons/notLike.js";
-import type QueryParam from "./param.js";
 import type { ResultShape } from "./queryBuilder.js";
 import type QueryBuilder from "./queryBuilder.js";
 
@@ -38,7 +25,7 @@ class SubQueryEntry<
     TFieldName extends string = TComparable extends IComparable<TDbType, any, any, any, infer TFieldName, infer TAs, any> ? TAs extends undefined ? TFieldName : TAs : never,
     TAsName extends string | undefined = undefined,
     TCastType extends PgColumnType | undefined = undefined
-> implements IComparable<
+> extends BaseQueryExpression<
     TDbType,
     undefined,
     DetermineValueType<TCastType, TValueType>,
@@ -47,42 +34,18 @@ class SubQueryEntry<
     TAsName,
     TCastType
 > {
-    dbType: TDbType;
-
-    [IComparableValueDummySymbol]: DetermineValueType<TCastType, TValueType>;
-    [IComparableFinalValueDummySymbol]: DetermineFinalValueType<TFinalValueType, DetermineValueType<TCastType, TValueType>>;
-
-    params?: undefined;
-    asName: TAsName;
-    castType?: TCastType;
-    fieldName: TFieldName;
-
     comparable: TComparable;
 
-    eq: typeof eq = eq;
-    notEq: typeof notEq = notEq;
-    gt: typeof gt = gt;
-    gte: typeof gte = gte;
-    lt: typeof lt = lt;
-    lte: typeof lte = lte;
-    sqlIn: typeof sqlIn = sqlIn;
-    between: typeof between = between;
-    notBetween: typeof notBetween = notBetween;
-    isNull: typeof isNull = isNull;
-    isNotNull: typeof isNotNull = isNotNull;
-    like: typeof like = like;
-    notLike: typeof notLike = notLike;
-
     as<TAsName extends string>(val: TAsName) {
-        return new SubQueryEntry<TDbType, TComparable, TValueType, TFinalValueType, TFieldName, TAsName, TCastType>(this.dbType, this.comparable, val, this.ownerName, this.castType);
+        return new SubQueryEntry<TDbType, TComparable, TValueType, TFinalValueType, TFieldName, TAsName, TCastType>(this.dbType, this.comparable, val, this.castType, this.ownerName);
     }
     cast<TCastType extends PgColumnType>(type: TCastType) {
-        return new SubQueryEntry<TDbType, TComparable, TValueType, TFinalValueType, TFieldName, TAsName, TCastType>(this.dbType, this.comparable, this.asName, this.ownerName, type);
+        return new SubQueryEntry<TDbType, TComparable, TValueType, TFinalValueType, TFieldName, TAsName, TCastType>(this.dbType, this.comparable, this.asName, type, this.ownerName);
 
     }
     ownerName?: string;
     setOwnerName(val: string): SubQueryEntry<TDbType, TComparable, TValueType, TFinalValueType, TFieldName, TAsName, TCastType> {
-        return new SubQueryEntry<TDbType, TComparable, TValueType, TFinalValueType, TFieldName, TAsName, TCastType>(this.dbType, this.comparable, this.asName, val, this.castType);
+        return new SubQueryEntry<TDbType, TComparable, TValueType, TFinalValueType, TFieldName, TAsName, TCastType>(this.dbType, this.comparable, this.asName, this.castType, val);
     }
 
     buildSQL(context?: QueryBuilderContext) {
@@ -97,19 +60,13 @@ class SubQueryEntry<
         dbType: TDbType,
         comparable: TComparable,
         asName: TAsName,
-        ownerName?: string,
-        castType?: TCastType
+        castType: TCastType,
+        ownerName?: string
     ) {
-        this.dbType = dbType;
+        const fieldName = comparable.asName === undefined ? comparable.fieldName : comparable.asName;
+        super(dbType, undefined, fieldName, asName, castType);
         this.comparable = comparable;
-        this.asName = asName;
         this.ownerName = ownerName;
-        this.castType = castType;
-
-        this.fieldName = comparable.asName === undefined ? comparable.fieldName : comparable.asName;
-
-        this[IComparableValueDummySymbol] = undefined as any;
-        this[IComparableFinalValueDummySymbol] = undefined as any;
     }
 }
 
@@ -146,7 +103,7 @@ class SubQueryObject<
         let tmpEntries: readonly SubQueryEntry<TDbType, any, any, any, any, any, any>[] = [];
         if (qb.selectResult !== undefined) {
             qb.selectResult.forEach(res => {
-                tmpEntries = [...tmpEntries, (new SubQueryEntry(dbType, res, undefined, qb.asName))];
+                tmpEntries = [...tmpEntries, (new SubQueryEntry(dbType, res, undefined, undefined, qb.asName))];
             })
         }
 

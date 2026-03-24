@@ -81,7 +81,7 @@ class Table<
 
     as<TAsName extends string>(val: TAsName) {
         const queryColumns = this.columnsList.map((col) => {
-            return new QueryColumn(this.dbType, col, { tableName: this.name, asTableName: val }, undefined);
+            return new QueryColumn(this.dbType, col, { tableName: this.name, asTableName: val }, undefined, undefined);
         }) as MapToQueryColumns<TDbType, TTableName, TColumns, TAsName>;
 
         return new QueryTable<TDbType, TColumns, TTableName, Table<TDbType, TColumns, TTableName>, typeof queryColumns, TAsName>(this.dbType, this, queryColumns, val);
@@ -130,7 +130,7 @@ class Table<
     > {
 
         const queryColumns = this.columnsList.map((col) => {
-            return new QueryColumn(this.dbType, col, { tableName: this.name }, undefined);
+            return new QueryColumn(this.dbType, col, { tableName: this.name }, undefined, undefined);
         }) as MapToQueryColumns<TDbType, TTableName, TColumns>;
 
         const queryTable = new QueryTable<TDbType, TColumns, TTableName, Table<TDbType, TColumns, TTableName>, MapToQueryColumns<TDbType, TTableName, TColumns>, undefined>(this.dbType, this, queryColumns);
@@ -193,7 +193,7 @@ class Table<
             TJoinParamsResult
         > {
         const queryColumns = this.columnsList.map((col) => {
-            return new QueryColumn(this.dbType, col, { tableName: this.name }, undefined);
+            return new QueryColumn(this.dbType, col, { tableName: this.name }, undefined, undefined);
         }) as MapToQueryColumns<TDbType, TTableName, TColumns>;
 
         const queryTable = new QueryTable<TDbType, TColumns, TTableName, Table<TDbType, TColumns, TTableName>, MapToQueryColumns<TDbType, TTableName, TColumns>>(this.dbType, this, queryColumns);
@@ -208,7 +208,7 @@ class Table<
         ) => TCbResult
     ) {
         const queryColumns = this.columnsList.map((col) => {
-            return new QueryColumn(this.dbType, col, { tableName: this.name }, undefined);
+            return new QueryColumn(this.dbType, col, { tableName: this.name }, undefined, undefined);
         }) as MapToQueryColumns<TDbType, TTableName, TColumns>;
 
         const queryTable = new QueryTable<TDbType, TColumns, TTableName, Table<TDbType, TColumns, TTableName>, MapToQueryColumns<TDbType, TTableName, TColumns>, undefined>(this.dbType, this, queryColumns);
@@ -231,7 +231,7 @@ class Table<
         AccumulateColumnParams<undefined, TCbResult>
     > {
         const queryColumns = this.columnsList.map((col) => {
-            return new QueryColumn(this.dbType, col, { tableName: this.name }, undefined);
+            return new QueryColumn(this.dbType, col, { tableName: this.name }, undefined, undefined);
         }) as MapToQueryColumns<TDbType, TTableName, TColumns>;
 
         const queryTable = new QueryTable<TDbType, TColumns, TTableName, Table<TDbType, TColumns, TTableName>, MapToQueryColumns<TDbType, TTableName, TColumns>, undefined>(this.dbType, this, queryColumns);
@@ -251,7 +251,7 @@ class Table<
             AccumulateOrderByParams<TDbType, undefined, TCbResult>
         > {
         const queryColumns = this.columnsList.map((col) => {
-            return new QueryColumn(this.dbType, col, { tableName: this.name }, undefined);
+            return new QueryColumn(this.dbType, col, { tableName: this.name }, undefined, undefined);
         }) as MapToQueryColumns<TDbType, TTableName, TColumns>;
 
         const queryTable = new QueryTable<TDbType, TColumns, TTableName, Table<TDbType, TColumns, TTableName>, MapToQueryColumns<TDbType, TTableName, TColumns>, undefined>(this.dbType, this, queryColumns);

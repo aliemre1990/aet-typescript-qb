@@ -43,7 +43,7 @@ function generateCoalesceFn<
             typeof sqlFunctions.coalesce,
             ConvertMediansInArray<TArgs, TDbType, FirstType | null>,
             DetermineReturnType<TDbType, TArgs, FirstType>
-        >(dbType, args as ConvertMediansInArray<TArgs, TDbType, FirstType | null>, sqlFunctions.coalesce, undefined);
+        >(dbType, args as ConvertMediansInArray<TArgs, TDbType, FirstType | null>, sqlFunctions.coalesce, undefined, undefined);
     }
 }
 

@@ -1,23 +1,11 @@
 import type { DbType } from "../../db.js";
 import type { DbValueTypes } from "../../table/column.js";
 import { IComparableFinalValueDummySymbol, IComparableValueDummySymbol, queryBuilderContextFactory, type DetermineFinalValueType, type DetermineValueType, type IComparable, type QueryBuilderContext } from "../_interfaces/IComparable.js";
-import between from "../comparisons/between.js";
-import eq from "../comparisons/eq.js";
-import sqlIn from "../comparisons/in.js";
 import type { InferParamsFromFnArgs } from "../_types/inferParamsFromArgs.js";
 import QueryParam from "../param.js";
-import notEq from "../comparisons/notEq.js";
-import gt from "../comparisons/gt.js";
-import gte from "../comparisons/gte.js";
-import lt from "../comparisons/lt.js";
-import lte from "../comparisons/lte.js";
 import { convertArgsToQueryString } from "../uitlity/common.js";
 import type { PgColumnType } from "../../table/columnTypes.js";
-import notBetween from "../comparisons/notBetween.js";
-import isNull from "../comparisons/isNull.js";
-import isNotNull from "../comparisons/isNotNull.js";
-import like from "../comparisons/like.js";
-import notLike from "../comparisons/notLike.js";
+import BaseQueryExpression from "../_baseClasses/BaseQueryExpression.js";
 
 
 const aggregationOperations = {
@@ -65,7 +53,7 @@ class BasicColumnAggregationOperation<
     TParams extends QueryParam<TDbType, string, any, any, any>[] | undefined = InferParamsFromFnArgs<TArgs>,
     TAs extends string | undefined = undefined,
     TCastType extends PgColumnType | undefined = undefined
-> implements IComparable<
+> extends BaseQueryExpression<
     TDbType,
     TParams,
     DetermineValueType<TCastType, NonNullable<TReturnType>>,
@@ -74,31 +62,8 @@ class BasicColumnAggregationOperation<
     TAs,
     TCastType
 > {
-
-    dbType: TDbType;
     args: TArgs;
     operation: TAggregationOperation;
-
-    [IComparableValueDummySymbol]: DetermineValueType<TCastType, NonNullable<TReturnType>>;
-    [IComparableFinalValueDummySymbol]: DetermineFinalValueType<TReturnType, DetermineValueType<TCastType, NonNullable<TReturnType>>>;
-    params?: TParams;
-    asName: TAs;
-    castType?: TCastType;
-    fieldName: undefined = undefined;
-
-    eq: typeof eq = eq;
-    notEq: typeof notEq = notEq;
-    gt: typeof gt = gt;
-    gte: typeof gte = gte;
-    lt: typeof lt = lt;
-    lte: typeof lte = lte;
-    sqlIn: typeof sqlIn = sqlIn;
-    between: typeof between = between;
-    notBetween: typeof notBetween = notBetween;
-    isNull: typeof isNull = isNull;
-    isNotNull: typeof isNotNull = isNotNull;
-    like: typeof like = like;
-    notLike: typeof notLike = notLike;
 
     as<TAs extends string>(asName: TAs) {
         return new BasicColumnAggregationOperation<TDbType, TAggregationOperation, TArgs, TReturnType, TParams, TAs, TCastType>(this.dbType, this.args, this.operation, asName, this.castType);
@@ -124,17 +89,8 @@ class BasicColumnAggregationOperation<
         args: TArgs,
         operation: TAggregationOperation,
         asName: TAs,
-        castType?: TCastType
+        castType: TCastType
     ) {
-        this.dbType = dbType;
-        this.args = args;
-        this.operation = operation;
-        this.asName = asName;
-        this.castType = castType;
-
-        this[IComparableValueDummySymbol] = undefined as any;
-        this[IComparableFinalValueDummySymbol] = undefined as any;
-
         let tmpParams: QueryParam<TDbType, any, any, any, any>[] = [];
 
         for (const arg of args) {
@@ -149,10 +105,10 @@ class BasicColumnAggregationOperation<
                 tmpParams.push(arg);
             }
         }
+        super(dbType, tmpParams as TParams, undefined, asName, castType);
 
-        if (tmpParams.length > 0) {
-            this.params = tmpParams as TParams;
-        }
+        this.args = args;
+        this.operation = operation;
     }
 }
 

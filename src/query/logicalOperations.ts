@@ -1,25 +1,13 @@
 import { type DbType } from "../db.js";
 import type { PgColumnType } from "../table/columnTypes.js";
 import type { UndefinedIfLengthZero } from "../utility/common.js";
+import type BaseColumnComparisonOperation from "./_baseClasses/BaseColumnComparisonOperation.js";
+import BaseQueryExpression from "./_baseClasses/BaseQueryExpression.js";
 import { IComparableFinalValueDummySymbol, IComparableValueDummySymbol, queryBuilderContextFactory, type DetermineFinalValueType, type DetermineValueType, type IComparable, type QueryBuilderContext } from "./_interfaces/IComparable.js";
-import type { IComparisonOperation } from "./_interfaces/IComparisonOperation.js";
-import between from "./comparisons/between.js";
-import eq from "./comparisons/eq.js";
-import gt from "./comparisons/gt.js";
-import gte from "./comparisons/gte.js";
-import sqlIn from "./comparisons/in.js";
-import isNotNull from "./comparisons/isNotNull.js";
-import isNull from "./comparisons/isNull.js";
-import like from "./comparisons/like.js";
-import lt from "./comparisons/lt.js";
-import lte from "./comparisons/lte.js";
-import notBetween from "./comparisons/notBetween.js";
-import notEq from "./comparisons/notEq.js";
-import notLike from "./comparisons/notLike.js";
 import QueryParam from "./param.js";
 
 type InferLogicalOperationParams<
-    TComparisons extends readonly (IComparisonOperation<any, any, any, any, any, any, any> | ColumnLogicalOperation<any, any, any, any, any>)[],
+    TComparisons extends readonly (BaseColumnComparisonOperation<any, any, any, any, any, any, any> | ColumnLogicalOperation<any, any, any, any, any>)[],
 > = TComparisons extends readonly [infer First, ...infer Rest] ?
     First extends { params?: infer TParams extends readonly QueryParam<any, any, any, any, any>[] | undefined } ?
     Rest extends readonly [any, ...any[]] ?
@@ -39,11 +27,11 @@ type LogicalOperation = (typeof logicalOperations[keyof typeof logicalOperations
 
 class ColumnLogicalOperation<
     TDbType extends DbType,
-    TComparisons extends readonly (IComparisonOperation<TDbType, any, any, any, any, any, any> | ColumnLogicalOperation<TDbType, any, any, any, any>)[],
+    TComparisons extends readonly (BaseColumnComparisonOperation<TDbType, any, any, any, any, any, any> | ColumnLogicalOperation<TDbType, any, any, any, any>)[],
     TParams extends readonly QueryParam<TDbType, string, any, any, any>[] | undefined = UndefinedIfLengthZero<InferLogicalOperationParams<TComparisons>>,
     TAs extends string | undefined = undefined,
     TCastType extends PgColumnType | undefined = undefined
-> implements IComparable<
+> extends BaseQueryExpression<
     TDbType,
     TParams,
     DetermineValueType<TCastType, boolean>,
@@ -52,30 +40,9 @@ class ColumnLogicalOperation<
     TAs,
     TCastType
 > {
-    dbType: TDbType;
-    params?: TParams;
-    [IComparableValueDummySymbol]: DetermineValueType<TCastType, boolean>;
-    [IComparableFinalValueDummySymbol]: DetermineValueType<TCastType, boolean>;
-    fieldName: undefined = undefined;
-    asName: TAs;
-    castType?: TCastType;
-
     operator: LogicalOperation;
     comparisons: TComparisons;
 
-    eq: typeof eq = eq;
-    notEq: typeof notEq = notEq;
-    gt: typeof gt = gt;
-    gte: typeof gte = gte;
-    lt: typeof lt = lt;
-    lte: typeof lte = lte;
-    sqlIn: typeof sqlIn = sqlIn;
-    between: typeof between = between;
-    notBetween: typeof notBetween = notBetween;
-    isNull: typeof isNull = isNull;
-    isNotNull: typeof isNotNull = isNotNull;
-    like: typeof like = like;
-    notLike: typeof notLike = notLike;
 
     as<TAs extends string>(asName: TAs) {
         return new ColumnLogicalOperation<TDbType, TComparisons, TParams, TAs, TCastType>(this.dbType, this.operator, this.comparisons, asName, this.castType);
@@ -89,18 +56,8 @@ class ColumnLogicalOperation<
         operator: LogicalOperation,
         comparisons: TComparisons,
         asName: TAs,
-        castType?: TCastType
+        castType: TCastType
     ) {
-        this.dbType = dbType;
-        this.operator = operator;
-        this.comparisons = comparisons;
-
-        this.asName = asName;
-        this.castType = castType;
-
-        this[IComparableValueDummySymbol] = undefined as any;
-        this[IComparableFinalValueDummySymbol] = undefined as any;
-
         let tmpParams: readonly QueryParam<TDbType, any, any, any, any>[] = [];
 
         comparisons.forEach(comp => {
@@ -114,11 +71,11 @@ class ColumnLogicalOperation<
             } else if (comp instanceof QueryParam) {
                 tmpParams = [...tmpParams, comp];
             }
-        })
+        });
+        super(dbType, tmpParams as TParams, undefined, asName, castType);
 
-        if (tmpParams.length > 0) {
-            this.params = tmpParams as TParams;
-        }
+        this.operator = operator;
+        this.comparisons = comparisons;
     }
 
     buildSQL(context?: QueryBuilderContext): { query: string, params: string[] } {
@@ -141,9 +98,9 @@ function generateAndFn<TDbType extends DbType>(
     dbType: TDbType
 ) {
     return function <
-        TComparisons extends (IComparisonOperation<TDbType, any, any, any, any, any, any> | ColumnLogicalOperation<TDbType, any, any, any, any>)[]
+        TComparisons extends (BaseColumnComparisonOperation<TDbType, any, any, any, any, any, any> | ColumnLogicalOperation<TDbType, any, any, any, any>)[]
     >(...ops: TComparisons) {
-        return new ColumnLogicalOperation<TDbType, TComparisons>(dbType, logicalOperations.and, ops, undefined);
+        return new ColumnLogicalOperation<TDbType, TComparisons>(dbType, logicalOperations.and, ops, undefined, undefined);
     }
 }
 
@@ -152,9 +109,9 @@ function generateOrFn<TDbType extends DbType>(
     dbType: TDbType
 ) {
     return function <
-        TComparisons extends (IComparisonOperation<TDbType, any, any, any, any, any, any> | ColumnLogicalOperation<TDbType, any, any, any, any>)[]
+        TComparisons extends (BaseColumnComparisonOperation<TDbType, any, any, any, any, any, any> | ColumnLogicalOperation<TDbType, any, any, any, any>)[]
     >(...ops: TComparisons) {
-        return new ColumnLogicalOperation<TDbType, TComparisons>(dbType, logicalOperations.or, ops, undefined);
+        return new ColumnLogicalOperation<TDbType, TComparisons>(dbType, logicalOperations.or, ops, undefined, undefined);
     }
 }
 

@@ -1,7 +1,7 @@
 import type { DbType } from "../../db.js";
+import { ConvertComparisonParamToNonNullTyped, InferValueTypeFromComparable, likeComparisonOperations } from "../_baseClasses/BaseColumnComparisonOperation.js";
 import type { IComparable } from "../_interfaces/IComparable.js";
 import QueryParam from "../param.js";
-import { likeComparisonOperations, type ConvertComparisonParamToNonNullTyped, type InferValueTypeFromComparable } from "../_interfaces/IComparisonOperation.js";
 import LikeColumnComparisonOperation from "./_likeColumnComparisonOperation.js";
 
 function notLike<
@@ -49,6 +49,7 @@ function notLike<TComparing extends IComparable<any, any, any, any, any, any, an
         likeComparisonOperations.notLike,
         this,
         value,
+        undefined,
         undefined
     );
 }

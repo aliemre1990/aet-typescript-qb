@@ -1,3 +1,5 @@
+import '../../moduleInitialization.js';
+
 // comparisons
 import '../typeTesting/comparisons/eq.js';
 import '../typeTesting/comparisons/between.js';

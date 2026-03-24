@@ -118,7 +118,7 @@ class QueryTable<
         TCbResult["length"] extends 0 ? undefined : UndefinedIfLengthZero<AccumulateColumnParams<undefined, TFinalResult>>
     > {
         if (cb === undefined) {
-            return new QueryBuilder<TDbType, [QueryTable<TDbType, TColumns, TTableName, TTable, TQColumns, TAsName>], undefined, undefined>(this.dbType, [this], undefined).select() as QueryBuilder<
+            return new QueryBuilder<TDbType, [QueryTable<TDbType, TColumns, TTableName, TTable, TQColumns, TAsName>], undefined, undefined>(this.dbType, [this], undefined, undefined).select() as QueryBuilder<
                 TDbType,
                 [QueryTable<TDbType, TColumns, TTableName, TTable, TQColumns, TAsName>],
                 undefined,
@@ -127,7 +127,7 @@ class QueryTable<
                 TCbResult["length"] extends 0 ? undefined : UndefinedIfLengthZero<AccumulateColumnParams<undefined, TFinalResult>>
             >;
         } else {
-            return new QueryBuilder<TDbType, [QueryTable<TDbType, TColumns, TTableName, TTable, TQColumns, TAsName>], undefined, undefined>(this.dbType, [this], undefined).select(cb) as QueryBuilder<
+            return new QueryBuilder<TDbType, [QueryTable<TDbType, TColumns, TTableName, TTable, TQColumns, TAsName>], undefined, undefined>(this.dbType, [this], undefined, undefined).select(cb) as QueryBuilder<
                 TDbType,
                 [QueryTable<TDbType, TColumns, TTableName, TTable, TQColumns, TAsName>],
                 undefined,
@@ -174,7 +174,7 @@ class QueryTable<
             TJoinParamsResult
         > {
 
-        return new QueryBuilder<TDbType, [QueryTable<TDbType, TColumns, TTableName, TTable, TQColumns, TAsName>], undefined, undefined>(this.dbType, [this], undefined)
+        return new QueryBuilder<TDbType, [QueryTable<TDbType, TColumns, TTableName, TTable, TQColumns, TAsName>], undefined, undefined>(this.dbType, [this], undefined, undefined)
             .join(type, tableSelection, cb);
     }
 
@@ -183,7 +183,7 @@ class QueryTable<
             tables: TableToColumnsMap<TDbType, TablesToObject<TDbType, [QueryTable<TDbType, TColumns, TTableName, TTable, TQColumns, TAsName>]>>,
             ops: DbOperations<TDbType>
         ) => TCbResult) {
-        return new QueryBuilder<TDbType, [QueryTable<TDbType, TColumns, TTableName, TTable, TQColumns, TAsName>], undefined, undefined>(this.dbType, [this], undefined).where(cb);
+        return new QueryBuilder<TDbType, [QueryTable<TDbType, TColumns, TTableName, TTable, TQColumns, TAsName>], undefined, undefined>(this.dbType, [this], undefined, undefined).where(cb);
     }
 
 
@@ -201,7 +201,7 @@ class QueryTable<
         undefined,
         AccumulateColumnParams<undefined, TCbResult>
     > {
-        return new QueryBuilder<TDbType, [QueryTable<TDbType, TColumns, TTableName, TTable, TQColumns, TAsName>], undefined, undefined>(this.dbType, [this], undefined).groupBy(cb);
+        return new QueryBuilder<TDbType, [QueryTable<TDbType, TColumns, TTableName, TTable, TQColumns, TAsName>], undefined, undefined>(this.dbType, [this], undefined, undefined).groupBy(cb);
     }
 
     orderBy<
@@ -219,7 +219,7 @@ class QueryTable<
             undefined,
             AccumulateOrderByParams<TDbType, undefined, TCbResult>
         > {
-        return new QueryBuilder<TDbType, [QueryTable<TDbType, TColumns, TTableName, TTable, TQColumns, TAsName>], undefined, undefined>(this.dbType, [this], undefined).orderBy(cb);
+        return new QueryBuilder<TDbType, [QueryTable<TDbType, TColumns, TTableName, TTable, TQColumns, TAsName>], undefined, undefined>(this.dbType, [this], undefined, undefined).orderBy(cb);
     }
 
 }

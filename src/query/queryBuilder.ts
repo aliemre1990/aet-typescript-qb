@@ -9,7 +9,6 @@ import QueryTable from "./queryTable.js";
 import type Column from "../table/column.js";
 import type { DbOperations } from "./_types/ops.js";
 import QueryParam from "./param.js";
-import type { DbValueTypes } from "../table/column.js";
 import type { IDbType } from "./_interfaces/IDbType.js";
 import type { AccumulateSubQueryParams, ConvertElementsToSubQueryCompliant, InferDbTypeFromFromFirstIDbType, MapToSubQueryObject } from "./_types/subQueryUtility.js";
 import type { AccumulateComparisonParams } from "./_types/paramAccumulationComparison.js";
@@ -19,27 +18,15 @@ import type ColumnsSelection from "./ColumnsSelection.js";
 import { columnsSelectionFactory, ColumnsSelectionQueryObjectSymbol } from "./ColumnsSelection.js";
 import { IComparableFinalValueDummySymbol, IComparableValueDummySymbol, queryBuilderContextFactory, type DetermineFinalValueType, type DetermineValueType, type IComparable, type QueryBuilderContext } from "./_interfaces/IComparable.js";
 import SubQueryObject from "./subQueryObject.js";
-import eq from "./comparisons/eq.js";
-import sqlIn from "./comparisons/in.js";
-import between from "./comparisons/between.js";
 import CTEObject, { CTEObjectEntry } from "./cteObject.js";
 import { mapCTESpecsToSelection } from "./utility.js";
-import notEq from "./comparisons/notEq.js";
-import gt from "./comparisons/gt.js";
-import gte from "./comparisons/gte.js";
-import lt from "./comparisons/lt.js";
-import lte from "./comparisons/lte.js";
 import type { PgColumnType } from "../table/columnTypes.js";
 import { getDbFunctions } from "./uitlity/dbOperations.js";
 import type { MapToCTEObjectForRecursive } from "./_types/cteUtility.js";
 import type { UndefinedIfLengthZero } from "../utility/common.js";
 import type { ExtractParams } from "./param.js";
-import notBetween from "./comparisons/notBetween.js";
-import isNull from "./comparisons/isNull.js";
-import isNotNull from "./comparisons/isNotNull.js";
-import like from "./comparisons/like.js";
-import notLike from "./comparisons/notLike.js";
-import type { IComparisonOperation } from "./_interfaces/IComparisonOperation.js";
+import type BaseColumnComparisonOperation from "./_baseClasses/BaseColumnComparisonOperation.js";
+import BaseQueryExpression from "./_baseClasses/BaseQueryExpression.js";
 
 type CombineComparableItems<
     TLeft extends ResultShapeItem<any>,
@@ -136,7 +123,7 @@ type JoinSpecsType<TDbType extends DbType> = readonly JoinSpecsItemType<TDbType>
 type GroupBySpecs<TDbType extends DbType> = readonly (ColumnsSelection<TDbType, any, any> | IComparable<TDbType, any, any, any, any, any, any>)[];
 
 type ColumnsSelectionListType<TDbType extends DbType> = { [key: string]: ColumnsSelection<TDbType, any, any> }
-type ComparisonType<TDbType extends DbType> = IComparisonOperation<TDbType, any, any, any, any, any, any> | ColumnLogicalOperation<TDbType, any, any, any, any>;
+type ComparisonType<TDbType extends DbType> = BaseColumnComparisonOperation<TDbType, any, any, any, any, any, any> | ColumnLogicalOperation<TDbType, any, any, any, any>;
 
 
 const cteTypes = {
@@ -215,9 +202,8 @@ class QueryBuilder<
     TAs extends string | undefined = undefined,
     TCastType extends PgColumnType | undefined = undefined
 >
-    implements
-    IDbType<TDbType>,
-    IComparable<
+    extends
+    BaseQueryExpression<
         TDbType,
         TParams,
         DetermineValueType<TCastType, GetFirstTypeFromResult<TDbType, TResult>>,
@@ -226,30 +212,6 @@ class QueryBuilder<
         TAs,
         TCastType
     > {
-
-    dbType: TDbType;
-
-    [IComparableValueDummySymbol]: DetermineValueType<TCastType, GetFirstTypeFromResult<TDbType, TResult>>;
-    [IComparableFinalValueDummySymbol]: DetermineFinalValueType<GetFirstFinalTypeFromResult<TDbType, TResult>, DetermineValueType<TCastType, GetFirstTypeFromResult<TDbType, TResult>>>;
-
-    params?: TParams;
-    fieldName: GetFirstDefaultKeyFromResult<TDbType, TResult>;
-    asName: TAs;
-    castType?: TCastType;
-
-    eq: typeof eq = eq;
-    notEq: typeof notEq = notEq;
-    gt: typeof gt = gt;
-    gte: typeof gte = gte;
-    lt: typeof lt = lt;
-    lte: typeof lte = lte;
-    sqlIn: typeof sqlIn = sqlIn;
-    between: typeof between = between;
-    notBetween: typeof notBetween = notBetween;
-    isNull: typeof isNull = isNull;
-    isNotNull: typeof isNotNull = isNotNull;
-    like: typeof like = like;
-    notLike: typeof notLike = notLike;
 
     cteSpecs?: TCTESpecs;
     fromSpecs: TFrom;
@@ -268,8 +230,8 @@ class QueryBuilder<
         dbType: TDbType,
         fromSpecs: TFrom,
         asName: TAs,
+        castType: TCastType,
         data?: {
-            castType?: TCastType,
             queryType?: QUERY_TYPE,
             params?: TParams;
             cteSpecs?: TCTESpecs,
@@ -283,7 +245,8 @@ class QueryBuilder<
             combineSpecs?: CombineSpecsType<TDbType>
         }
     ) {
-        this.dbType = dbType;
+        const fieldName = data?.selectResult !== undefined && data.selectResult.length > 0 ? data.selectResult[0].asName || data.selectResult[0].fieldName : "";
+        super(dbType, data?.params as TParams, fieldName, asName, castType);
 
         this.params = data?.params;
         this.cteSpecs = data?.cteSpecs;
@@ -297,15 +260,7 @@ class QueryBuilder<
         this.orderBySpecs = data?.orderBySpecs;
         this.combineSpecs = data?.combineSpecs;
 
-        this.asName = asName;
-        this.castType = data?.castType;
-
         this.queryType = data?.queryType;
-
-        this.fieldName = data?.selectResult !== undefined && data.selectResult.length > 0 ? data.selectResult[0].asName || data.selectResult[0].fieldName : "";
-
-        this[IComparableValueDummySymbol] = undefined as any;
-        this[IComparableFinalValueDummySymbol] = undefined as any;
     }
 
     as<TAs extends string>(asName: TAs) {
@@ -313,8 +268,8 @@ class QueryBuilder<
             this.dbType,
             this.fromSpecs,
             asName,
+            this.castType,
             {
-                castType: this.castType,
                 queryType: this.queryType,
                 params: this.params,
                 cteSpecs: this.cteSpecs,
@@ -333,8 +288,8 @@ class QueryBuilder<
             this.dbType,
             this.fromSpecs,
             this.asName,
+            type,
             {
-                castType: type,
                 queryType: this.queryType,
                 params: this.params,
                 cteSpecs: this.cteSpecs,
@@ -634,8 +589,8 @@ class QueryBuilder<
                 this.dbType,
                 this.fromSpecs,
                 this.asName,
+                this.castType,
                 {
-                    castType: this.castType,
                     queryType: queryTypes.SELECT,
                     params: params as TCbResult["length"] extends 0 ? TParams : UndefinedIfLengthZero<AccumulateColumnParams<TParams, TFinalResult>>,
                     cteSpecs: this.cteSpecs,
@@ -675,8 +630,8 @@ class QueryBuilder<
                 this.dbType,
                 this.fromSpecs,
                 this.asName,
+                this.castType,
                 {
-                    castType: this.castType,
                     queryType: queryTypes.SELECT,
                     params: params as TCbResult["length"] extends 0 ? TParams : UndefinedIfLengthZero<AccumulateColumnParams<TParams, TFinalResult>>,
                     cteSpecs: this.cteSpecs,
@@ -740,7 +695,7 @@ class QueryBuilder<
         let joinTable: TJoinResult;
         if (table instanceof Table) {
             const queryColumns = table.columnsList.map((col: Column<TDbType, any, any, any, any, any, any>) => {
-                return new QueryColumn(table.dbType, col, { tableName: table.name }, undefined);
+                return new QueryColumn(table.dbType, col, { tableName: table.name }, undefined, undefined);
             }) as QueryColumn<TDbType, any, any, any, any, any, any>[];
 
             let res = new QueryTable(table.dbType, table, queryColumns);
@@ -816,8 +771,8 @@ class QueryBuilder<
             this.dbType,
             this.fromSpecs,
             this.asName,
+            this.castType,
             {
-                castType: this.castType,
                 queryType: this.queryType,
                 params: params as TJoinParams,
                 cteSpecs: this.cteSpecs,
@@ -874,8 +829,8 @@ class QueryBuilder<
             this.dbType,
             this.fromSpecs,
             this.asName,
+            this.castType,
             {
-                castType: this.castType,
                 queryType: this.queryType,
                 cteSpecs: this.cteSpecs,
                 joinSpecs: this.joinSpecs,
@@ -938,8 +893,8 @@ class QueryBuilder<
             this.dbType,
             this.fromSpecs,
             this.asName,
+            this.castType,
             {
-                castType: this.castType,
                 queryType: this.queryType,
                 params: params as AccumulateColumnParams<TParams, TCbResult>,
                 cteSpecs: this.cteSpecs,
@@ -994,8 +949,8 @@ class QueryBuilder<
             this.dbType,
             this.fromSpecs,
             this.asName,
+            this.castType,
             {
-                castType: this.castType,
                 queryType: this.queryType,
                 params: params as AccumulateComparisonParams<TCbResult, TParams>,
                 cteSpecs: this.cteSpecs,
@@ -1071,8 +1026,8 @@ class QueryBuilder<
             this.dbType,
             this.fromSpecs,
             this.asName,
+            this.castType,
             {
-                castType: this.castType,
                 queryType: this.queryType,
                 params: params as AccumulateOrderByParams<TDbType, TParams, TCbResult>,
                 cteSpecs: this.cteSpecs,
@@ -1161,7 +1116,7 @@ class QueryBuilder<
         const fromResult = res.map(item => {
             if (item instanceof Table) {
                 const queryColumns = item.columnsList.map((col: Column<TDbType, any, any, any, any, any, any>) => {
-                    return new QueryColumn(item.dbType, col, { tableName: item.name }, undefined);
+                    return new QueryColumn(item.dbType, col, { tableName: item.name }, undefined, undefined);
                 }) as QueryColumn<TDbType, any, any, any, any, any, any>[];
 
                 return new QueryTable(item.dbType, item, queryColumns);
@@ -1183,8 +1138,8 @@ class QueryBuilder<
             this.dbType,
             fromResult,
             this.asName,
+            this.castType,
             {
-                castType: this.castType,
                 queryType: this.queryType,
                 params: params,
                 cteSpecs: this.cteSpecs,
@@ -1267,8 +1222,8 @@ class QueryBuilder<
             this.dbType,
             this.fromSpecs,
             this.asName,
+            this.castType,
             {
-                castType: this.castType,
                 queryType: this.queryType,
                 params: params as TParamsAccumulated,
                 cteSpecs: newCteSpecs as CTESpecsType<TDbType> as TFinalCTESpec,
@@ -1355,7 +1310,7 @@ class QueryBuilder<
                 let currName = columnNames[i];
                 let currComp = selectResult[i];
 
-                finalCTEentries.push(new CTEObjectEntry(anchorQb.dbType, currComp, undefined, cteName, currName));
+                finalCTEentries.push(new CTEObjectEntry(anchorQb.dbType, currComp, undefined, undefined, cteName, currName));
             }
 
             cte = new CTEObject(anchorQb.dbType, anchorQb, cteName, cteTypes.RECURSIVE, finalCTEentries) as TFinalCTE;
@@ -1405,8 +1360,8 @@ class QueryBuilder<
             this.dbType,
             this.fromSpecs,
             this.asName,
+            this.castType,
             {
-                castType: this.castType,
                 queryType: this.queryType,
                 params: params as TParamsAccumulated,
                 cteSpecs: finalCTEs as TFinalCTESpecs,
@@ -1537,8 +1492,8 @@ class QueryBuilder<
             this.dbType,
             this.fromSpecs,
             this.asName,
+            this.castType,
             {
-                castType: this.castType,
                 queryType: this.queryType,
                 params: params as TFinalParamsAccumulated,
                 cteSpecs: this.cteSpecs,
@@ -1726,7 +1681,7 @@ function from<
         if (item instanceof Table) {
 
             const queryColumns = item.columnsList.map((col: Column<TDbType, any, any, any, any, any, any>) => {
-                return new QueryColumn(item.dbType, col, { tableName: item.name }, undefined);
+                return new QueryColumn(item.dbType, col, { tableName: item.name }, undefined, undefined);
             }) as QueryColumn<TDbType, any, any, any, any, any, any>[];
 
             return new QueryTable(item.dbType, item, queryColumns);
@@ -1752,7 +1707,7 @@ function from<
         undefined,
         undefined,
         AccumulatedParams
-    >(dbType, fromResult, undefined, { params: params as AccumulatedParams });
+    >(dbType, fromResult, undefined, undefined, { params: params as AccumulatedParams });
 }
 
 export default QueryBuilder;

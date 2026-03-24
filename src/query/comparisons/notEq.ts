@@ -2,8 +2,8 @@ import type { DbType } from "../../db.js";
 import type { IComparable } from "../_interfaces/IComparable.js";
 import type { LiteralToBase } from "../../utility/common.js";
 import QueryParam from "../param.js";
-import { basicComparisonOperations, type ConvertComparisonParamToTyped, type InferValueTypeFromComparable } from "../_interfaces/IComparisonOperation.js";
 import BasicColumnComparisonOperation from "./_basicColumnComparisonOperation.js";
+import { basicComparisonOperations, ConvertComparisonParamToTyped, InferValueTypeFromComparable } from "../_baseClasses/BaseColumnComparisonOperation.js";
 
 function notEq<
     TComparing extends IComparable<TDbType, any, any, any, any, any, any>,
@@ -17,6 +17,7 @@ function notEq<
         typeof basicComparisonOperations.notEq,
         TComparing,
         ConvertComparisonParamToTyped<TParamMedian, TValueType>
+
     >
 function notEq<
     TComparing extends IComparable<TDbType, any, any, any, any, any, any>,
@@ -52,6 +53,7 @@ function notEq<TComparing extends IComparable<any, any, any, any, any, any, any>
         basicComparisonOperations.notEq,
         this,
         value,
+        undefined,
         undefined
     );
 }

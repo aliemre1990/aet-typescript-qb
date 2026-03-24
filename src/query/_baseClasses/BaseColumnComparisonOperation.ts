@@ -1,10 +1,11 @@
 import type { DbType } from "../../db.js";
-import type QueryParam from "../param.js";
-import type { PgColumnType } from "../../table/columnTypes.js";
-import type { IComparable } from "./IComparable.js";
-import type { IsAny, LiteralToBase } from "../../utility/common.js";
 import type { DbValueTypes } from "../../table/column.js";
+import type { PgColumnType } from "../../table/columnTypes.js";
+import type { IsAny, LiteralToBase } from "../../utility/common.js";
+import type { IComparable } from "../_interfaces/IComparable.js";
 import type { ExtractParams } from "../param.js";
+import type QueryParam from "../param.js";
+import BaseQueryExpression from "./BaseQueryExpression.js";
 
 type ConvertComparisonParamToTyped<TIntermediate extends QueryParam<any, any, any, any, any>, TValueType extends DbValueTypes | null> =
     TIntermediate extends QueryParam<infer TDbType, infer TName, infer TVal, infer TAs, infer TCastType> ?
@@ -93,7 +94,8 @@ type ComparisonOperationType =
     LikeComparisonOperationType |
     InComparisonOperationType;
 
-interface IComparisonOperation<
+
+class BaseColumnComparisonOperation<
     TDbType extends DbType,
     TOperation extends ComparisonOperationType,
     TParams extends readonly QueryParam<TDbType, string, any, any, any>[] | undefined,
@@ -101,7 +103,7 @@ interface IComparisonOperation<
     TFinalValueType extends DbValueTypes | null,
     TAs extends string | undefined,
     TCastType extends PgColumnType | undefined
-> extends IComparable<
+> extends BaseQueryExpression<
     TDbType,
     TParams,
     TValueType,
@@ -111,10 +113,16 @@ interface IComparisonOperation<
     TCastType
 > {
     operation: TOperation;
+
+    constructor(dbType: TDbType, operation: TOperation, params: TParams, fieldName: undefined, asName: TAs, castType: TCastType) {
+        super(dbType, params, fieldName, asName, castType);
+        this.operation = operation;
+    }
 }
 
+export default BaseColumnComparisonOperation;
+
 export type {
-    IComparisonOperation,
     BasicComparisonOperationType,
     BetweenComparisonOperationType,
     InComparisonOperationType,
@@ -138,3 +146,4 @@ export {
     isNullComparisonOperations,
     likeComparisonOperations
 }
+

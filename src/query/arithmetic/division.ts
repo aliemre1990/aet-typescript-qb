@@ -17,7 +17,7 @@ function generateArithmeticDivision<
             typeof arithmeticOperations.divison,
             TArgs,
             IsContainsNull<TDbType, TArgs> extends true ? number | null : number
-        >(dbType, args, arithmeticOperations.divison, undefined);
+        >(dbType, args, arithmeticOperations.divison, undefined, undefined);
     }
 }
 

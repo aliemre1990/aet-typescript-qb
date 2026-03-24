@@ -2,8 +2,8 @@ import type { DbType } from "../../db.js";
 import type { IComparable } from "../_interfaces/IComparable.js";
 import type { LiteralToBase } from "../../utility/common.js";
 import QueryParam from "../param.js";
-import { betweenComparisonOperations, type ConvertComparisonParamToTyped, type InferValueTypeFromComparable } from "../_interfaces/IComparisonOperation.js";
 import BetweenColumnComparisonOperation from "./_betweenColumnComparisonOperation.js";
+import { betweenComparisonOperations, ConvertComparisonParamToTyped, InferValueTypeFromComparable } from "../_baseClasses/BaseColumnComparisonOperation.js";
 
 
 
@@ -181,6 +181,7 @@ function between<TComparing extends IComparable<any, any, any, any, any, any, an
         this,
         leftValue,
         rightValue,
+        undefined,
         undefined
     );
 }

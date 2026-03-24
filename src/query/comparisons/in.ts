@@ -4,8 +4,8 @@ import type { IsAny, LiteralToBase } from "../../utility/common.js";
 import QueryParam from "../param.js";
 import QueryBuilder from "../queryBuilder.js";
 import type { DbValueTypes } from "../../table/column.js";
-import { inComparisonOperations, type InferValueTypeFromComparable } from "../_interfaces/IComparisonOperation.js";
 import InColumnComparisonOperation from "./_inColumnComparisonOperation.js";
+import { inComparisonOperations, type InferValueTypeFromComparable } from "../_baseClasses/BaseColumnComparisonOperation.js";
 
 type MapParamsToTypeRecursively<
     TValueType extends DbValueTypes,
@@ -74,6 +74,7 @@ function sqlIn<
         inComparisonOperations.in,
         this,
         [...val],
+        undefined,
         undefined
     )
 }

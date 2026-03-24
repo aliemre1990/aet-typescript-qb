@@ -1,24 +1,12 @@
 import { dbTypes, type DbType, type PgDbType } from "../../../db.js";
 import type { DbValueTypes } from "../../../table/column.js";
 import type { RecordToTupleSafe } from "../../../utility/common.js";
-import { IComparableFinalValueDummySymbol, IComparableValueDummySymbol, queryBuilderContextFactory, type DetermineFinalValueType, type DetermineValueType, type IComparable, type QueryBuilderContext } from "../../_interfaces/IComparable.js";
-import between from "../../comparisons/between.js";
-import eq from "../../comparisons/eq.js";
-import sqlIn from "../../comparisons/in.js";
+import { queryBuilderContextFactory, type DetermineFinalValueType, type DetermineValueType, type IComparable, type QueryBuilderContext } from "../../_interfaces/IComparable.js";
 import type { InferReturnTypeFromJSONBuildObjectParam } from "../../_types/args.js";
 import QueryParam from "../../param.js";
-import notEq from "../../comparisons/notEq.js";
-import gt from "../../comparisons/gt.js";
-import gte from "../../comparisons/gte.js";
-import lt from "../../comparisons/lt.js";
-import lte from "../../comparisons/lte.js";
 import type { PgColumnType } from "../../../table/columnTypes.js";
 import type { ExtractParams } from "../../param.js";
-import notBetween from "../../comparisons/notBetween.js";
-import isNull from "../../comparisons/isNull.js";
-import isNotNull from "../../comparisons/isNotNull.js";
-import like from "../../comparisons/like.js";
-import notLike from "../../comparisons/notLike.js";
+import BaseQueryExpression from "../../_baseClasses/BaseQueryExpression.js";
 
 type InferParamsFromJsonBuildObjectArg<TDbType extends DbType, TObj extends JSONBuildObjectParam<TDbType>> =
     InferParamsFromObj<TDbType, TObj>["length"] extends 0 ? undefined :
@@ -65,7 +53,7 @@ class JSONBuildObjectFunction<
     TParams extends QueryParam<TDbType, string, any, any, any>[] | undefined = InferParamsFromJsonBuildObjectArg<TDbType, TObj>,
     TAs extends string | undefined = undefined,
     TCastType extends PgColumnType | undefined = undefined
-> implements IComparable<
+> extends BaseQueryExpression<
     TDbType,
     TParams,
     DetermineValueType<TCastType, NonNullable<TReturnType>>,
@@ -74,17 +62,8 @@ class JSONBuildObjectFunction<
     TAs,
     TCastType
 > {
-    [IComparableValueDummySymbol]: DetermineValueType<TCastType, NonNullable<TReturnType>>;
-    [IComparableFinalValueDummySymbol]: DetermineFinalValueType<TReturnType, DetermineValueType<TCastType, NonNullable<TReturnType>>>;
-
-    dbType: TDbType;
     obj: TObj;
     isJsonB: boolean;
-
-    params?: TParams;
-    asName: TAs;
-    fieldName: undefined = undefined;
-    castType?: TCastType;
 
     as<TAs extends string>(asName: TAs) {
         return new JSONBuildObjectFunction<TDbType, TObj, TReturnType, TParams, TAs, TCastType>(this.dbType, this.obj, this.isJsonB, asName, this.castType);
@@ -108,20 +87,11 @@ class JSONBuildObjectFunction<
         dbType: TDbType,
         obj: TObj,
         isJsonB: boolean,
-        asName?: TAs,
-        castType?: TCastType
+        asName: TAs,
+        castType: TCastType
     ) {
-        this.dbType = dbType;
-        this.obj = obj;
-        this.isJsonB = isJsonB;
-        this.asName = asName as TAs;
-        this.castType = castType;
-
-        this[IComparableValueDummySymbol] = undefined as any;
-        this[IComparableFinalValueDummySymbol] = undefined as any;
-
         const tmpParams: QueryParam<TDbType, any, any, any, any>[] = [];
-        let entries = Object.entries(this.obj);
+        let entries = Object.entries(obj);
 
         for (const entry of entries) {
             if (
@@ -135,26 +105,10 @@ class JSONBuildObjectFunction<
                 tmpParams.push(entry[1]);
             }
         }
-
-
-        if (tmpParams.length > 0) {
-            this.params = tmpParams as TParams;
-        }
+        super(dbType, tmpParams as TParams, undefined, asName, castType);
+        this.obj = obj;
+        this.isJsonB = isJsonB;
     }
-
-    eq: typeof eq = eq;
-    notEq: typeof notEq = notEq;
-    gt: typeof gt = gt;
-    gte: typeof gte = gte;
-    lt: typeof lt = lt;
-    lte: typeof lte = lte;
-    sqlIn: typeof sqlIn = sqlIn;
-    between: typeof between = between;
-    notBetween: typeof notBetween = notBetween;
-    isNull: typeof isNull = isNull;
-    isNotNull: typeof isNotNull = isNotNull;
-    like: typeof like = like;
-    notLike: typeof notLike = notLike;
 }
 
 function jsonBuildObjectFn<
@@ -166,7 +120,7 @@ function jsonBuildObjectFn<
         PgDbType,
         TObj
     >(
-        dbTypes.postgresql, obj, false
+        dbTypes.postgresql, obj, false, undefined, undefined
     )
 }
 
@@ -179,7 +133,7 @@ function jsonbBuildObjectFn<
         PgDbType,
         TObj
     >(
-        dbTypes.postgresql, obj, true
+        dbTypes.postgresql, obj, true, undefined, undefined
     )
 }
 

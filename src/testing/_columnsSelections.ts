@@ -7,7 +7,7 @@ import { customersTable } from "./_tables.js";
 
 const customersQueryColumns = customersTable
     .columnsList
-    .map(cl => new QueryColumn(dbTypes.postgresql, cl, { tableName: customersTable.name }, undefined)) as MapToQueryColumns<PgDbType, typeof customersTable.name, typeof customersTable.columnsList>;
+    .map(cl => new QueryColumn(dbTypes.postgresql, cl, { tableName: customersTable.name }, undefined, undefined)) as MapToQueryColumns<PgDbType, typeof customersTable.name, typeof customersTable.columnsList>;
 const customersQueryTable = new QueryTable<
     PgDbType,
     typeof customersTable.columnsList,

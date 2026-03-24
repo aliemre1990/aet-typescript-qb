@@ -1,23 +1,10 @@
 import type { DbType } from "../../db.js";
 import type { PgColumnType } from "../../table/columnTypes.js";
 import type { UndefinedIfLengthZero } from "../../utility/common.js";
+import BaseColumnComparisonOperation, { type InferComparisonParams, type IsNullComparisonOperationType } from "../_baseClasses/BaseColumnComparisonOperation.js";
 import { IComparableFinalValueDummySymbol, IComparableValueDummySymbol, queryBuilderContextFactory, type DetermineValueType, type IComparable, type QueryBuilderContext } from "../_interfaces/IComparable.js";
-import type { IComparisonOperation, InferComparisonParams, IsNullComparisonOperationType } from "../_interfaces/IComparisonOperation.js";
 import type QueryParam from "../param.js";
 import QueryBuilder from "../queryBuilder.js";
-import between from "./between.js";
-import eq from "./eq.js";
-import gt from "./gt.js";
-import gte from "./gte.js";
-import sqlIn from "./in.js";
-import isNotNull from "./isNotNull.js";
-import isNull from "./isNull.js";
-import like from "./like.js";
-import lt from "./lt.js";
-import lte from "./lte.js";
-import notBetween from "./notBetween.js";
-import notEq from "./notEq.js";
-import notLike from "./notLike.js";
 
 class IsNullColumnComparisonOperation<
     TDbType extends DbType,
@@ -26,7 +13,7 @@ class IsNullColumnComparisonOperation<
     TParams extends readonly QueryParam<TDbType, string, any, any, any>[] | undefined = UndefinedIfLengthZero<InferComparisonParams<TComparing, []>>,
     TAs extends string | undefined = undefined,
     TCastType extends PgColumnType | undefined = undefined,
-> implements IComparisonOperation<
+> extends BaseColumnComparisonOperation<
     TDbType,
     TOperation,
     TParams,
@@ -35,31 +22,7 @@ class IsNullColumnComparisonOperation<
     TAs,
     TCastType
 > {
-
-    dbType: TDbType;
-    params?: TParams;
-    [IComparableValueDummySymbol]: DetermineValueType<TCastType, boolean>;
-    [IComparableFinalValueDummySymbol]: DetermineValueType<TCastType, boolean>;
-    fieldName: undefined = undefined;
-    asName: TAs;
-    castType?: TCastType;
-
-    operation: TOperation;
     comparing: TComparing;
-
-    eq: typeof eq = eq;
-    notEq: typeof notEq = notEq;
-    gt: typeof gt = gt;
-    gte: typeof gte = gte;
-    lt: typeof lt = lt;
-    lte: typeof lte = lte;
-    sqlIn: typeof sqlIn = sqlIn;
-    between: typeof between = between;
-    notBetween: typeof notBetween = notBetween;
-    isNull: typeof isNull = isNull;
-    isNotNull: typeof isNotNull = isNotNull;
-    like: typeof like = like;
-    notLike: typeof notLike = notLike;
 
     as<TAs extends string>(asName: TAs) {
         return new IsNullColumnComparisonOperation<TDbType, TOperation, TComparing, TParams, TAs, TCastType>(this.dbType, this.operation, this.comparing, asName, this.castType);
@@ -88,26 +51,15 @@ class IsNullColumnComparisonOperation<
         operation: TOperation,
         comparing: TComparing,
         asName: TAs,
-        castType?: TCastType
+        castType: TCastType
     ) {
-        this.dbType = dbType;
-        this.operation = operation;
-        this.comparing = comparing;
-        this.asName = asName;
-        this.castType = castType;
-
-        this[IComparableValueDummySymbol] = undefined as any;
-        this[IComparableFinalValueDummySymbol] = undefined as any;
-
         let tmpParams: readonly QueryParam<TDbType, any, any, any, any>[] = [];
         if (comparing.params !== undefined && comparing.params.length > 0) {
             tmpParams = [...tmpParams, ...comparing.params];
         }
+        super(dbType, operation, tmpParams as TParams, undefined, asName, castType);
 
-        if (tmpParams.length > 0) {
-            this.params = tmpParams as TParams;
-        }
-
+        this.comparing = comparing;
     }
 }
 

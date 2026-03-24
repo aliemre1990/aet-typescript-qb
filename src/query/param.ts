@@ -2,20 +2,9 @@ import { dbTypes, type DbType } from "../db.js";
 import type { DbValueTypes } from "../table/column.js";
 import type { PgColumnType } from "../table/columnTypes.js";
 import type { IsAny } from "../utility/common.js";
+import BaseQueryExpression from "./_baseClasses/BaseQueryExpression.js";
 import { IComparableFinalValueDummySymbol, IComparableValueDummySymbol, queryBuilderContextFactory, type DetermineFinalValueType, type DetermineValueType, type IComparable, type QueryBuilderContext } from "./_interfaces/IComparable.js";
-import between from "./comparisons/between.js";
-import eq from "./comparisons/eq.js";
-import gt from "./comparisons/gt.js";
-import gte from "./comparisons/gte.js";
-import sqlIn from "./comparisons/in.js";
-import isNotNull from "./comparisons/isNotNull.js";
-import isNull from "./comparisons/isNull.js";
-import like from "./comparisons/like.js";
-import lt from "./comparisons/lt.js";
-import lte from "./comparisons/lte.js";
-import notBetween from "./comparisons/notBetween.js";
-import notEq from "./comparisons/notEq.js";
-import notLike from "./comparisons/notLike.js";
+
 
 type ExtractParams<T> =
     T extends QueryParam<any, any, any, any, any> ? [T] :
@@ -28,49 +17,37 @@ class QueryParam<
     TValueType extends DbValueTypes | null,
     TAs extends string | undefined = undefined,
     TCastType extends PgColumnType | undefined = undefined
->
-    implements IComparable<
-        TDbType,
-        undefined,
-        DetermineValueType<TCastType, NonNullable<TValueType>>,
-        DetermineFinalValueType<IsAny<TValueType> extends true ? DetermineValueType<TCastType, TValueType> | null : TValueType, DetermineValueType<TCastType, NonNullable<TValueType>>>,
-        undefined,
-        TAs,
-        TCastType
-    > {
-
-    dbType: TDbType;
-
-    params?: undefined;
-    [IComparableValueDummySymbol]: DetermineValueType<TCastType, NonNullable<TValueType>>;
-    [IComparableFinalValueDummySymbol]: DetermineFinalValueType<IsAny<TValueType> extends true ? DetermineValueType<TCastType, TValueType> | null : TValueType, DetermineValueType<TCastType, NonNullable<TValueType>>>;
-
+> extends BaseQueryExpression<
+    TDbType,
+    undefined,
+    DetermineValueType<TCastType, NonNullable<TValueType>>,
+    DetermineFinalValueType<IsAny<TValueType> extends true ? DetermineValueType<TCastType, TValueType> | null : TValueType, DetermineValueType<TCastType, NonNullable<TValueType>>>,
+    undefined,
+    TAs,
+    TCastType
+> {
     name: TName;
-    asName: TAs;
-    fieldName: undefined = undefined;
-    castType?: TCastType;
+    ownerName?: string;
 
-    constructor(dbType: TDbType, name: TName, asName: TAs, ownerName?: string, castType?: TCastType) {
-        this.dbType = dbType;
+    constructor(dbType: TDbType, name: TName, asName: TAs, castType: TCastType, ownerName?: string) {
+        super(dbType, undefined, undefined, asName, castType);
         this.name = name;
-        this.asName = asName;
-        this.castType = castType;
         this.ownerName = ownerName;
-
-        this[IComparableValueDummySymbol] = undefined as any;
-        this[IComparableFinalValueDummySymbol] = undefined as any;
     }
 
     as<TAs extends string>(asName: TAs) {
-        return new QueryParam<TDbType, TName, TValueType, TAs, TCastType>(this.dbType, this.name, asName, this.ownerName, this.castType);
+        return new QueryParam<TDbType, TName, TValueType, TAs, TCastType>(this.dbType, this.name, asName, this.castType, this.ownerName);
     }
     cast<TCastType extends PgColumnType>(type: TCastType) {
-        return new QueryParam<TDbType, TName, TValueType, TAs, TCastType>(this.dbType, this.name, this.asName, this.ownerName, type);
+        return new QueryParam<TDbType, TName, TValueType, TAs, TCastType>(this.dbType, this.name, this.asName, type, this.ownerName);
     }
 
-    ownerName?: string;
     setOwnerName(val: string): QueryParam<TDbType, TName, TValueType, TAs, TCastType> {
-        return new QueryParam<TDbType, TName, TValueType, TAs, TCastType>(this.dbType, this.name, this.asName, val, this.castType);
+        return new QueryParam<TDbType, TName, TValueType, TAs, TCastType>(this.dbType, this.name, this.asName, this.castType, val);
+    }
+
+    type<TValueType extends DbValueTypes | null>() {
+        return new QueryParam<TDbType, TName, TValueType, TAs, TCastType>(this.dbType, this.name, this.asName, this.castType, this.ownerName);
     }
 
     buildSQL(context?: QueryBuilderContext) {
@@ -86,23 +63,6 @@ class QueryParam<
         return { query: `$${paramIndex + 1}`, params: context.params };
     }
 
-    type<TValueType extends DbValueTypes | null>() {
-        return new QueryParam<TDbType, TName, TValueType, TAs, TCastType>(this.dbType, this.name, this.asName, this.ownerName, this.castType);
-    }
-
-    eq: typeof eq = eq;
-    notEq: typeof notEq = notEq;
-    gt: typeof gt = gt;
-    gte: typeof gte = gte;
-    lt: typeof lt = lt;
-    lte: typeof lte = lte;
-    sqlIn: typeof sqlIn = sqlIn;
-    between: typeof between = between;
-    notBetween: typeof notBetween = notBetween;
-    isNull: typeof isNull = isNull;
-    isNotNull: typeof isNotNull = isNotNull;
-    like: typeof like = like;
-    notLike: typeof notLike = notLike;
 }
 
 
@@ -118,7 +78,7 @@ function generateParamFn<
     >(
         name: TName
     ) => {
-        return new QueryParam<TDbType, TName, any>(dbType, name, undefined);
+        return new QueryParam<TDbType, TName, any>(dbType, name, undefined, undefined);
     }
 }
 

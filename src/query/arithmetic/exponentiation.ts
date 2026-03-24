@@ -16,7 +16,7 @@ function generateArithmeticExponentiation<
             typeof arithmeticOperations.exponentiation,
             TArgs,
             IsContainsNull<TDbType, TArgs> extends true ? number | null : number
-        >(dbType, args, arithmeticOperations.exponentiation, undefined);
+        >(dbType, args, arithmeticOperations.exponentiation, undefined, undefined);
     }
 }
 

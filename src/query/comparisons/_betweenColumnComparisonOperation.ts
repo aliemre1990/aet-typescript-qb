@@ -2,24 +2,11 @@ import type { DbType } from "../../db.js";
 import type { DbValueTypes } from "../../table/column.js";
 import type { PgColumnType } from "../../table/columnTypes.js";
 import type { UndefinedIfLengthZero } from "../../utility/common.js";
+import BaseColumnComparisonOperation, { type BetweenComparisonOperationType, type InferComparisonParams, type InferValueTypeFromComparable } from "../_baseClasses/BaseColumnComparisonOperation.js";
 import { IComparableFinalValueDummySymbol, IComparableValueDummySymbol, queryBuilderContextFactory, type DetermineValueType, type IComparable, type QueryBuilderContext } from "../_interfaces/IComparable.js";
-import type { BetweenComparisonOperationType, IComparisonOperation, InferComparisonParams, InferValueTypeFromComparable } from "../_interfaces/IComparisonOperation.js";
 import QueryParam from "../param.js";
 import QueryBuilder from "../queryBuilder.js";
 import { convertArgsToQueryString } from "../uitlity/common.js";
-import between from "./between.js";
-import eq from "./eq.js";
-import gt from "./gt.js";
-import gte from "./gte.js";
-import sqlIn from "./in.js";
-import isNotNull from "./isNotNull.js";
-import isNull from "./isNull.js";
-import like from "./like.js";
-import lt from "./lt.js";
-import lte from "./lte.js";
-import notBetween from "./notBetween.js";
-import notEq from "./notEq.js";
-import notLike from "./notLike.js";
 
 class BetweenColumnComparisonOperation<
     TDbType extends DbType,
@@ -31,7 +18,7 @@ class BetweenColumnComparisonOperation<
     TParams extends readonly QueryParam<TDbType, string, any, any, any>[] | undefined = UndefinedIfLengthZero<InferComparisonParams<TComparing, [TLApplied, TRApplied]>>,
     TAs extends string | undefined = undefined,
     TCastType extends PgColumnType | undefined = undefined,
-> implements IComparisonOperation<
+> extends BaseColumnComparisonOperation<
     TDbType,
     TOperation,
     TParams,
@@ -40,33 +27,9 @@ class BetweenColumnComparisonOperation<
     TAs,
     TCastType
 > {
-
-    dbType: TDbType;
-    params?: TParams;
-    [IComparableValueDummySymbol]: DetermineValueType<TCastType, boolean>;
-    [IComparableFinalValueDummySymbol]: DetermineValueType<TCastType, boolean>;
-    fieldName: undefined = undefined;
-    asName: TAs;
-    castType?: TCastType;
-
-    operation: TOperation;
     comparing: TComparing;
     lValue: TLApplied;
     rValue: TRApplied;
-
-    eq: typeof eq = eq;
-    notEq: typeof notEq = notEq;
-    gt: typeof gt = gt;
-    gte: typeof gte = gte;
-    lt: typeof lt = lt;
-    lte: typeof lte = lte;
-    sqlIn: typeof sqlIn = sqlIn;
-    between: typeof between = between;
-    notBetween: typeof notBetween = notBetween;
-    isNull: typeof isNull = isNull;
-    isNotNull: typeof isNotNull = isNotNull;
-    like: typeof like = like;
-    notLike: typeof notLike = notLike;
 
     as<TAs extends string>(asName: TAs) {
         return new BetweenColumnComparisonOperation<TDbType, TOperation, TComparing, TLApplied, TRApplied, TValueType, TParams, TAs, TCastType>(this.dbType, this.operation, this.comparing, this.lValue, this.rValue, asName, this.castType);
@@ -99,50 +62,39 @@ class BetweenColumnComparisonOperation<
         lValue: TLApplied,
         rValue: TRApplied,
         asName: TAs,
-        castType?: TCastType
+        castType: TCastType
     ) {
-        this.dbType = dbType;
-        this.operation = operation;
-        this.comparing = comparing;
-        this.lValue = lValue;
-        this.rValue = rValue;
-        this.asName = asName;
-        this.castType = castType;
-
-        this[IComparableValueDummySymbol] = undefined as any;
-        this[IComparableFinalValueDummySymbol] = undefined as any;
-
         let tmpParams: readonly QueryParam<TDbType, any, any, any, any>[] = [];
         if (comparing.params !== undefined && comparing.params.length > 0) {
             tmpParams = [...tmpParams, ...comparing.params];
         }
 
         if (
-            this.lValue instanceof Object &&
-            "params" in this.lValue &&
-            this.lValue.params !== undefined &&
-            this.lValue.params.length > 0
+            lValue instanceof Object &&
+            "params" in lValue &&
+            lValue.params !== undefined &&
+            lValue.params.length > 0
         ) {
-            tmpParams = [...tmpParams, ... this.lValue.params];
-        } else if (this.lValue instanceof QueryParam) {
-            tmpParams = [...tmpParams, this.lValue];
+            tmpParams = [...tmpParams, ...lValue.params];
+        } else if (lValue instanceof QueryParam) {
+            tmpParams = [...tmpParams, lValue];
         }
 
         if (
-            this.rValue instanceof Object &&
-            "params" in this.rValue &&
-            this.rValue.params !== undefined &&
-            this.rValue.params.length > 0
+            rValue instanceof Object &&
+            "params" in rValue &&
+            rValue.params !== undefined &&
+            rValue.params.length > 0
         ) {
-            tmpParams = [...tmpParams, ... this.rValue.params];
-        } else if (this.lValue instanceof QueryParam) {
-            tmpParams = [...tmpParams, this.lValue];
+            tmpParams = [...tmpParams, ...rValue.params];
+        } else if (lValue instanceof QueryParam) {
+            tmpParams = [...tmpParams, lValue];
         }
+        super(dbType, operation, tmpParams as TParams, undefined, asName, castType);
 
-        if (tmpParams.length > 0) {
-            this.params = tmpParams as TParams;
-        }
-
+        this.comparing = comparing;
+        this.lValue = lValue;
+        this.rValue = rValue;
     }
 }
 

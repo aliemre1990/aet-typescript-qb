@@ -2,28 +2,16 @@ import type { DbType } from "../db.js";
 import type { DbValueTypes } from "../table/column.js";
 import type { PgColumnType } from "../table/columnTypes.js";
 import type { IsExact, UndefinedIfLengthZero } from "../utility/common.js";
+import type BaseColumnComparisonOperation from "./_baseClasses/BaseColumnComparisonOperation.js";
+import BaseQueryExpression from "./_baseClasses/BaseQueryExpression.js";
 import { IComparableFinalValueDummySymbol, IComparableValueDummySymbol, queryBuilderContextFactory, type DetermineFinalValueType, type DetermineValueType, type IComparable, type QueryBuilderContext } from "./_interfaces/IComparable.js";
-import type { IComparisonOperation } from "./_interfaces/IComparisonOperation.js";
-import between from "./comparisons/between.js";
-import eq from "./comparisons/eq.js";
-import gt from "./comparisons/gt.js";
-import gte from "./comparisons/gte.js";
-import sqlIn from "./comparisons/in.js";
-import isNotNull from "./comparisons/isNotNull.js";
-import isNull from "./comparisons/isNull.js";
-import like from "./comparisons/like.js";
-import lt from "./comparisons/lt.js";
-import lte from "./comparisons/lte.js";
-import notBetween from "./comparisons/notBetween.js";
-import notEq from "./comparisons/notEq.js";
-import notLike from "./comparisons/notLike.js";
 import type ColumnLogicalOperation from "./logicalOperations.js";
 import type { ExtractParams } from "./param.js";
 import type QueryParam from "./param.js";
 import { convertValueToQueryString } from "./uitlity/common.js";
 
 type CalculateSQLParams<
-    TValues extends readonly (IComparable<any, any, any, any, any, any, any> | IComparisonOperation<any, any, any, any, any, any, any> | ColumnLogicalOperation<any, any, any, any, any> | DbValueTypes | null)[],
+    TValues extends readonly (IComparable<any, any, any, any, any, any, any> | BaseColumnComparisonOperation<any, any, any, any, any, any, any> | ColumnLogicalOperation<any, any, any, any, any> | DbValueTypes | null)[],
 > = TValues extends readonly [infer First, ...infer Rest] ?
     Rest extends readonly [any, ...any[]] ?
     [...ExtractParams<First>, ...CalculateSQLParams<Rest>] :
@@ -33,13 +21,13 @@ type CalculateSQLParams<
 
 class SQLOperator<
     TDbType extends DbType,
-    TValues extends readonly (IComparable<TDbType, any, any, any, any, any, any> | IComparisonOperation<TDbType, any, any, any, any, any, any> | ColumnLogicalOperation<TDbType, any, any, any, any> | DbValueTypes | null)[],
+    TValues extends readonly (IComparable<TDbType, any, any, any, any, any, any> | BaseColumnComparisonOperation<TDbType, any, any, any, any, any, any> | ColumnLogicalOperation<TDbType, any, any, any, any> | DbValueTypes | null)[],
     TValueType extends DbValueTypes | null = any,
     TFieldName extends string | undefined = undefined,
     TAs extends string | undefined = undefined,
     TCastType extends PgColumnType | undefined = undefined,
     TParams extends readonly QueryParam<TDbType, any, any, any, any>[] | undefined = UndefinedIfLengthZero<CalculateSQLParams<TValues>>
-> implements IComparable<
+> extends BaseQueryExpression<
     TDbType,
     TParams,
     IsExact<TValueType, null> extends true ? null : DetermineValueType<TCastType, NonNullable<TValueType>>,
@@ -49,45 +37,13 @@ class SQLOperator<
     TCastType
 
 > {
-    dbType: TDbType;
-
-    [IComparableValueDummySymbol]: IsExact<TValueType, null> extends true ? null : DetermineValueType<TCastType, NonNullable<TValueType>>;
-    [IComparableFinalValueDummySymbol]: DetermineFinalValueType<TValueType, DetermineValueType<TCastType, TValueType>>;
-    params?: TParams;
-    fieldName: TFieldName;
-    asName: TAs;
-    castType?: TCastType;
-
     strs: TemplateStringsArray;
     values: TValues;
 
-
-    eq: typeof eq = eq;
-    notEq: typeof notEq = notEq;
-    gt: typeof gt = gt;
-    gte: typeof gte = gte;
-    lt: typeof lt = lt;
-    lte: typeof lte = lte;
-    sqlIn: typeof sqlIn = sqlIn;
-    between: typeof between = between;
-    notBetween: typeof notBetween = notBetween;
-    isNull: typeof isNull = isNull;
-    isNotNull: typeof isNotNull = isNotNull;
-    like: typeof like = like;
-    notLike: typeof notLike = notLike;
-
-    constructor(dbType: TDbType, strs: TemplateStringsArray, values: TValues, asName: TAs, castType?: TCastType) {
-        this.dbType = dbType;
-        this.asName = asName;
-        this.castType = castType;
-
+    constructor(dbType: TDbType, strs: TemplateStringsArray, values: TValues, asName: TAs, castType: TCastType) {
+        super(dbType, undefined as TParams, 'Any Value' as TFieldName, asName, castType);
         this.strs = strs;
         this.values = values;
-
-        this.fieldName = 'Any Value' as TFieldName;
-
-        this[IComparableValueDummySymbol] = undefined as any;
-        this[IComparableFinalValueDummySymbol] = undefined as any;
     }
 
     as<TAs extends string>(asName: TAs) {
@@ -138,9 +94,9 @@ function generateSqlOperatorFn<
     TDbType extends DbType
 >(dbType: TDbType) {
     return function <
-        TValues extends readonly (IComparable<TDbType, any, any, any, any, any, any> | IComparisonOperation<TDbType, any, any, any, any, any, any> | ColumnLogicalOperation<TDbType, any, any, any, any> | DbValueTypes | null)[]
+        TValues extends readonly (IComparable<TDbType, any, any, any, any, any, any> | BaseColumnComparisonOperation<TDbType, any, any, any, any, any, any> | ColumnLogicalOperation<TDbType, any, any, any, any> | DbValueTypes | null)[]
     >(strs: TemplateStringsArray, ...values: TValues): SQLOperator<TDbType, TValues> {
-        return new SQLOperator(dbType, strs, values, undefined);
+        return new SQLOperator(dbType, strs, values, undefined, undefined);
     }
 }
 

@@ -1,7 +1,7 @@
 import type { DbType } from "../../db.js";
+import { likeComparisonOperations, type ConvertComparisonParamToNonNullTyped, type InferValueTypeFromComparable } from "../_baseClasses/BaseColumnComparisonOperation.js";
 import type { IComparable } from "../_interfaces/IComparable.js";
 import QueryParam from "../param.js";
-import { likeComparisonOperations, type ConvertComparisonParamToNonNullTyped, type InferValueTypeFromComparable } from "../_interfaces/IComparisonOperation.js";
 import LikeColumnComparisonOperation from "./_likeColumnComparisonOperation.js";
 
 function like<
@@ -49,6 +49,7 @@ function like<TComparing extends IComparable<any, any, any, any, any, any, any>,
         likeComparisonOperations.like,
         this,
         value,
+        undefined,
         undefined
     );
 }
