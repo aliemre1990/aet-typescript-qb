@@ -5,6 +5,7 @@ import type BaseColumnComparisonOperation from "./_baseClasses/BaseColumnCompari
 import BaseQueryExpression from "./_baseClasses/BaseQueryExpression.js";
 import { IComparableFinalValueDummySymbol, IComparableValueDummySymbol, queryBuilderContextFactory, type DetermineFinalValueType, type DetermineValueType, type IComparable, type QueryBuilderContext } from "./_interfaces/IComparable.js";
 import QueryParam from "./param.js";
+import { extractParams } from "./utility.js";
 
 type InferLogicalOperationParams<
     TComparisons extends readonly (BaseColumnComparisonOperation<any, any, any, any, any, any, any> | ColumnLogicalOperation<any, any, any, any, any>)[],
@@ -58,21 +59,8 @@ class ColumnLogicalOperation<
         asName: TAs,
         castType: TCastType
     ) {
-        let tmpParams: readonly QueryParam<TDbType, any, any, any, any>[] = [];
-
-        comparisons.forEach(comp => {
-            if (
-                comp instanceof Object &&
-                "params" in comp &&
-                comp.params !== undefined &&
-                comp.params.length > 0
-            ) {
-                tmpParams = [...tmpParams, ...comp.params];
-            } else if (comp instanceof QueryParam) {
-                tmpParams = [...tmpParams, comp];
-            }
-        });
-        super(dbType, tmpParams as TParams, undefined, asName, castType);
+        const params = extractParams<TParams>(comparisons);
+        super(dbType, params, undefined, asName, castType);
 
         this.operator = operator;
         this.comparisons = comparisons;

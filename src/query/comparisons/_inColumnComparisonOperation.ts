@@ -7,6 +7,7 @@ import { IComparableFinalValueDummySymbol, IComparableValueDummySymbol, queryBui
 import QueryParam from "../param.js";
 import QueryBuilder from "../queryBuilder.js";
 import { convertArgsToQueryString } from "../uitlity/common.js";
+import { extractParams } from "../utility.js";
 
 class InColumnComparisonOperation<
     TDbType extends DbType,
@@ -64,27 +65,8 @@ class InColumnComparisonOperation<
         asName: TAs,
         castType: TCastType
     ) {
-        let tmpParams: readonly QueryParam<TDbType, any, any, any, any>[] = [];
-        if (comparing.params !== undefined && comparing.params.length > 0) {
-            tmpParams = [...tmpParams, ...comparing.params];
-        }
-
-        if (value !== undefined && value.length > 0) {
-            value.forEach(val => {
-                if (
-                    val instanceof Object &&
-                    "params" in val &&
-                    val.params !== undefined &&
-                    Array.isArray(val.params) &&
-                    val.params.length > 0
-                ) {
-                    tmpParams = [...tmpParams, ...val.params];
-                } else if (val instanceof QueryParam) {
-                    tmpParams = [...tmpParams, val];
-                }
-            })
-        }
-        super(dbType, operation, tmpParams as TParams, undefined, asName, castType);
+        const params = extractParams<TParams>([comparing, ...(value || [])]);
+        super(dbType, operation, params, undefined, asName, castType);
 
         this.comparing = comparing;
         this.value = value;

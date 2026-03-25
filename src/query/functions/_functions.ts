@@ -6,6 +6,7 @@ import QueryParam from "../param.js";
 import { convertArgsToQueryString } from "../uitlity/common.js";
 import type { PgColumnType } from "../../table/columnTypes.js";
 import BaseQueryExpression from "../_baseClasses/BaseQueryExpression.js";
+import { extractParams } from "../utility.js";
 
 const sqlFunctions = {
     coalesce: { name: 'COALESCE' },
@@ -65,21 +66,8 @@ class ColumnSQLFunction<
         asName: TAs,
         castType: TCastType
     ) {
-        let tmpParams: QueryParam<TDbType, any, any, any, any>[] = [];
-
-        for (const arg of args) {
-            if (
-                arg instanceof Object &&
-                "params" in arg &&
-                arg.params !== undefined &&
-                arg.params.length > 0
-            ) {
-                tmpParams.push(...arg.params);
-            } else if (arg instanceof QueryParam) {
-                tmpParams.push(arg);
-            }
-        }
-        super(dbType, tmpParams as TParams, undefined, asName, castType);
+        const params = extractParams<TParams>(args);
+        super(dbType, params, undefined, asName, castType);
         this.args = args;
         this.sqlFunction = sqlFunction;
     }

@@ -5,6 +5,7 @@ import BaseColumnComparisonOperation, { type InferComparisonParams, type IsNullC
 import { IComparableFinalValueDummySymbol, IComparableValueDummySymbol, queryBuilderContextFactory, type DetermineValueType, type IComparable, type QueryBuilderContext } from "../_interfaces/IComparable.js";
 import type QueryParam from "../param.js";
 import QueryBuilder from "../queryBuilder.js";
+import { extractParams } from "../utility.js";
 
 class IsNullColumnComparisonOperation<
     TDbType extends DbType,
@@ -41,7 +42,6 @@ class IsNullColumnComparisonOperation<
             comparingStr = `(${comparingStr})`;
         }
 
-
         let queryRes = `${comparingStr} ${this.operation.symbol}`;
         return { query: queryRes, params: [...(context?.params || [])] };
     }
@@ -53,11 +53,8 @@ class IsNullColumnComparisonOperation<
         asName: TAs,
         castType: TCastType
     ) {
-        let tmpParams: readonly QueryParam<TDbType, any, any, any, any>[] = [];
-        if (comparing.params !== undefined && comparing.params.length > 0) {
-            tmpParams = [...tmpParams, ...comparing.params];
-        }
-        super(dbType, operation, tmpParams as TParams, undefined, asName, castType);
+        const params = extractParams<TParams>([comparing]);
+        super(dbType, operation, params, undefined, asName, castType);
 
         this.comparing = comparing;
     }

@@ -15,6 +15,7 @@ import type ColumnLogicalOperation from "./logicalOperations.js";
 import type { ExtractParams } from "./param.js";
 import QueryParam from "./param.js";
 import { convertValueToQueryString } from "./uitlity/common.js";
+import { extractParams } from "./utility.js";
 
 type CalculateSQLParams<
     TValues extends readonly (IComparable<any, any, any, any, any, any, any> | BaseColumnComparisonOperation<any, any, any, any, any, any, any> | ColumnLogicalOperation<any, any, any, any, any> | DbValueTypes | null)[],
@@ -47,16 +48,8 @@ class SQLOperator<
     values: TValues;
 
     constructor(dbType: TDbType, strs: TemplateStringsArray, values: TValues, asName: TAs, castType: TCastType) {
-        let tmpParams: readonly QueryParam<TDbType, any, any, any, any>[] = [];
-        for (let value of values) {
-            if (value instanceof QueryParam) {
-                tmpParams = [...tmpParams, value];
-            }
-            else if (value !== null && typeof value === 'object' && "params" in value && value.params && value.params.length > 0) {
-                tmpParams = [...tmpParams, ...value.params];
-            }
-        }
-        super(dbType, tmpParams as TParams, 'Any Value' as TFieldName, asName, castType);
+        const params = extractParams<TParams>(values);
+        super(dbType, params, 'Any Value' as TFieldName, asName, castType);
         this.strs = strs;
         this.values = values;
     }

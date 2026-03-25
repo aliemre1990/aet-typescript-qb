@@ -9,6 +9,7 @@ import type { AccumulateComparisonParams } from "./_types/paramAccumulationCompa
 import type ColumnLogicalOperation from "./logicalOperations.js";
 import type { ExtractParams } from "./param.js";
 import QueryParam from "./param.js";
+import { extractParams } from "./utility.js";
 
 type MapQueryParamToType<TQP extends QueryParam<any, any, any, any, any>, TValueType extends DbValueTypes | null> =
     TQP extends QueryParam<infer TDbType, infer TName, any, infer TAs, infer TCastType> ?
@@ -197,13 +198,14 @@ class SQLCaseExpression<
         elseExpression?: TElseExpression,
         whenExpressions?: TWhenExpressions
     ) {
-        let tmpParams: readonly QueryParam<TDbType, any, any, any, any>[] = [];
-        if (mainExpression?.params !== undefined && mainExpression.params.length > 0) {
-            tmpParams = [...mainExpression.params];
-        } else if (mainExpression instanceof QueryParam) {
-            tmpParams = [mainExpression];
-        }
-        super(dbType, tmpParams as TParams, undefined, asName, castType);
+        const whenExpressionExtraction = (whenExpressions || []).reduce((acc, whenExp) => [...acc, whenExp[0], whenExp[1]], [] as any[]);
+        let expressions = [
+            ...(mainExpression ? [mainExpression] : []),
+            ...whenExpressionExtraction,
+            ...(elseExpression ? [elseExpression] : [])
+        ];
+        const params = extractParams<TParams>(expressions);
+        super(dbType, params, undefined, asName, castType);
 
         this.mainExpression = mainExpression;
         this.elseExpression = elseExpression;

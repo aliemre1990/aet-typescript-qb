@@ -7,6 +7,7 @@ import QueryParam from "../../param.js";
 import type { PgColumnType } from "../../../table/columnTypes.js";
 import type { ExtractParams } from "../../param.js";
 import BaseQueryExpression from "../../_baseClasses/BaseQueryExpression.js";
+import { extractParams } from "../../utility.js";
 
 type InferParamsFromJsonBuildObjectArg<TDbType extends DbType, TObj extends JSONBuildObjectParam<TDbType>> =
     InferParamsFromObj<TDbType, TObj>["length"] extends 0 ? undefined :
@@ -90,22 +91,8 @@ class JSONBuildObjectFunction<
         asName: TAs,
         castType: TCastType
     ) {
-        const tmpParams: QueryParam<TDbType, any, any, any, any>[] = [];
-        let entries = Object.entries(obj);
-
-        for (const entry of entries) {
-            if (
-                entry[1] instanceof Object &&
-                "params" in entry[1] &&
-                entry[1].params !== undefined &&
-                entry[1].params.length > 0
-            ) {
-                tmpParams.push(...entry[1].params);
-            } else if (entry[1] instanceof QueryParam) {
-                tmpParams.push(entry[1]);
-            }
-        }
-        super(dbType, tmpParams as TParams, undefined, asName, castType);
+        const params = extractParams<TParams>(Object.entries(obj).map(entry => entry[1]));
+        super(dbType, params, undefined, asName, castType);
         this.obj = obj;
         this.isJsonB = isJsonB;
     }

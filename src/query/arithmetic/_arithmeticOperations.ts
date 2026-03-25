@@ -2,10 +2,11 @@ import { type DbType } from "../../db.js";
 import type { DbValueTypes } from "../../table/column.js";
 import { IComparableFinalValueDummySymbol, IComparableValueDummySymbol, queryBuilderContextFactory, type DetermineFinalValueType, type DetermineValueType, type IComparable, type QueryBuilderContext } from "../_interfaces/IComparable.js";
 import type { InferParamsFromFnArgs } from "../_types/inferParamsFromArgs.js";
-import type QueryParam from "../param.js";
+import QueryParam from "../param.js";
 import { convertArgsToQueryString } from "../uitlity/common.js";
 import type { PgColumnType } from "../../table/columnTypes.js";
 import BaseQueryExpression from "../_baseClasses/BaseQueryExpression.js";
+import { extractParams } from "../utility.js";
 
 
 const arithmeticOperations = {
@@ -93,7 +94,8 @@ class SQLArithmeticOperation<
         asName: TAs,
         castType: TCastType
     ) {
-        super(dbType, undefined as TParams, undefined, asName, castType);
+        const params = extractParams<TParams>(args);
+        super(dbType, params, undefined, asName, castType);
         this.args = args;
         this.operation = operation;
     }
