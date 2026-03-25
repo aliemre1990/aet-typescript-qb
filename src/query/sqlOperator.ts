@@ -4,10 +4,16 @@ import type { PgColumnType } from "../table/columnTypes.js";
 import type { IsExact, UndefinedIfLengthZero } from "../utility/common.js";
 import type BaseColumnComparisonOperation from "./_baseClasses/BaseColumnComparisonOperation.js";
 import BaseQueryExpression from "./_baseClasses/BaseQueryExpression.js";
-import { IComparableFinalValueDummySymbol, IComparableValueDummySymbol, queryBuilderContextFactory, type DetermineFinalValueType, type DetermineValueType, type IComparable, type QueryBuilderContext } from "./_interfaces/IComparable.js";
+import {
+    queryBuilderContextFactory,
+    type DetermineFinalValueType,
+    type DetermineValueType,
+    type IComparable,
+    type QueryBuilderContext
+} from "./_interfaces/IComparable.js";
 import type ColumnLogicalOperation from "./logicalOperations.js";
 import type { ExtractParams } from "./param.js";
-import type QueryParam from "./param.js";
+import QueryParam from "./param.js";
 import { convertValueToQueryString } from "./uitlity/common.js";
 
 type CalculateSQLParams<
@@ -41,7 +47,16 @@ class SQLOperator<
     values: TValues;
 
     constructor(dbType: TDbType, strs: TemplateStringsArray, values: TValues, asName: TAs, castType: TCastType) {
-        super(dbType, undefined as TParams, 'Any Value' as TFieldName, asName, castType);
+        let tmpParams: readonly QueryParam<TDbType, any, any, any, any>[] = [];
+        for (let value of values) {
+            if (value instanceof QueryParam) {
+                tmpParams = [...tmpParams, value];
+            }
+            else if (value !== null && typeof value === 'object' && "params" in value && value.params && value.params.length > 0) {
+                tmpParams = [...tmpParams, ...value.params];
+            }
+        }
+        super(dbType, tmpParams as TParams, 'Any Value' as TFieldName, asName, castType);
         this.strs = strs;
         this.values = values;
     }
