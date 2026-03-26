@@ -5,20 +5,15 @@ import type { IsAny } from "../../utility/common.js";
 import { IQueryExpressionFinalValueDummySymbol, IQueryExpressionValueDummySymbol, type IQueryExpression, type QueryBuilderContext } from "../_interfaces/IQueryExpression.js";
 import type { IDbType } from "../_interfaces/IDbType.js";
 import type between from "../comparisons/between.js";
-import type eq from "../comparisons/eq.js";
-import type gt from "../comparisons/gt.js";
-import type gte from "../comparisons/gte.js";
 import type sqlIn from "../comparisons/in.js";
 import type isNotNull from "../comparisons/isNotNull.js";
 import type isNull from "../comparisons/isNull.js";
 import type like from "../comparisons/like.js";
-import type lt from "../comparisons/lt.js";
-import type lte from "../comparisons/lte.js";
 import type notBetween from "../comparisons/notBetween.js";
-import type notEq from "../comparisons/notEq.js";
 import type sqlNotIn from "../comparisons/notIn.js";
 import type notLike from "../comparisons/notLike.js";
 import type QueryParam from "../param.js";
+import type { eq, gt, gte, lt, lte, notEq } from "../comparisons/_basicColumnComparisonOperation.js";
 
 class BaseQueryExpression<
     TDbType extends DbType,

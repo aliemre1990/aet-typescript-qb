@@ -2,14 +2,8 @@ import type { DbType } from "../../db.js";
 import type { DbValueTypes } from "../../table/column.js";
 import type QueryParam from "../param.js";
 import type between from "../comparisons/between.js";
-import type eq from "../comparisons/eq.js";
 import type sqlIn from "../comparisons/in.js";
 import type { IDbType } from "./IDbType.js";
-import type notEq from "../comparisons/notEq.js";
-import type gt from "../comparisons/gt.js";
-import type gte from "../comparisons/gte.js";
-import type lt from "../comparisons/lt.js";
-import type lte from "../comparisons/lte.js";
 import type { PgColumnType, PgTypeToJsType } from "../../table/columnTypes.js";
 import type { IsAny } from "../../utility/common.js";
 import type notBetween from "../comparisons/notBetween.js";
@@ -17,6 +11,7 @@ import type isNull from "../comparisons/isNull.js";
 import type isNotNull from "../comparisons/isNotNull.js";
 import type like from "../comparisons/like.js";
 import type notLike from "../comparisons/notLike.js";
+import type { eq, gt, gte, lt, lte, notEq } from "../comparisons/_basicColumnComparisonOperation.js";
 
 type DetermineValueType<TCastType extends PgColumnType | undefined, TValueType extends DbValueTypes | null> =
     TCastType extends undefined ?
