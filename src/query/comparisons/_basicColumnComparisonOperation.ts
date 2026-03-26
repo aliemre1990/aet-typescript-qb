@@ -72,7 +72,7 @@ class BasicColumnComparisonOperation<
 }
 
 
-function generateBasicComparison(operation: BasicComparisonOperationType) {
+function generateBasicComparison<TComparisonType extends BasicComparisonOperationType>(operation: TComparisonType) {
 
     function basicComparison<
         TComparing extends IQueryExpression<TDbType, any, any, any, any, any, any>,
@@ -83,7 +83,7 @@ function generateBasicComparison(operation: BasicComparisonOperationType) {
     >(this: TComparing, value: TParamValue extends (LiteralToBase<TValueType> | null) ? TParamMedian : never):
         BasicColumnComparisonOperation<
             TDbType,
-            typeof operation,
+            TComparisonType,
             TComparing,
             ConvertComparisonParamToTyped<TParamMedian, TValueType>
 
@@ -96,7 +96,7 @@ function generateBasicComparison(operation: BasicComparisonOperationType) {
     >(this: TComparing, value: TApplied):
         BasicColumnComparisonOperation<
             TDbType,
-            typeof operation,
+            TComparisonType,
             TComparing,
             TApplied
         >
@@ -107,7 +107,7 @@ function generateBasicComparison(operation: BasicComparisonOperationType) {
     >(this: TComparing, value: LiteralToBase<TValueType> | null):
         BasicColumnComparisonOperation<
             TDbType,
-            typeof operation,
+            TComparisonType,
             TComparing,
             TValueType | null
         >
