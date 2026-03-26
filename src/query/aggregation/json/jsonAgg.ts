@@ -1,5 +1,5 @@
 import { dbTypes, type PgDbType } from "../../../db.js";
-import type { IComparable } from "../../_interfaces/IComparable.js";
+import type { IQueryExpression } from "../../_interfaces/IQueryExpression.js";
 import BasicColumnAggregationOperation, { aggregationOperations } from "../_aggregationOperations.js";
 
 /**
@@ -9,10 +9,10 @@ import BasicColumnAggregationOperation, { aggregationOperations } from "../_aggr
  * preserved order it will be added then.
  */
 // type InferTupleFromCols<
-//     TCols extends { [key: string]: IComparable<any, any, any, any, any, any, any> },
+//     TCols extends { [key: string]: IQueryExpression<any, any, any, any, any, any, any> },
 //     Acc extends readonly any[] = []
 // > = {
-//         [K in keyof TCols]: TCols[K] extends IComparable<any, any, any, any, infer TFinalType, any, any> ?
+//         [K in keyof TCols]: TCols[K] extends IQueryExpression<any, any, any, any, infer TFinalType, any, any> ?
 //         Exclude<keyof TCols, K> extends never ?
 //         [...Acc, TFinalType] :
 //         InferTupleFromCols<Pick<TCols, Exclude<keyof TCols, K>>, [...Acc, TFinalType]>
@@ -22,13 +22,13 @@ import BasicColumnAggregationOperation, { aggregationOperations } from "../_aggr
 
 
 type InferReturnTypeFromArg<TArg> =
-    TArg extends IComparable<any, any, any, infer TFinalType, any, any, any> ? TFinalType[] :
+    TArg extends IQueryExpression<any, any, any, infer TFinalType, any, any, any> ? TFinalType[] :
     never
     ;
 
 
 function jsonAggFn<
-    TArg extends IComparable<PgDbType, any, any, any, any, any, any>
+    TArg extends IQueryExpression<PgDbType, any, any, any, any, any, any>
 >(
     arg: TArg
 ) {
@@ -42,7 +42,7 @@ function jsonAggFn<
 
 
 function jsonbAggFn<
-    TArg extends IComparable<PgDbType, any, any, any, any, any, any>
+    TArg extends IQueryExpression<PgDbType, any, any, any, any, any, any>
 >(
     arg: TArg
 ) {

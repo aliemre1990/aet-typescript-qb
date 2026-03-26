@@ -1,6 +1,6 @@
 import type { DbType } from "../../db.js";
 import type { DbValueTypes } from "../../table/column.js";
-import { IComparableFinalValueDummySymbol, IComparableValueDummySymbol, queryBuilderContextFactory, type DetermineFinalValueType, type DetermineValueType, type IComparable, type QueryBuilderContext } from "../_interfaces/IComparable.js";
+import { IQueryExpressionFinalValueDummySymbol, IQueryExpressionValueDummySymbol, queryBuilderContextFactory, type DetermineFinalValueType, type DetermineValueType, type IQueryExpression, type QueryBuilderContext } from "../_interfaces/IQueryExpression.js";
 import type { InferParamsFromFnArgs } from "../_types/inferParamsFromArgs.js";
 import QueryParam from "../param.js";
 import { convertArgsToQueryString } from "../uitlity/common.js";
@@ -48,7 +48,7 @@ class BasicColumnAggregationOperation<
     TArgs extends (
 
         DbValueTypes | null |
-        IComparable<TDbType, any, any, any, any, any, any>
+        IQueryExpression<TDbType, any, any, any, any, any, any>
     )[],
     TReturnType extends DbValueTypes | null,
     TParams extends QueryParam<TDbType, string, any, any, any>[] | undefined = InferParamsFromFnArgs<TArgs>,

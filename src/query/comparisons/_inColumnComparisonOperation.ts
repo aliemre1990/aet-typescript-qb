@@ -2,8 +2,8 @@ import type { DbType } from "../../db.js";
 import type { DbValueTypes } from "../../table/column.js";
 import type { PgColumnType } from "../../table/columnTypes.js";
 import type { UndefinedIfLengthZero } from "../../utility/common.js";
-import BaseColumnComparisonOperation, { type InComparisonOperationType, type InferComparisonParams, type InferValueTypeFromComparable } from "../_baseClasses/BaseColumnComparisonOperation.js";
-import { IComparableFinalValueDummySymbol, IComparableValueDummySymbol, queryBuilderContextFactory, type DetermineValueType, type IComparable, type QueryBuilderContext } from "../_interfaces/IComparable.js";
+import BaseColumnComparisonOperation, { type InComparisonOperationType, type InferComparisonParams, type InferValueTypeFromExpression } from "../_baseClasses/BaseColumnComparisonOperation.js";
+import { IQueryExpressionFinalValueDummySymbol, IQueryExpressionValueDummySymbol, queryBuilderContextFactory, type DetermineValueType, type IQueryExpression, type QueryBuilderContext } from "../_interfaces/IQueryExpression.js";
 import QueryParam from "../param.js";
 import QueryBuilder from "../queryBuilder.js";
 import { convertArgsToQueryString } from "../uitlity/common.js";
@@ -12,9 +12,9 @@ import { extractParams } from "../utility.js";
 class InColumnComparisonOperation<
     TDbType extends DbType,
     TOperation extends InComparisonOperationType,
-    TComparing extends IComparable<TDbType, any, any, any, any, any, any>,
-    TApplied extends readonly (TValueType | null | IComparable<TDbType, any, any, any, any, any, any>)[] | undefined,
-    TValueType extends DbValueTypes = InferValueTypeFromComparable<TDbType, TComparing>,
+    TComparing extends IQueryExpression<TDbType, any, any, any, any, any, any>,
+    TApplied extends readonly (TValueType | null | IQueryExpression<TDbType, any, any, any, any, any, any>)[] | undefined,
+    TValueType extends DbValueTypes = InferValueTypeFromExpression<TDbType, TComparing>,
     TParams extends readonly QueryParam<TDbType, string, any, any, any>[] | undefined = UndefinedIfLengthZero<InferComparisonParams<TComparing, TApplied>>,
     TAs extends string | undefined = undefined,
     TCastType extends PgColumnType | undefined = undefined

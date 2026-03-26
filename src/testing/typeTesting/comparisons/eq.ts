@@ -15,7 +15,7 @@ type typeof_EqToParam_Value = typeof_EqToParam extends BasicColumnComparisonOper
 type typeof_EqToParam_ParamType = typeof_EqToParam_Value extends QueryParam<any, any, infer TVal, any, any> ? TVal : never;
 type eqToParam_Test = AssertTrue<AssertEqual<typeof_EqToParam_ParamType, number | null>>;
 //
-const eqToComparable = customerIdQC.eq(empSalaryQC);
+const eqToColumn = customerIdQC.eq(empSalaryQC);
 //
 const eqToLiteral = customerIdQC.eq(literalTester(1));
 //

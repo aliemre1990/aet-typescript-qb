@@ -2,7 +2,7 @@ import type { DbType } from "../../db.js";
 import type { DbValueTypes } from "../../table/column.js";
 import type { PgColumnType } from "../../table/columnTypes.js";
 import type { IsAny, LiteralToBase } from "../../utility/common.js";
-import type { IComparable } from "../_interfaces/IComparable.js";
+import type { IQueryExpression } from "../_interfaces/IQueryExpression.js";
 import type { ExtractParams } from "../param.js";
 import type QueryParam from "../param.js";
 import BaseQueryExpression from "./BaseQueryExpression.js";
@@ -17,29 +17,29 @@ type ConvertComparisonParamToNonNullTyped<TIntermediate extends QueryParam<any, 
     QueryParam<TDbType, TName, IsAny<TVal> extends true ? LiteralToBase<TValueType> : TVal, TAs, TCastType> :
     never;
 
-type InferValueTypeFromComparable<TDbType extends DbType, T> =
-    T extends IComparable<TDbType, any, infer TValueType, any, any, any, any> ? TValueType : never;
+type InferValueTypeFromExpression<TDbType extends DbType, T> =
+    T extends IQueryExpression<TDbType, any, infer TValueType, any, any, any, any> ? TValueType : never;
 
 
-type InferFinalValueTypeFromComparable<T> =
-    T extends IComparable<any, any, any, infer TFinalValueType, any, any, any> ? TFinalValueType : never;
+type InferFinalValueTypeFromExpression<T> =
+    T extends IQueryExpression<any, any, any, infer TFinalValueType, any, any, any> ? TFinalValueType : never;
 
 type InferFinalValueTypeFromApplied<T> =
-    T extends IComparable<any, any, any, infer TFinalValueType, any, any, any> ? TFinalValueType :
+    T extends IQueryExpression<any, any, any, infer TFinalValueType, any, any, any> ? TFinalValueType :
     T extends DbValueTypes | null ?
     T :
     never;
 
 type InferComparisonParams<
-    TComparing extends IComparable<any, any, any, any, any, any, any>,
-    TApplied extends readonly (DbValueTypes | null | IComparable<any, any, any, any, any, any, any>)[] | undefined
+    TComparing extends IQueryExpression<any, any, any, any, any, any, any>,
+    TApplied extends readonly (DbValueTypes | null | IQueryExpression<any, any, any, any, any, any, any>)[] | undefined
 > = [
-        ...(TComparing extends IComparable<any, infer TParams, any, any, any, any, any> ? TParams extends undefined ? [] : TParams : []),
+        ...(TComparing extends IQueryExpression<any, infer TParams, any, any, any, any, any> ? TParams extends undefined ? [] : TParams : []),
         ...InferAppliedParams<TApplied>
     ];
 
 type InferAppliedParams<
-    TApplied extends readonly (DbValueTypes | null | IComparable<any, any, any, any, any, any, any>)[] | undefined
+    TApplied extends readonly (DbValueTypes | null | IQueryExpression<any, any, any, any, any, any, any>)[] | undefined
 > = TApplied extends undefined ? [] :
     TApplied extends readonly [infer First, ...infer Rest] ?
 
@@ -132,8 +132,8 @@ export type {
 
     ConvertComparisonParamToTyped,
     ConvertComparisonParamToNonNullTyped,
-    InferValueTypeFromComparable,
-    InferFinalValueTypeFromComparable,
+    InferValueTypeFromExpression,
+    InferFinalValueTypeFromExpression,
     InferFinalValueTypeFromApplied,
     InferComparisonParams,
     InferAppliedParams

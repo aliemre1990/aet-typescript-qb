@@ -1,9 +1,9 @@
 import type { DbType } from "../../db.js";
 import type { PgColumnType } from "../../table/columnTypes.js";
 import type { UndefinedIfLengthZero } from "../../utility/common.js";
-import type { InferComparisonParams, InferFinalValueTypeFromApplied, InferFinalValueTypeFromComparable, LikeComparisonOperationType } from "../_baseClasses/BaseColumnComparisonOperation.js";
+import type { InferComparisonParams, InferFinalValueTypeFromApplied, InferFinalValueTypeFromExpression, LikeComparisonOperationType } from "../_baseClasses/BaseColumnComparisonOperation.js";
 import BaseColumnComparisonOperation from "../_baseClasses/BaseColumnComparisonOperation.js";
-import { IComparableFinalValueDummySymbol, IComparableValueDummySymbol, queryBuilderContextFactory, type DetermineValueType, type IComparable, type QueryBuilderContext } from "../_interfaces/IComparable.js";
+import { IQueryExpressionFinalValueDummySymbol, IQueryExpressionValueDummySymbol, queryBuilderContextFactory, type DetermineValueType, type IQueryExpression, type QueryBuilderContext } from "../_interfaces/IQueryExpression.js";
 import QueryParam from "../param.js";
 import QueryBuilder from "../queryBuilder.js";
 import { convertArgsToQueryString } from "../uitlity/common.js";
@@ -20,8 +20,8 @@ type InferLikeComparisonReturnType<
 class LikeColumnComparisonOperation<
     TDbType extends DbType,
     TOperation extends LikeComparisonOperationType,
-    TComparing extends IComparable<TDbType, any, any, string | null, any, any, any>,
-    TApplied extends string | null | IComparable<TDbType, any, any, string | null, any, any, any>,
+    TComparing extends IQueryExpression<TDbType, any, any, string | null, any, any, any>,
+    TApplied extends string | null | IQueryExpression<TDbType, any, any, string | null, any, any, any>,
     TParams extends readonly QueryParam<TDbType, string, any, any, any>[] | undefined = UndefinedIfLengthZero<InferComparisonParams<TComparing, [TApplied]>>,
     TAs extends string | undefined = undefined,
     TCastType extends PgColumnType | undefined = undefined,
@@ -30,7 +30,7 @@ class LikeColumnComparisonOperation<
     TOperation,
     TParams,
     DetermineValueType<TCastType, boolean>,
-    DetermineValueType<TCastType, InferLikeComparisonReturnType<InferFinalValueTypeFromComparable<TComparing>, InferFinalValueTypeFromApplied<TApplied>>>,
+    DetermineValueType<TCastType, InferLikeComparisonReturnType<InferFinalValueTypeFromExpression<TComparing>, InferFinalValueTypeFromApplied<TApplied>>>,
     TAs,
     TCastType
 > {

@@ -1,21 +1,21 @@
 import type { DbType } from "../../db.js";
-import type { IComparable } from "../_interfaces/IComparable.js";
+import type { IQueryExpression } from "../_interfaces/IQueryExpression.js";
 import type { LiteralToBase } from "../../utility/common.js";
 import QueryParam from "../param.js";
 import BetweenColumnComparisonOperation from "./_betweenColumnComparisonOperation.js";
-import { betweenComparisonOperations, ConvertComparisonParamToTyped, InferValueTypeFromComparable } from "../_baseClasses/BaseColumnComparisonOperation.js";
+import { betweenComparisonOperations, ConvertComparisonParamToTyped, InferValueTypeFromExpression } from "../_baseClasses/BaseColumnComparisonOperation.js";
 
 
 
 // params
 function notBetween<
-    TComparing extends IComparable<TDbType, any, any, any, any, any, any>,
-    TValueType extends InferValueTypeFromComparable<TDbType, TComparing>,
+    TComparing extends IQueryExpression<TDbType, any, any, any, any, any, any>,
+    TValueType extends InferValueTypeFromExpression<TDbType, TComparing>,
     TLParamMedian extends QueryParam<TDbType, string, any, any, any>,
     TLParamValue extends TLParamMedian extends QueryParam<any, any, infer TVal, any, any> ? TVal : never,
     TRParamMedian extends QueryParam<TDbType, string, any, any, any>,
     TRParamValue extends TRParamMedian extends QueryParam<any, any, infer TVal, any, any> ? TVal : never,
-    TDbType extends DbType = TComparing extends IComparable<infer DbType, any, any, any, any, any, any> ? DbType : never
+    TDbType extends DbType = TComparing extends IQueryExpression<infer DbType, any, any, any, any, any, any> ? DbType : never
 >(
     this: TComparing,
     leftValue: TLParamValue extends (LiteralToBase<TValueType> | null) ? TLParamMedian : never,
@@ -28,11 +28,11 @@ function notBetween<
     ConvertComparisonParamToTyped<TRParamMedian, TValueType>
 >
 function notBetween<
-    TComparing extends IComparable<TDbType, any, any, any, any, any, any>,
-    TValueType extends InferValueTypeFromComparable<TDbType, TComparing>,
+    TComparing extends IQueryExpression<TDbType, any, any, any, any, any, any>,
+    TValueType extends InferValueTypeFromExpression<TDbType, TComparing>,
     TLParamMedian extends QueryParam<TDbType, string, any, any, any>,
     TLParamValue extends TLParamMedian extends QueryParam<any, any, infer TVal, any, any> ? TVal : never,
-    TDbType extends DbType = TComparing extends IComparable<infer DbType, any, any, any, any, any, any> ? DbType : never
+    TDbType extends DbType = TComparing extends IQueryExpression<infer DbType, any, any, any, any, any, any> ? DbType : never
 >(
     this: TComparing,
     leftValue: TLParamValue extends (LiteralToBase<TValueType> | null) ? TLParamMedian : never,
@@ -46,11 +46,11 @@ function notBetween<
 
 >
 function notBetween<
-    TComparing extends IComparable<TDbType, any, any, any, any, any, any>,
-    TValueType extends InferValueTypeFromComparable<TDbType, TComparing>,
+    TComparing extends IQueryExpression<TDbType, any, any, any, any, any, any>,
+    TValueType extends InferValueTypeFromExpression<TDbType, TComparing>,
     TRParamMedian extends QueryParam<TDbType, string, any, any, any>,
     TRParamValue extends TRParamMedian extends QueryParam<any, any, infer TVal, any, any> ? TVal : never,
-    TDbType extends DbType = TComparing extends IComparable<infer DbType, any, any, any, any, any, any> ? DbType : never
+    TDbType extends DbType = TComparing extends IQueryExpression<infer DbType, any, any, any, any, any, any> ? DbType : never
 >(
     this: TComparing,
     leftValue: LiteralToBase<TValueType> | null,
@@ -63,12 +63,12 @@ function notBetween<
     ConvertComparisonParamToTyped<TRParamMedian, TValueType>
 >
 function notBetween<
-    TComparing extends IComparable<TDbType, any, any, any, any, any, any>,
-    TValueType extends InferValueTypeFromComparable<TDbType, TComparing>,
+    TComparing extends IQueryExpression<TDbType, any, any, any, any, any, any>,
+    TValueType extends InferValueTypeFromExpression<TDbType, TComparing>,
     TLParamMedian extends QueryParam<TDbType, string, any, any, any>,
     TLParamValue extends TLParamMedian extends QueryParam<any, any, infer TVal, any, any> ? TVal : never,
-    TRApplied extends IComparable<TDbType, any, LiteralToBase<TValueType>, any, any, any, any>,
-    TDbType extends DbType = TComparing extends IComparable<infer DbType, any, any, any, any, any, any> ? DbType : never
+    TRApplied extends IQueryExpression<TDbType, any, LiteralToBase<TValueType>, any, any, any, any>,
+    TDbType extends DbType = TComparing extends IQueryExpression<infer DbType, any, any, any, any, any, any> ? DbType : never
 >(
     this: TComparing,
     leftValue: TLParamValue extends (LiteralToBase<TValueType> | null) ? TLParamMedian : never,
@@ -81,12 +81,12 @@ function notBetween<
     TRApplied
 >
 function notBetween<
-    TComparing extends IComparable<TDbType, any, any, any, any, any, any>,
-    TValueType extends InferValueTypeFromComparable<TDbType, TComparing>,
+    TComparing extends IQueryExpression<TDbType, any, any, any, any, any, any>,
+    TValueType extends InferValueTypeFromExpression<TDbType, TComparing>,
     TRParamMedian extends QueryParam<TDbType, string, any, any, any>,
     TRParamValue extends TRParamMedian extends QueryParam<any, any, infer TVal, any, any> ? TVal : never,
-    TLApplied extends IComparable<TDbType, any, LiteralToBase<TValueType>, any, any, any, any>,
-    TDbType extends DbType = TComparing extends IComparable<infer DbType, any, any, any, any, any, any> ? DbType : never
+    TLApplied extends IQueryExpression<TDbType, any, LiteralToBase<TValueType>, any, any, any, any>,
+    TDbType extends DbType = TComparing extends IQueryExpression<infer DbType, any, any, any, any, any, any> ? DbType : never
 >(
     this: TComparing,
     leftValue: TLApplied,
@@ -102,9 +102,9 @@ function notBetween<
 
 // All same
 function notBetween<
-    TComparing extends IComparable<TDbType, any, any, any, any, any, any>,
-    TValueType extends InferValueTypeFromComparable<TDbType, TComparing>,
-    TDbType extends DbType = TComparing extends IComparable<infer DbType, any, any, any, any, any, any> ? DbType : never
+    TComparing extends IQueryExpression<TDbType, any, any, any, any, any, any>,
+    TValueType extends InferValueTypeFromExpression<TDbType, TComparing>,
+    TDbType extends DbType = TComparing extends IQueryExpression<infer DbType, any, any, any, any, any, any> ? DbType : never
 >(this: TComparing, leftValue: LiteralToBase<TValueType> | null, rightValue: LiteralToBase<TValueType> | null):
     BetweenColumnComparisonOperation<
         TDbType,
@@ -114,11 +114,11 @@ function notBetween<
         TValueType | null
     >
 function notBetween<
-    TComparing extends IComparable<TDbType, any, any, any, any, any, any>,
-    TValueType extends InferValueTypeFromComparable<TDbType, TComparing>,
-    TLApplied extends IComparable<TDbType, any, LiteralToBase<TValueType>, any, any, any, any>,
-    TRApplied extends IComparable<TDbType, any, LiteralToBase<TValueType>, any, any, any, any>,
-    TDbType extends DbType = TComparing extends IComparable<infer DbType, any, any, any, any, any, any> ? DbType : never
+    TComparing extends IQueryExpression<TDbType, any, any, any, any, any, any>,
+    TValueType extends InferValueTypeFromExpression<TDbType, TComparing>,
+    TLApplied extends IQueryExpression<TDbType, any, LiteralToBase<TValueType>, any, any, any, any>,
+    TRApplied extends IQueryExpression<TDbType, any, LiteralToBase<TValueType>, any, any, any, any>,
+    TDbType extends DbType = TComparing extends IQueryExpression<infer DbType, any, any, any, any, any, any> ? DbType : never
 >(this: TComparing, leftValue: TLApplied, rightValue: TRApplied):
     BetweenColumnComparisonOperation<
         TDbType,
@@ -139,10 +139,10 @@ function notBetween<
  * @param rightValue 
  */
 function notBetween<
-    TComparing extends IComparable<TDbType, any, any, any, any, any, any>,
-    TValueType extends InferValueTypeFromComparable<TDbType, TComparing>,
-    TLApplied extends IComparable<TDbType, any, LiteralToBase<TValueType>, any, any, any, any>,
-    TDbType extends DbType = TComparing extends IComparable<infer DbType, any, any, any, any, any, any> ? DbType : never
+    TComparing extends IQueryExpression<TDbType, any, any, any, any, any, any>,
+    TValueType extends InferValueTypeFromExpression<TDbType, TComparing>,
+    TLApplied extends IQueryExpression<TDbType, any, LiteralToBase<TValueType>, any, any, any, any>,
+    TDbType extends DbType = TComparing extends IQueryExpression<infer DbType, any, any, any, any, any, any> ? DbType : never
 >(this: TComparing, leftValue: TLApplied, rightValue: LiteralToBase<TValueType> | null):
     BetweenColumnComparisonOperation<
         TDbType,
@@ -152,10 +152,10 @@ function notBetween<
         TValueType | null
     >
 function notBetween<
-    TComparing extends IComparable<TDbType, any, any, any, any, any, any>,
-    TValueType extends InferValueTypeFromComparable<TDbType, TComparing>,
-    TRApplied extends IComparable<TDbType, any, LiteralToBase<TValueType>, any, any, any, any>,
-    TDbType extends DbType = TComparing extends IComparable<infer DbType, any, any, any, any, any, any> ? DbType : never
+    TComparing extends IQueryExpression<TDbType, any, any, any, any, any, any>,
+    TValueType extends InferValueTypeFromExpression<TDbType, TComparing>,
+    TRApplied extends IQueryExpression<TDbType, any, LiteralToBase<TValueType>, any, any, any, any>,
+    TDbType extends DbType = TComparing extends IQueryExpression<infer DbType, any, any, any, any, any, any> ? DbType : never
 >(this: TComparing, leftValue: LiteralToBase<TValueType> | null, rightValue: TRApplied):
     BetweenColumnComparisonOperation<
         TDbType,
@@ -167,7 +167,7 @@ function notBetween<
 
 
 //Implementation
-function notBetween<TComparing extends IComparable<any, any, any, any, any, any, any>>(
+function notBetween<TComparing extends IQueryExpression<any, any, any, any, any, any, any>>(
     this: TComparing,
     leftValue: any,
     rightValue: any

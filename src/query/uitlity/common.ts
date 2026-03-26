@@ -1,7 +1,7 @@
 import type { DbValueTypes } from "../../table/column.js";
-import { queryBuilderContextFactory, type IComparable, type QueryBuilderContext } from "../_interfaces/IComparable.js";
+import { queryBuilderContextFactory, type IQueryExpression, type QueryBuilderContext } from "../_interfaces/IQueryExpression.js";
 
-export function convertArgsToQueryString(args: readonly (DbValueTypes | null | IComparable<any, any, any, any, any, any, any>)[], context?: QueryBuilderContext) {
+export function convertArgsToQueryString(args: readonly (DbValueTypes | null | IQueryExpression<any, any, any, any, any, any, any>)[], context?: QueryBuilderContext) {
     if (context === undefined) {
         context = queryBuilderContextFactory();
     }

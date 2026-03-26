@@ -1,6 +1,6 @@
 import type { DbType } from "../../db.js";
 import type { DeepPrettify } from "../../utility/common.js";
-import type { IComparable } from "../_interfaces/IComparable.js";
+import type { IQueryExpression } from "../_interfaces/IQueryExpression.js";
 import type ColumnsSelection from "../ColumnsSelection.js";
 import type CTEObject from "../cteObject.js";
 import type QueryParam from "../param.js";
@@ -21,7 +21,7 @@ type ColumnsToResultMapRecursively<
     Acc extends { [key: string]: any } = {}
 > =
     T extends readonly [infer First, ...infer Rest] ?
-    First extends IComparable<TDbType, any, any, infer TFinalType, infer TName, infer TAs, any> ?
+    First extends IQueryExpression<TDbType, any, any, infer TFinalType, infer TName, infer TAs, any> ?
 
     TAs extends string ?
     Rest extends [any, ...any[]] ?
@@ -42,10 +42,10 @@ type ColumnsToResultMapRecursively<
 
 type SelectToResultMapRecursively<
     TDbType extends DbType,
-    TSelect extends readonly (ColumnsSelection<TDbType, any, any> | IComparable<TDbType, any, any, any, any, any, any>)[]
+    TSelect extends readonly (ColumnsSelection<TDbType, any, any> | IQueryExpression<TDbType, any, any, any, any, any, any>)[]
 > =
     TSelect extends readonly [infer First, ...infer Rest] ?
-    First extends IComparable<TDbType, any, any, any, any, any, any> ?
+    First extends IQueryExpression<TDbType, any, any, any, any, any, any> ?
     Rest extends readonly [any, ...any[]] ?
     [First, ...SelectToResultMapRecursively<TDbType, Rest>] :
     [First] :

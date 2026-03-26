@@ -1,5 +1,5 @@
 import type { DbType } from "../../db.js";
-import type { IComparable } from "../_interfaces/IComparable.js";
+import type { IQueryExpression } from "../_interfaces/IQueryExpression.js";
 import type { IsContainsNull } from "../_types/args.js";
 import SQLArithmeticOperation, { arithmeticOperations } from "./_arithmeticOperations.js";
 
@@ -7,7 +7,7 @@ function generateArithmeticExponentiation<
     TDbType extends DbType
 >(dbType: TDbType) {
     return <
-        TArgs extends IComparable<TDbType, any, number, any, any, any, any>[]
+        TArgs extends IQueryExpression<TDbType, any, number, any, any, any, any>[]
     >
         (...args: TArgs) => {
 

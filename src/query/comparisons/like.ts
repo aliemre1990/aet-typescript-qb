@@ -1,14 +1,14 @@
 import type { DbType } from "../../db.js";
-import { likeComparisonOperations, type ConvertComparisonParamToNonNullTyped, type InferValueTypeFromComparable } from "../_baseClasses/BaseColumnComparisonOperation.js";
-import type { IComparable } from "../_interfaces/IComparable.js";
+import { likeComparisonOperations, type ConvertComparisonParamToNonNullTyped, type InferValueTypeFromExpression } from "../_baseClasses/BaseColumnComparisonOperation.js";
+import type { IQueryExpression } from "../_interfaces/IQueryExpression.js";
 import QueryParam from "../param.js";
 import LikeColumnComparisonOperation from "./_likeColumnComparisonOperation.js";
 
 function like<
-    TComparing extends IComparable<TDbType, any, string, any, any, any, any>,
+    TComparing extends IQueryExpression<TDbType, any, string, any, any, any, any>,
     TParamMedian extends QueryParam<TDbType, string, any, any, any>,
     TParamValue extends TParamMedian extends QueryParam<any, any, infer TVal, any, any> ? TVal : never,
-    TDbType extends DbType = TComparing extends IComparable<infer DbType, any, any, any, any, any, any> ? DbType : never,
+    TDbType extends DbType = TComparing extends IQueryExpression<infer DbType, any, any, any, any, any, any> ? DbType : never,
 >(this: TComparing, value: TParamValue extends string ? TParamMedian : never
 ): LikeColumnComparisonOperation<
     TDbType,
@@ -18,9 +18,9 @@ function like<
 
 >
 function like<
-    TComparing extends IComparable<TDbType, any, string, any, any, any, any>,
-    TApplied extends IComparable<TDbType, any, string, any, any, any, any>,
-    TDbType extends DbType = TComparing extends IComparable<infer DbType, any, any, any, any, any, any> ? DbType : never,
+    TComparing extends IQueryExpression<TDbType, any, string, any, any, any, any>,
+    TApplied extends IQueryExpression<TDbType, any, string, any, any, any, any>,
+    TDbType extends DbType = TComparing extends IQueryExpression<infer DbType, any, any, any, any, any, any> ? DbType : never,
 >(this: TComparing, value: TApplied):
     LikeColumnComparisonOperation<
         TDbType,
@@ -29,16 +29,16 @@ function like<
         TApplied
     >
 function like<
-    TComparing extends IComparable<TDbType, any, string, any, any, any, any>,
-    TDbType extends DbType = TComparing extends IComparable<infer DbType, any, any, any, any, any, any> ? DbType : never,
+    TComparing extends IQueryExpression<TDbType, any, string, any, any, any, any>,
+    TDbType extends DbType = TComparing extends IQueryExpression<infer DbType, any, any, any, any, any, any> ? DbType : never,
 >(this: TComparing, value: string):
     LikeColumnComparisonOperation<
         TDbType,
         typeof likeComparisonOperations.like,
         TComparing,
-        InferValueTypeFromComparable<TDbType, TComparing>
+        InferValueTypeFromExpression<TDbType, TComparing>
     >
-function like<TComparing extends IComparable<any, any, any, any, any, any, any>,>(
+function like<TComparing extends IQueryExpression<any, any, any, any, any, any, any>,>(
     this: TComparing,
     value: any
 ) {

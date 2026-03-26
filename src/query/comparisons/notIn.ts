@@ -1,15 +1,15 @@
 import type { DbType } from "../../db.js";
-import type { IComparable } from "../_interfaces/IComparable.js";
+import type { IQueryExpression } from "../_interfaces/IQueryExpression.js";
 import type { IsAny, IsExactAlt, LiteralToBase } from "../../utility/common.js";
 import QueryParam from "../param.js";
 import QueryBuilder from "../queryBuilder.js";
 import type { DbValueTypes } from "../../table/column.js";
 import InColumnComparisonOperation from "./_inColumnComparisonOperation.js";
-import { inComparisonOperations, type InferValueTypeFromComparable } from "../_baseClasses/BaseColumnComparisonOperation.js";
+import { inComparisonOperations, type InferValueTypeFromExpression } from "../_baseClasses/BaseColumnComparisonOperation.js";
 
 type MapParamsToTypeRecursively<
     TValueType extends DbValueTypes,
-    T extends readonly (TValueType | IComparable<any, any, TValueType, any, any, any, any>)[]
+    T extends readonly (TValueType | IQueryExpression<any, any, TValueType, any, any, any, any>)[]
 > =
     T extends readonly [infer First, ...infer Rest] ?
     First extends QueryParam<infer DbType, infer Name, infer ValueType, infer As, infer TCastType> ?
@@ -28,13 +28,13 @@ type MapParamsToTypeRecursively<
 
 
 function sqlNotIn<
-    TComparing extends IComparable<TDbType, any, any, any, any, any, any>,
-    TValueType extends InferValueTypeFromComparable<TDbType, TComparing>,
+    TComparing extends IQueryExpression<TDbType, any, any, any, any, any, any>,
+    TValueType extends InferValueTypeFromExpression<TDbType, TComparing>,
     TQb extends QueryBuilder<TDbType, any, any, any, any, any, any, any>,
-    TDbType extends DbType = TComparing extends IComparable<infer DbType, any, any, any, any, any, any> ? DbType : never
+    TDbType extends DbType = TComparing extends IQueryExpression<infer DbType, any, any, any, any, any, any> ? DbType : never
 >(
     this: TComparing,
-    val: TQb & IComparable<TDbType, any, LiteralToBase<TValueType>, any, any, any, any>
+    val: TQb & IQueryExpression<TDbType, any, LiteralToBase<TValueType>, any, any, any, any>
 ): InColumnComparisonOperation<
     TDbType,
     typeof inComparisonOperations.notIn,
@@ -42,11 +42,11 @@ function sqlNotIn<
     [TQb]
 >
 function sqlNotIn<
-    TComparing extends IComparable<TDbType, any, any, any, any, any, any>,
-    TValueType extends InferValueTypeFromComparable<TDbType, TComparing>,
-    const TValues extends readonly (LiteralToBase<TValueType> | IComparable<TDbType, any, LiteralToBase<TValueType>, any, any, any, any>)[],
-    const TFinalValues extends readonly (LiteralToBase<TValueType> | IComparable<TDbType, any, LiteralToBase<TValueType>, any, any, any, any>)[] = MapParamsToTypeRecursively<LiteralToBase<TValueType>, TValues>,
-    TDbType extends DbType = TComparing extends IComparable<infer DbType, any, any, any, any, any, any> ? DbType : never
+    TComparing extends IQueryExpression<TDbType, any, any, any, any, any, any>,
+    TValueType extends InferValueTypeFromExpression<TDbType, TComparing>,
+    const TValues extends readonly (LiteralToBase<TValueType> | IQueryExpression<TDbType, any, LiteralToBase<TValueType>, any, any, any, any>)[],
+    const TFinalValues extends readonly (LiteralToBase<TValueType> | IQueryExpression<TDbType, any, LiteralToBase<TValueType>, any, any, any, any>)[] = MapParamsToTypeRecursively<LiteralToBase<TValueType>, TValues>,
+    TDbType extends DbType = TComparing extends IQueryExpression<infer DbType, any, any, any, any, any, any> ? DbType : never
 >(
     this: TComparing,
     ...val: TValues
@@ -59,8 +59,8 @@ function sqlNotIn<
 
 
 function sqlNotIn<
-    TComparing extends IComparable<TDbType, any, any, any, any, any, any>,
-    TDbType extends DbType = TComparing extends IComparable<infer DbType, any, any, any, any, any, any> ? DbType : never
+    TComparing extends IQueryExpression<TDbType, any, any, any, any, any, any>,
+    TDbType extends DbType = TComparing extends IQueryExpression<infer DbType, any, any, any, any, any, any> ? DbType : never
 >
     (
         this: TComparing,

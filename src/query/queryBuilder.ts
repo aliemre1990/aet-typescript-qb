@@ -16,7 +16,7 @@ import type { AccumulateOrderByParams } from "./_types/paramAccumulationOrderBy.
 import type { AccumulateColumnParams } from "./_types/paramAccumulationSelect.js";
 import type ColumnsSelection from "./ColumnsSelection.js";
 import { columnsSelectionFactory, ColumnsSelectionQueryObjectSymbol } from "./ColumnsSelection.js";
-import { IComparableFinalValueDummySymbol, IComparableValueDummySymbol, queryBuilderContextFactory, type DetermineFinalValueType, type DetermineValueType, type IComparable, type QueryBuilderContext } from "./_interfaces/IComparable.js";
+import { IQueryExpressionFinalValueDummySymbol, IQueryExpressionValueDummySymbol, queryBuilderContextFactory, type DetermineFinalValueType, type DetermineValueType, type IQueryExpression, type QueryBuilderContext } from "./_interfaces/IQueryExpression.js";
 import SubQueryObject from "./subQueryObject.js";
 import CTEObject, { CTEObjectEntry } from "./cteObject.js";
 import { mapCTESpecsToSelection } from "./utility.js";
@@ -28,13 +28,13 @@ import type { ExtractParams } from "./param.js";
 import type BaseColumnComparisonOperation from "./_baseClasses/BaseColumnComparisonOperation.js";
 import BaseQueryExpression from "./_baseClasses/BaseQueryExpression.js";
 
-type CombineComparableItems<
+type CombineExpressions<
     TLeft extends ResultShapeItem<any>,
     TRight extends ResultShapeItem<any>
 > =
-    TLeft extends IComparable<infer TDbType, any, infer TValue, infer TFinalValue, infer TName, infer TAs, infer TCastType>
-    ? TRight extends IComparable<any, any, infer TValue2, infer TFinalValue2, any, any, any>
-    ? IComparable<
+    TLeft extends IQueryExpression<infer TDbType, any, infer TValue, infer TFinalValue, infer TName, infer TAs, infer TCastType>
+    ? TRight extends IQueryExpression<any, any, infer TValue2, infer TFinalValue2, any, any, any>
+    ? IQueryExpression<
         TDbType,
         UndefinedIfLengthZero<ExtractParams<TLeft>>,
         TValue | TValue2,
@@ -56,11 +56,11 @@ type CalculateCombineResultRecursively<
     STail extends readonly [any, ...any[]] ?
     UTail extends readonly [any, ...any[]] ?
     readonly [
-        CombineComparableItems<SHead, UHead>,
+        CombineExpressions<SHead, UHead>,
         ...CalculateCombineResultRecursively<STail, UTail>
     ] :
-    [CombineComparableItems<SHead, UHead>] :
-    [CombineComparableItems<SHead, UHead>] :
+    [CombineExpressions<SHead, UHead>] :
+    [CombineExpressions<SHead, UHead>] :
     never :
     never :
     never :
@@ -81,10 +81,10 @@ type MapQueryResultForCombineRecursively<
     TResult extends ResultShape<any>
 > =
     TResult extends readonly [infer First, ...infer Rest] ?
-    First extends IComparable<infer TDbType, any, infer TValueType, any, any, any, any> ?
+    First extends IQueryExpression<infer TDbType, any, infer TValueType, any, any, any, any> ?
     Rest extends readonly [any, ...any[]] ?
-    [IComparable<TDbType, any, any, TValueType extends null ? any : TValueType | null, any, any, any>, ...MapQueryResultForCombineRecursively<Rest>] :
-    [IComparable<TDbType, any, any, TValueType extends null ? any : TValueType | null, any, any, any>] :
+    [IQueryExpression<TDbType, any, any, TValueType extends null ? any : TValueType | null, any, any, any>, ...MapQueryResultForCombineRecursively<Rest>] :
+    [IQueryExpression<TDbType, any, any, TValueType extends null ? any : TValueType | null, any, any, any>] :
     Rest extends readonly [any, ...any[]] ?
     [never, ...MapQueryResultForCombineRecursively<Rest>] :
     [never] :
@@ -94,10 +94,10 @@ type MapQueryResultForCombine<
     TResult extends ResultShape<any> | undefined,
 > = TResult extends undefined ? never : TResult extends ResultShape<any> ? MapQueryResultForCombineRecursively<TResult> : never;
 
-type ResultShapeItem<TDbType extends DbType> = IComparable<TDbType, any, any, any, any, any, any>;
+type ResultShapeItem<TDbType extends DbType> = IQueryExpression<TDbType, any, any, any, any, any, any>;
 type ResultShape<TDbType extends DbType> = readonly ResultShapeItem<TDbType>[];
 
-type SelectSpecsType<TDbType extends DbType> = "*" | readonly (ColumnsSelection<TDbType, any, any> | IComparable<TDbType, any, any, any, any, any, any>)[]
+type SelectSpecsType<TDbType extends DbType> = "*" | readonly (ColumnsSelection<TDbType, any, any> | IQueryExpression<TDbType, any, any, any, any, any, any>)[]
 
 type FromItemType<TDbType extends DbType> = QueryTable<TDbType, any, any, any, any, any> | SubQueryObject<TDbType, any, any, string> | CTEObject<TDbType, any, any, any, any, any>;
 type FromType<TDbType extends DbType> = readonly FromItemType<TDbType>[];
@@ -107,7 +107,7 @@ const orderTypes = {
     desc: 'DESC'
 } as const;
 type OrderType = typeof orderTypes[keyof typeof orderTypes];
-type OrderBySpecsType<TDbType extends DbType> = readonly (IComparable<TDbType, any, any, any, any, any, any> | [IComparable<TDbType, any, any, any, any, any, any>, OrderType])[];
+type OrderBySpecsType<TDbType extends DbType> = readonly (IQueryExpression<TDbType, any, any, any, any, any, any> | [IQueryExpression<TDbType, any, any, any, any, any, any>, OrderType])[];
 
 const joinTypes = {
     inner: 'INNER',
@@ -120,7 +120,7 @@ type JoinSpecsTableType<TDbType extends DbType> = FromItemType<TDbType>;
 type JoinSpecsItemType<TDbType extends DbType> = { joinType: JoinType, table: JoinSpecsTableType<TDbType>, comparison: ComparisonType<TDbType> }
 type JoinSpecsType<TDbType extends DbType> = readonly JoinSpecsItemType<TDbType>[]
 
-type GroupBySpecs<TDbType extends DbType> = readonly (ColumnsSelection<TDbType, any, any> | IComparable<TDbType, any, any, any, any, any, any>)[];
+type GroupBySpecs<TDbType extends DbType> = readonly (ColumnsSelection<TDbType, any, any> | IQueryExpression<TDbType, any, any, any, any, any, any>)[];
 
 type ColumnsSelectionListType<TDbType extends DbType> = { [key: string]: ColumnsSelection<TDbType, any, any> }
 type ComparisonType<TDbType extends DbType> = BaseColumnComparisonOperation<TDbType, any, any, any, any, any, any> | ColumnLogicalOperation<TDbType, any, any, any, any>;
@@ -148,7 +148,7 @@ type GetFirstTypeFromResult<TDbType extends DbType, TResult extends ResultShape<
     TResult extends undefined ? never :
     TResult extends ResultShape<TDbType> ?
     TResult[0] extends never ? never :
-    TResult[0] extends IComparable<TDbType, any, infer TValueType, any, any, any, any> ? TValueType :
+    TResult[0] extends IQueryExpression<TDbType, any, infer TValueType, any, any, any, any> ? TValueType :
     never :
     never;
 
@@ -156,7 +156,7 @@ type GetFirstFinalTypeFromResult<TDbType extends DbType, TResult extends ResultS
     TResult extends undefined ? never :
     TResult extends ResultShape<TDbType> ?
     TResult[0] extends never ? never :
-    TResult[0] extends IComparable<TDbType, any, any, infer TFinalValueType, any, any, any> ? TFinalValueType :
+    TResult[0] extends IQueryExpression<TDbType, any, any, infer TFinalValueType, any, any, any> ? TFinalValueType :
     never :
     never;
 
@@ -164,7 +164,7 @@ type GetFirstDefaultKeyFromResult<TDbType extends DbType, TResult extends Result
     TResult extends undefined ? never :
     TResult extends ResultShape<TDbType> ?
     TResult[0] extends never ? never :
-    TResult[0] extends IComparable<TDbType, any, any, any, any, infer TFieldKey, any> ? TFieldKey :
+    TResult[0] extends IQueryExpression<TDbType, any, any, any, any, infer TFieldKey, any> ? TFieldKey :
     never :
     never;
 
@@ -483,7 +483,7 @@ class QueryBuilder<
         TCastType
     >
     select<
-        const TCbResult extends readonly (ColumnsSelection<TDbType, any, any> | IComparable<TDbType, any, any, any, string, any, any> | IComparable<TDbType, any, any, any, any, string, any>)[],
+        const TCbResult extends readonly (ColumnsSelection<TDbType, any, any> | IQueryExpression<TDbType, any, any, any, string, any, any> | IQueryExpression<TDbType, any, any, any, any, string, any>)[],
         TFinalResult extends ResultShape<TDbType> = SelectToResultMapRecursively<TDbType, TCbResult>
     >(
         cb: (
@@ -501,7 +501,7 @@ class QueryBuilder<
         TCastType
     >
     select<
-        const TCbResult extends readonly (ColumnsSelection<TDbType, any, any> | IComparable<TDbType, any, any, any, string, any, any> | IComparable<TDbType, any, any, any, any, string, any>)[],
+        const TCbResult extends readonly (ColumnsSelection<TDbType, any, any> | IQueryExpression<TDbType, any, any, any, string, any, any> | IQueryExpression<TDbType, any, any, any, any, string, any>)[],
         TFinalResult extends ResultShape<TDbType> = SelectToResultMapRecursively<TDbType, TCbResult>
     >(
         cb?: (
@@ -519,7 +519,7 @@ class QueryBuilder<
         TCastType
     > {
 
-        let selectRes: readonly (ColumnsSelection<TDbType, any, any> | IComparable<TDbType, any, any, any, any, any, any>)[] = [];
+        let selectRes: readonly (ColumnsSelection<TDbType, any, any> | IQueryExpression<TDbType, any, any, any, any, any, any>)[] = [];
         if (!isNullOrUndefined(cb)) {
             const columnsSelection = this.#getColumnsSelection() as TableToColumnsMap<TDbType, TablesToObject<TDbType, TFrom, TJoinSpecs>>;
             const functions = getDbFunctions(this.dbType);
@@ -609,8 +609,8 @@ class QueryBuilder<
             for (const it of selectRes) {
                 if (ColumnsSelectionQueryObjectSymbol in it) {
                     for (const k in it) {
-                        let comparable = it[k] as IComparable<TDbType, any, any, any, any, any, any>;
-                        finalSelectRes.push(comparable);
+                        let expression = it[k] as IQueryExpression<TDbType, any, any, any, any, any, any>;
+                        finalSelectRes.push(expression);
                     }
                 } else {
                     finalSelectRes.push(it);
@@ -990,11 +990,11 @@ class QueryBuilder<
         let params: readonly QueryParam<TDbType, any, any, any, any>[] | undefined = this.params;
         let orderByParams: readonly QueryParam<TDbType, any, any, any, any>[] = res.reduce((acc, it) => {
             if (Array.isArray(it)) {
-                let comparable = it[0];
-                if (comparable.params) {
-                    return [...acc, ...comparable.params];
-                } else if (comparable instanceof QueryParam) {
-                    return [...acc, comparable];
+                let expression = it[0];
+                if (expression.params) {
+                    return [...acc, ...expression.params];
+                } else if (expression instanceof QueryParam) {
+                    return [...acc, expression];
                 } else {
                     return acc;
                 }

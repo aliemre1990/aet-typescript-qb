@@ -37,10 +37,10 @@ function queryBuilderContextFactory(): QueryBuilderContext {
     return { params: [], isTopLevel: true }
 }
 
-const IComparableValueDummySymbol = Symbol();
-const IComparableFinalValueDummySymbol = Symbol();
+const IQueryExpressionValueDummySymbol = Symbol();
+const IQueryExpressionFinalValueDummySymbol = Symbol();
 
-interface IComparable<
+interface IQueryExpression<
     TDbType extends DbType,
     TParams extends readonly QueryParam<TDbType, string, any, any, any>[] | undefined,
     TValueType extends DbValueTypes | null,
@@ -51,8 +51,8 @@ interface IComparable<
 > extends IDbType<TDbType> {
     dbType: TDbType;
 
-    [IComparableValueDummySymbol]: TValueType;
-    [IComparableFinalValueDummySymbol]: TFinalValueType;
+    [IQueryExpressionValueDummySymbol]: TValueType;
+    [IQueryExpressionFinalValueDummySymbol]: TFinalValueType;
 
     params?: TParams;
     fieldName: TFieldName;
@@ -73,8 +73,8 @@ interface IComparable<
     like: typeof like;
     notLike: typeof notLike;
 
-    as<TAs extends string>(asName: TAs): IComparable<TDbType, TParams, TValueType, TFinalValueType, TFieldName, TAs, TCastType>
-    cast<TCastType extends PgColumnType>(type: TCastType): IComparable<TDbType, TParams, any, any, TFieldName, TAs, TCastType>
+    as<TAs extends string>(asName: TAs): IQueryExpression<TDbType, TParams, TValueType, TFinalValueType, TFieldName, TAs, TCastType>
+    cast<TCastType extends PgColumnType>(type: TCastType): IQueryExpression<TDbType, TParams, any, any, TFieldName, TAs, TCastType>
 
     buildSQL(context?: QueryBuilderContext): { query: string, params: string[] };
 }
@@ -82,12 +82,12 @@ interface IComparable<
 export type {
     DetermineValueType,
     DetermineFinalValueType,
-    IComparable,
+    IQueryExpression,
     QueryBuilderContext
 }
 
 export {
-    IComparableValueDummySymbol,
-    IComparableFinalValueDummySymbol,
+    IQueryExpressionValueDummySymbol,
+    IQueryExpressionFinalValueDummySymbol,
     queryBuilderContextFactory
 }

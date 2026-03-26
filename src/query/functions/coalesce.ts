@@ -1,7 +1,7 @@
 import type { DbType } from "../../db.js";
 import type { DbValueTypes } from "../../table/column.js";
 import type { IsAny } from "../../utility/common.js";
-import type { IComparable } from "../_interfaces/IComparable.js";
+import type { IQueryExpression } from "../_interfaces/IQueryExpression.js";
 import QueryParam from "../param.js";
 import ColumnSQLFunction, { sqlFunctions } from "./_functions.js";
 import type { InferFirstTypeFromArgs, IsContainsNonNull } from "../_types/args.js";
@@ -18,7 +18,7 @@ type ConvertMediansInArray<T extends any[], TDbType extends DbType, TValueType e
 type CoalesceArg<TDbType extends DbType, TValueType extends DbValueTypes> =
     | TValueType | null
     | QueryParam<TDbType, string, TValueType | null, any, any>
-    | IComparable<TDbType, any, TValueType, any, any, any, any>;
+    | IQueryExpression<TDbType, any, TValueType, any, any, any, any>;
 
 type DetermineReturnType<TDbType extends DbType, TArgs extends any[], TReturnType extends DbValueTypes | null> =
     IsContainsNonNull<TDbType, TArgs> extends true ? NonNullable<TReturnType> : TReturnType | null

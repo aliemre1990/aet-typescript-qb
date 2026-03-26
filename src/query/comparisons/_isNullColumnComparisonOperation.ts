@@ -2,7 +2,7 @@ import type { DbType } from "../../db.js";
 import type { PgColumnType } from "../../table/columnTypes.js";
 import type { UndefinedIfLengthZero } from "../../utility/common.js";
 import BaseColumnComparisonOperation, { type InferComparisonParams, type IsNullComparisonOperationType } from "../_baseClasses/BaseColumnComparisonOperation.js";
-import { IComparableFinalValueDummySymbol, IComparableValueDummySymbol, queryBuilderContextFactory, type DetermineValueType, type IComparable, type QueryBuilderContext } from "../_interfaces/IComparable.js";
+import { IQueryExpressionFinalValueDummySymbol, IQueryExpressionValueDummySymbol, queryBuilderContextFactory, type DetermineValueType, type IQueryExpression, type QueryBuilderContext } from "../_interfaces/IQueryExpression.js";
 import type QueryParam from "../param.js";
 import QueryBuilder from "../queryBuilder.js";
 import { extractParams } from "../utility.js";
@@ -10,7 +10,7 @@ import { extractParams } from "../utility.js";
 class IsNullColumnComparisonOperation<
     TDbType extends DbType,
     TOperation extends IsNullComparisonOperationType,
-    TComparing extends IComparable<TDbType, any, any, any, any, any, any>,
+    TComparing extends IQueryExpression<TDbType, any, any, any, any, any, any>,
     TParams extends readonly QueryParam<TDbType, string, any, any, any>[] | undefined = UndefinedIfLengthZero<InferComparisonParams<TComparing, []>>,
     TAs extends string | undefined = undefined,
     TCastType extends PgColumnType | undefined = undefined,

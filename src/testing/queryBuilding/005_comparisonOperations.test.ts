@@ -4,7 +4,7 @@ import test from "node:test";
 import assert from "node:assert";
 
 import { customersTable, ordersTable } from "../_tables.js";
-import type { IComparable } from "../../query/_interfaces/IComparable.js";
+import type { IQueryExpression } from "../../query/_interfaces/IQueryExpression.js";
 import { customerIdQC, customerNameQC } from "../_columns.js";
 
 test.suite("COMPARISON OPERATIONS TESTS", () => {

@@ -1,6 +1,6 @@
 import type { DbType } from "../../db.js";
 import type { UndefinedIfLengthZero } from "../../utility/common.js";
-import type { IComparable } from "../_interfaces/IComparable.js";
+import type { IQueryExpression } from "../_interfaces/IQueryExpression.js";
 import type { ExtractParams } from "../param.js";
 import type QueryParam from "../param.js";
 import type { OrderBySpecsType, OrderType } from "../queryBuilder.js";
@@ -17,11 +17,11 @@ type AccumulateOrderByParams<
 
 type InferParamsFromOrderByParams<TDbType extends DbType, TOrderByParams extends OrderBySpecsType<TDbType>> =
     TOrderByParams extends readonly [infer First, ...infer Rest] ?
-    First extends IComparable<TDbType, any, any, any, any, any, any> ?
+    First extends IQueryExpression<TDbType, any, any, any, any, any, any> ?
     Rest extends OrderBySpecsType<TDbType> ?
     [...(ExtractParams<First>), InferParamsFromOrderByParams<TDbType, Rest>] :
     [...(ExtractParams<First>)] :
-    First extends [infer TComp extends IComparable<TDbType, any, any, any, any, any, any>, OrderType] ? Rest extends OrderBySpecsType<TDbType> ?
+    First extends [infer TComp extends IQueryExpression<TDbType, any, any, any, any, any, any>, OrderType] ? Rest extends OrderBySpecsType<TDbType> ?
     [...(ExtractParams<TComp>), InferParamsFromOrderByParams<TDbType, Rest>] :
     [...(ExtractParams<TComp>)] :
     [] :

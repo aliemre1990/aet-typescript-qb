@@ -1,16 +1,16 @@
 import type { DbType } from "../../db.js";
-import type { IComparable } from "../_interfaces/IComparable.js";
+import type { IQueryExpression } from "../_interfaces/IQueryExpression.js";
 import type { LiteralToBase } from "../../utility/common.js";
 import QueryParam from "../param.js";
 import BasicColumnComparisonOperation from "./_basicColumnComparisonOperation.js";
-import { basicComparisonOperations, ConvertComparisonParamToTyped, InferValueTypeFromComparable } from "../_baseClasses/BaseColumnComparisonOperation.js";
+import { basicComparisonOperations, ConvertComparisonParamToTyped, InferValueTypeFromExpression } from "../_baseClasses/BaseColumnComparisonOperation.js";
 
 function gt<
-    TComparing extends IComparable<TDbType, any, any, any, any, any, any>,
-    TValueType extends InferValueTypeFromComparable<TDbType, TComparing>,
+    TComparing extends IQueryExpression<TDbType, any, any, any, any, any, any>,
+    TValueType extends InferValueTypeFromExpression<TDbType, TComparing>,
     TParamMedian extends QueryParam<TDbType, string, any, any, any>,
     TParamValue extends TParamMedian extends QueryParam<any, any, infer TVal, any, any> ? TVal : never,
-    TDbType extends DbType = TComparing extends IComparable<infer DbType, any, any, any, any, any, any> ? DbType : never,
+    TDbType extends DbType = TComparing extends IQueryExpression<infer DbType, any, any, any, any, any, any> ? DbType : never,
 >(this: TComparing, value: TParamValue extends (LiteralToBase<TValueType> | null) ? TParamMedian : never):
     BasicColumnComparisonOperation<
         TDbType,
@@ -20,10 +20,10 @@ function gt<
 
     >
 function gt<
-    TComparing extends IComparable<TDbType, any, any, any, any, any, any>,
-    TValueType extends InferValueTypeFromComparable<TDbType, TComparing>,
-    TApplied extends IComparable<TDbType, any, LiteralToBase<TValueType>, any, any, any, any>,
-    TDbType extends DbType = TComparing extends IComparable<infer DbType, any, any, any, any, any, any> ? DbType : never,
+    TComparing extends IQueryExpression<TDbType, any, any, any, any, any, any>,
+    TValueType extends InferValueTypeFromExpression<TDbType, TComparing>,
+    TApplied extends IQueryExpression<TDbType, any, LiteralToBase<TValueType>, any, any, any, any>,
+    TDbType extends DbType = TComparing extends IQueryExpression<infer DbType, any, any, any, any, any, any> ? DbType : never,
 >(this: TComparing, value: TApplied):
     BasicColumnComparisonOperation<
         TDbType,
@@ -32,9 +32,9 @@ function gt<
         TApplied
     >
 function gt<
-    TComparing extends IComparable<TDbType, any, any, any, any, any, any>,
-    TValueType extends InferValueTypeFromComparable<TDbType, TComparing>,
-    TDbType extends DbType = TComparing extends IComparable<infer DbType, any, any, any, any, any, any> ? DbType : never,
+    TComparing extends IQueryExpression<TDbType, any, any, any, any, any, any>,
+    TValueType extends InferValueTypeFromExpression<TDbType, TComparing>,
+    TDbType extends DbType = TComparing extends IQueryExpression<infer DbType, any, any, any, any, any, any> ? DbType : never,
 >(this: TComparing, value: LiteralToBase<TValueType> | null):
     BasicColumnComparisonOperation<
         TDbType,
@@ -42,7 +42,7 @@ function gt<
         TComparing,
         TValueType | null
     >
-function gt<TComparing extends IComparable<any, any, any, any, any, any, any>,>(
+function gt<TComparing extends IQueryExpression<any, any, any, any, any, any, any>,>(
     this: TComparing,
     value: any
 ) {

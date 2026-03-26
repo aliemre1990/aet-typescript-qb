@@ -3,13 +3,13 @@ import type { DbValueTypes } from "../table/column.js";
 import type { PgColumnType } from "../table/columnTypes.js";
 import BaseQueryExpression from "./_baseClasses/BaseQueryExpression.js";
 import {
-    IComparableFinalValueDummySymbol,
-    IComparableValueDummySymbol,
+    IQueryExpressionFinalValueDummySymbol,
+    IQueryExpressionValueDummySymbol,
     queryBuilderContextFactory,
     type DetermineFinalValueType,
     type DetermineValueType,
     type QueryBuilderContext
-} from "./_interfaces/IComparable.js";
+} from "./_interfaces/IQueryExpression.js";
 import { convertValueToQueryString } from "./uitlity/common.js";
 
 class LiteralValue<

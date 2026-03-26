@@ -2,7 +2,7 @@ import type { DbType } from "../db.js";
 import type { DbValueTypes } from "../table/column.js";
 import type { PgColumnType } from "../table/columnTypes.js";
 import BaseQueryExpression from "./_baseClasses/BaseQueryExpression.js";
-import { IComparableFinalValueDummySymbol, IComparableValueDummySymbol, queryBuilderContextFactory, type DetermineFinalValueType, type DetermineValueType, type IComparable, type QueryBuilderContext } from "./_interfaces/IComparable.js";
+import { IQueryExpressionFinalValueDummySymbol, IQueryExpressionValueDummySymbol, queryBuilderContextFactory, type DetermineFinalValueType, type DetermineValueType, type IQueryExpression, type QueryBuilderContext } from "./_interfaces/IQueryExpression.js";
 import type { IDbType } from "./_interfaces/IDbType.js";
 import type { IName } from "./_interfaces/IName.js";
 import type { MapToCTEObject, MapToCTEObjectForRecursive } from "./_types/cteUtility.js";
@@ -10,9 +10,9 @@ import type QueryParam from "./param.js";
 import type { CTEType, MapQueryResultForCombine, ResultShape, UNION_TYPE } from "./queryBuilder.js";
 import QueryBuilder, { cteTypes } from "./queryBuilder.js";
 
-type MapResultToCTEObjectEntry<TDbType extends DbType, TComparables extends ResultShape<TDbType>> =
-    TComparables extends readonly [infer First, ...infer Rest] ?
-    First extends IComparable<TDbType, any, any, any, any, any, any> ?
+type MapResultToCTEObjectEntry<TDbType extends DbType, TExpressions extends ResultShape<TDbType>> =
+    TExpressions extends readonly [infer First, ...infer Rest] ?
+    First extends IQueryExpression<TDbType, any, any, any, any, any, any> ?
     Rest extends ResultShape<TDbType> ?
     [CTEObjectEntry<TDbType, First>, ...MapResultToCTEObjectEntry<TDbType, Rest>] :
     [CTEObjectEntry<TDbType, First>] :
@@ -22,10 +22,10 @@ type MapResultToCTEObjectEntry<TDbType extends DbType, TComparables extends Resu
 
 class CTEObjectEntry<
     TDbType extends DbType,
-    TComparable extends IComparable<TDbType, any, any, any, any, any, any>,
-    TValueType extends DbValueTypes = TComparable extends IComparable<TDbType, any, infer TValType, any, any, any, any> ? TValType : never,
-    TFinalValueType extends TValueType | null = TComparable extends IComparable<TDbType, any, any, infer TFinalType, any, any, any> ? TFinalType : never,
-    TFieldName extends string = TComparable extends IComparable<TDbType, any, any, any, infer TName, infer TAs, any> ? TAs extends undefined ? TName : TAs : never,
+    TExpression extends IQueryExpression<TDbType, any, any, any, any, any, any>,
+    TValueType extends DbValueTypes = TExpression extends IQueryExpression<TDbType, any, infer TValType, any, any, any, any> ? TValType : never,
+    TFinalValueType extends TValueType | null = TExpression extends IQueryExpression<TDbType, any, any, infer TFinalType, any, any, any> ? TFinalType : never,
+    TFieldName extends string = TExpression extends IQueryExpression<TDbType, any, any, any, infer TName, infer TAs, any> ? TAs extends undefined ? TName : TAs : never,
     TAsName extends string | undefined = undefined,
     TCastType extends PgColumnType | undefined = undefined
 > extends BaseQueryExpression<
@@ -37,18 +37,18 @@ class CTEObjectEntry<
     TAsName,
     TCastType
 > {
-    comparable: TComparable;
+    expression: TExpression;
 
     as<TAsName extends string>(val: TAsName) {
-        return new CTEObjectEntry<TDbType, TComparable, TValueType, TFinalValueType, TFieldName, TAsName, TCastType>(this.dbType, this.comparable, val, this.castType, this.ownerName, this.fieldName);
+        return new CTEObjectEntry<TDbType, TExpression, TValueType, TFinalValueType, TFieldName, TAsName, TCastType>(this.dbType, this.expression, val, this.castType, this.ownerName, this.fieldName);
     }
     cast<TCastType extends PgColumnType>(type: TCastType) {
-        return new CTEObjectEntry<TDbType, TComparable, TValueType, TFinalValueType, TFieldName, TAsName, TCastType>(this.dbType, this.comparable, this.asName, type, this.ownerName, this.fieldName);
+        return new CTEObjectEntry<TDbType, TExpression, TValueType, TFinalValueType, TFieldName, TAsName, TCastType>(this.dbType, this.expression, this.asName, type, this.ownerName, this.fieldName);
     }
 
     ownerName?: string;
     setOwnerName(val: string) {
-        return new CTEObjectEntry<TDbType, TComparable, TValueType, TFinalValueType, TFieldName, TAsName, TCastType>(this.dbType, this.comparable, this.asName, this.castType, val);
+        return new CTEObjectEntry<TDbType, TExpression, TValueType, TFinalValueType, TFieldName, TAsName, TCastType>(this.dbType, this.expression, this.asName, this.castType, val);
     }
 
     buildSQL(context?: QueryBuilderContext) {
@@ -61,16 +61,16 @@ class CTEObjectEntry<
 
     constructor(
         dbType: TDbType,
-        comparable: TComparable,
+        expression: TExpression,
         asName: TAsName,
         castType: TCastType,
         ownerName?: string,
         fieldName?: TFieldName,
     ) {
-        const fieldNameCalced = fieldName || (comparable.asName === undefined ? comparable.fieldName : comparable.asName);
+        const fieldNameCalced = fieldName || (expression.asName === undefined ? expression.fieldName : expression.asName);
         super(dbType, undefined, fieldNameCalced, asName, castType);
 
-        this.comparable = comparable;
+        this.expression = expression;
         this.ownerName = ownerName;
     }
 }
@@ -137,7 +137,7 @@ class CTEObject<
 
     as<TAs extends string>(val: TAs) {
         const newEntries = this.cteObjectEntries
-            .map(ent => new CTEObjectEntry(ent.dbType, ent.comparable, ent.asName, ent.castType, ent.fieldName, val)) as readonly CTEObjectEntry<TDbType, any, any, any, any, any>[] as TEntries;
+            .map(ent => new CTEObjectEntry(ent.dbType, ent.expression, ent.asName, ent.castType, ent.fieldName, val)) as readonly CTEObjectEntry<TDbType, any, any, any, any, any>[] as TEntries;
 
         return new CTEObject<TDbType, TCTEName, TCTEType, TQb, TEntries, TAs>(this.dbType, this.qb, this.cteName, this.cteType, newEntries, val);
     }

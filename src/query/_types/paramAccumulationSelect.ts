@@ -1,5 +1,5 @@
 import type { UndefinedIfLengthZero } from "../../utility/common.js";
-import type { IComparable } from "../_interfaces/IComparable.js";
+import type { IQueryExpression } from "../_interfaces/IQueryExpression.js";
 import type { ExtractParams } from "../param.js";
 import type QueryParam from "../param.js";
 

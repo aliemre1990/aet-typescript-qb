@@ -8,9 +8,9 @@ import {
     queryBuilderContextFactory,
     type DetermineFinalValueType,
     type DetermineValueType,
-    type IComparable,
+    type IQueryExpression,
     type QueryBuilderContext
-} from "./_interfaces/IComparable.js";
+} from "./_interfaces/IQueryExpression.js";
 import type ColumnLogicalOperation from "./logicalOperations.js";
 import type { ExtractParams } from "./param.js";
 import QueryParam from "./param.js";
@@ -18,7 +18,7 @@ import { convertValueToQueryString } from "./uitlity/common.js";
 import { extractParams } from "./utility.js";
 
 type CalculateSQLParams<
-    TValues extends readonly (IComparable<any, any, any, any, any, any, any> | BaseColumnComparisonOperation<any, any, any, any, any, any, any> | ColumnLogicalOperation<any, any, any, any, any> | DbValueTypes | null)[],
+    TValues extends readonly (IQueryExpression<any, any, any, any, any, any, any> | BaseColumnComparisonOperation<any, any, any, any, any, any, any> | ColumnLogicalOperation<any, any, any, any, any> | DbValueTypes | null)[],
 > = TValues extends readonly [infer First, ...infer Rest] ?
     Rest extends readonly [any, ...any[]] ?
     [...ExtractParams<First>, ...CalculateSQLParams<Rest>] :
@@ -28,7 +28,7 @@ type CalculateSQLParams<
 
 class SQLOperator<
     TDbType extends DbType,
-    TValues extends readonly (IComparable<TDbType, any, any, any, any, any, any> | BaseColumnComparisonOperation<TDbType, any, any, any, any, any, any> | ColumnLogicalOperation<TDbType, any, any, any, any> | DbValueTypes | null)[],
+    TValues extends readonly (IQueryExpression<TDbType, any, any, any, any, any, any> | BaseColumnComparisonOperation<TDbType, any, any, any, any, any, any> | ColumnLogicalOperation<TDbType, any, any, any, any> | DbValueTypes | null)[],
     TValueType extends DbValueTypes | null = any,
     TFieldName extends string | undefined = undefined,
     TAs extends string | undefined = undefined,
@@ -102,7 +102,7 @@ function generateSqlOperatorFn<
     TDbType extends DbType
 >(dbType: TDbType) {
     return function <
-        TValues extends readonly (IComparable<TDbType, any, any, any, any, any, any> | BaseColumnComparisonOperation<TDbType, any, any, any, any, any, any> | ColumnLogicalOperation<TDbType, any, any, any, any> | DbValueTypes | null)[]
+        TValues extends readonly (IQueryExpression<TDbType, any, any, any, any, any, any> | BaseColumnComparisonOperation<TDbType, any, any, any, any, any, any> | ColumnLogicalOperation<TDbType, any, any, any, any> | DbValueTypes | null)[]
     >(strs: TemplateStringsArray, ...values: TValues): SQLOperator<TDbType, TValues> {
         return new SQLOperator(dbType, strs, values, undefined, undefined);
     }

@@ -1,13 +1,13 @@
 import type { DbType } from "../../db.js";
 import type { IsAny } from "../../utility/common.js";
-import type { IComparable } from "../_interfaces/IComparable.js";
+import type { IQueryExpression } from "../_interfaces/IQueryExpression.js";
 import type QueryParam from "../param.js";
 import ColumnSQLFunction, { sqlFunctions } from "./_functions.js";
 
 /**
  * Used to drop argument to never if non number type of argument is provided.
  */
-type IsArgAnyOrNumber<TDbType extends DbType, TFirstArg extends QueryParam<TDbType, string, any, any, any> | IComparable<TDbType, any, number, any, any, any, any> | number | null> =
+type IsArgAnyOrNumber<TDbType extends DbType, TFirstArg extends QueryParam<TDbType, string, any, any, any> | IQueryExpression<TDbType, any, number, any, any, any, any> | number | null> =
     TFirstArg extends QueryParam<TDbType, string, infer TValueType, any, any> ? IsAny<TValueType> extends true ? {} :
     number extends TValueType ? {} : never :
     {}
@@ -15,8 +15,8 @@ type IsArgAnyOrNumber<TDbType extends DbType, TFirstArg extends QueryParam<TDbTy
 
 type DetermineReturnType<TFirstArg, TSecondArg> =
     [TFirstArg, TSecondArg] extends [null, any] | [any, null] | [null, null] ? number | null :
-    TFirstArg extends IComparable<any, any, any, infer TFinalType, any, any, any> ? number | null extends TFinalType ? number | null :
-    TSecondArg extends IComparable<any, any, any, infer TFinalType, any, any, any> ? number | null extends TFinalType ? number | null :
+    TFirstArg extends IQueryExpression<any, any, any, infer TFinalType, any, any, any> ? number | null extends TFinalType ? number | null :
+    TSecondArg extends IQueryExpression<any, any, any, infer TFinalType, any, any, any> ? number | null extends TFinalType ? number | null :
     number :
     number :
     number
@@ -24,8 +24,8 @@ type DetermineReturnType<TFirstArg, TSecondArg> =
 
 function generateRoundFn<TDbType extends DbType>(dbType: TDbType) {
     return <
-        TFirstArg extends QueryParam<TDbType, string, any, any, any> | IComparable<TDbType, any, number, any, any, any, any> | number | null,
-        TSecondArg extends QueryParam<TDbType, string, any, any, any> | IComparable<TDbType, any, number, any, any, any, any> | number | null,
+        TFirstArg extends QueryParam<TDbType, string, any, any, any> | IQueryExpression<TDbType, any, number, any, any, any, any> | number | null,
+        TSecondArg extends QueryParam<TDbType, string, any, any, any> | IQueryExpression<TDbType, any, number, any, any, any, any> | number | null,
 
     >(firstArg: TFirstArg & (IsArgAnyOrNumber<TDbType, TFirstArg>), secondArg: TSecondArg & (IsArgAnyOrNumber<TDbType, TSecondArg>)) => {
 

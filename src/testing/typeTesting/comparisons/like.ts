@@ -12,11 +12,11 @@ const likeValue = customerNameQC.like("A%");
 const likeInvalidValue = customerNameQC.like(1);
 
 // @ts-expect-error
-const likeInvalidComparable = empSalaryQC.like("A%");
+const likeInvalid_InvalidExpressionType = empSalaryQC.like("A%");
 
 const likeLiteral = customerNameQC.like(literalTester("A%"));
 
-const likeComparable = customerNameQC.like(customerNameQC);
+const likeColumn = customerNameQC.like(customerNameQC);
 
 // @ts-expect-error
 const likeFunction = customerNameQC.like(roundTester(1, 2));

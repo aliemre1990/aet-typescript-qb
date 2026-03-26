@@ -26,7 +26,7 @@ import type QueryParam from "../query/param.js";
 import type { AccumulateComparisonParams } from "../query/_types/paramAccumulationComparison.js";
 import type { IName } from "../query/_interfaces/IName.js";
 import type ColumnsSelection from "../query/ColumnsSelection.js";
-import type { IComparable } from "../query/_interfaces/IComparable.js";
+import type { IQueryExpression } from "../query/_interfaces/IQueryExpression.js";
 import type { UndefinedIfLengthZero } from "../utility/common.js";
 
 type TableSpecsType<TTableName extends string = string> = { tableName: TTableName }
@@ -97,7 +97,7 @@ class Table<
         undefined
     >
     select<
-        const TCbResult extends readonly (ColumnsSelection<TDbType, any, any> | IComparable<TDbType, any, any, any, string, any, any> | IComparable<TDbType, any, any, any, any, string, any>)[],
+        const TCbResult extends readonly (ColumnsSelection<TDbType, any, any> | IQueryExpression<TDbType, any, any, any, string, any, any> | IQueryExpression<TDbType, any, any, any, any, string, any>)[],
         TFinalResult extends ResultShape<TDbType> = SelectToResultMapRecursively<TDbType, TCbResult>
     >(
         cb: (
@@ -113,7 +113,7 @@ class Table<
         TCbResult["length"] extends 0 ? undefined : UndefinedIfLengthZero<AccumulateColumnParams<undefined, TFinalResult>>
     >
     select<
-        const TCbResult extends readonly (ColumnsSelection<TDbType, any, any> | IComparable<TDbType, any, any, any, string, any, any> | IComparable<TDbType, any, any, any, any, string, any>)[],
+        const TCbResult extends readonly (ColumnsSelection<TDbType, any, any> | IQueryExpression<TDbType, any, any, any, string, any, any> | IQueryExpression<TDbType, any, any, any, any, string, any>)[],
         TFinalResult extends ResultShape<TDbType> = SelectToResultMapRecursively<TDbType, TCbResult>
     >(
         cb?: (

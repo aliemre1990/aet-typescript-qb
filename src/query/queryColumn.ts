@@ -1,5 +1,5 @@
 import type { DbType } from "../db.js";
-import { IComparableFinalValueDummySymbol, IComparableValueDummySymbol, queryBuilderContextFactory, type DetermineFinalValueType, type DetermineValueType, type IComparable, type QueryBuilderContext } from "./_interfaces/IComparable.js";
+import { IQueryExpressionFinalValueDummySymbol, IQueryExpressionValueDummySymbol, queryBuilderContextFactory, type DetermineFinalValueType, type DetermineValueType, type IQueryExpression, type QueryBuilderContext } from "./_interfaces/IQueryExpression.js";
 import type Column from "../table/column.js";
 import type { ColumnType, DbValueTypes } from "../table/column.js";
 import type { PgColumnType } from "../table/columnTypes.js";

@@ -1,4 +1,4 @@
-import type { IComparable } from "../../../query/_interfaces/IComparable.js";
+import type { IQueryExpression } from "../../../query/_interfaces/IQueryExpression.js";
 import type ColumnSQLFunction from "../../../query/functions/_functions.js";
 import QueryParam from "../../../query/param.js";
 import { customerCreatedByQC, customerIdQC, customerNameQC, empSalaryQC } from "../../_columns.js";
@@ -7,13 +7,13 @@ import type { AssertEqual, AssertTrue } from "../../_typeTestingUtilities.js";
 
 const coalesce_NonNull = coalesceTester(empSalaryQC, 2000);
 type typeof_Coalesce_NonNull = typeof coalesce_NonNull;
-type typeof_Coalesce_NonNull_FinalValueType = typeof_Coalesce_NonNull extends IComparable<any, any, any, infer TFinalValueType, any, any, any> ? TFinalValueType : never;
+type typeof_Coalesce_NonNull_FinalValueType = typeof_Coalesce_NonNull extends IQueryExpression<any, any, any, infer TFinalValueType, any, any, any> ? TFinalValueType : never;
 type coalesce_NonNull_FinalValueType_Test = AssertTrue<AssertEqual<typeof_Coalesce_NonNull_FinalValueType, number>>;
 
 const coalesce_Null = coalesceTester(empSalaryQC, null);
 type typeof_Coalesce_Null = typeof coalesce_Null;
-type typeof_Coalesce_Null_ValueType = typeof_Coalesce_Null extends IComparable<any, any, infer TValueType, any, any, any, any> ? TValueType : never;
-type typeof_Coalesce_Null_FinalValueType = typeof_Coalesce_Null extends IComparable<any, any, any, infer TFinalValueType, any, any, any> ? TFinalValueType : never;
+type typeof_Coalesce_Null_ValueType = typeof_Coalesce_Null extends IQueryExpression<any, any, infer TValueType, any, any, any, any> ? TValueType : never;
+type typeof_Coalesce_Null_FinalValueType = typeof_Coalesce_Null extends IQueryExpression<any, any, any, infer TFinalValueType, any, any, any> ? TFinalValueType : never;
 type coalesce_Null_ValueType_Test = AssertTrue<AssertEqual<typeof_Coalesce_Null_ValueType, number>>;
 type coalesce_Null_FinalValueType_Test = AssertTrue<AssertEqual<typeof_Coalesce_Null_FinalValueType, number | null>>;
 

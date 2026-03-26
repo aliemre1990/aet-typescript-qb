@@ -2,7 +2,7 @@ import type { DbType } from "../../db.js";
 import type { DbValueTypes } from "../../table/column.js";
 import type { PgColumnType, PgTypeToJsType } from "../../table/columnTypes.js";
 import type { IsAny } from "../../utility/common.js";
-import { IComparableFinalValueDummySymbol, IComparableValueDummySymbol, type IComparable, type QueryBuilderContext } from "../_interfaces/IComparable.js";
+import { IQueryExpressionFinalValueDummySymbol, IQueryExpressionValueDummySymbol, type IQueryExpression, type QueryBuilderContext } from "../_interfaces/IQueryExpression.js";
 import type { IDbType } from "../_interfaces/IDbType.js";
 import type between from "../comparisons/between.js";
 import type eq from "../comparisons/eq.js";
@@ -28,11 +28,11 @@ class BaseQueryExpression<
     TFieldName extends string | undefined,
     TAs extends string | undefined,
     TCastType extends PgColumnType | undefined
-> implements IComparable<TDbType, TParams, TValueType, TFinalValueType, TFieldName, TAs, TCastType> {
+> implements IQueryExpression<TDbType, TParams, TValueType, TFinalValueType, TFieldName, TAs, TCastType> {
     dbType: TDbType;
 
-    [IComparableValueDummySymbol]: TValueType;
-    [IComparableFinalValueDummySymbol]: TFinalValueType;
+    [IQueryExpressionValueDummySymbol]: TValueType;
+    [IQueryExpressionFinalValueDummySymbol]: TFinalValueType;
 
     params?: TParams;
     fieldName: TFieldName;
@@ -57,8 +57,8 @@ class BaseQueryExpression<
         this.asName = asName;
         this.castType = castType;
 
-        this[IComparableValueDummySymbol] = null as any;
-        this[IComparableFinalValueDummySymbol] = null as any;
+        this[IQueryExpressionValueDummySymbol] = null as any;
+        this[IQueryExpressionFinalValueDummySymbol] = null as any;
     }
 }
 
