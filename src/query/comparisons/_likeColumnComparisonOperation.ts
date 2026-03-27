@@ -1,4 +1,4 @@
-import type { DbType } from "../../db.js";
+import { dbTypes, type DbType } from "../../db.js";
 import type { PgColumnType } from "../../table/columnTypes.js";
 import type { UndefinedIfLengthZero } from "../../utility/common.js";
 import type { ConvertComparisonParamToNonNullTyped, InferComparisonParams, InferFinalValueTypeFromApplied, InferFinalValueTypeFromExpression, InferValueTypeFromExpression, LikeComparisonOperationType } from "../_baseClasses/BaseColumnComparisonOperation.js";
@@ -77,13 +77,16 @@ class LikeColumnComparisonOperation<
     }
 }
 
-function generateLikeComparison<TComparisonType extends LikeComparisonOperationType>(operation: TComparisonType) {
+function generateLikeComparison<
+    TComparisonType extends LikeComparisonOperationType,
+    TDbTypeGenerator extends DbType | undefined = undefined
+>(operation: TComparisonType) {
 
     function likeComparison<
         TComparing extends IQueryExpression<TDbType, any, string, any, any, any, any>,
         TParamMedian extends QueryParam<TDbType, string, any, any, any>,
         TParamValue extends TParamMedian extends QueryParam<any, any, infer TVal, any, any> ? TVal : never,
-        TDbType extends DbType = TComparing extends IQueryExpression<infer DbType, any, any, any, any, any, any> ? DbType : never,
+        TDbType extends DbType = TDbTypeGenerator extends undefined ? TComparing extends IQueryExpression<infer DbType, any, any, any, any, any, any> ? DbType : never : TDbTypeGenerator,
     >(this: TComparing, value: TParamValue extends string ? TParamMedian : never
     ): LikeColumnComparisonOperation<
         TDbType,
@@ -94,7 +97,7 @@ function generateLikeComparison<TComparisonType extends LikeComparisonOperationT
     function likeComparison<
         TComparing extends IQueryExpression<TDbType, any, string, any, any, any, any>,
         TApplied extends IQueryExpression<TDbType, any, string, any, any, any, any>,
-        TDbType extends DbType = TComparing extends IQueryExpression<infer DbType, any, any, any, any, any, any> ? DbType : never,
+        TDbType extends DbType = TDbTypeGenerator extends undefined ? TComparing extends IQueryExpression<infer DbType, any, any, any, any, any, any> ? DbType : never : TDbTypeGenerator,
     >(this: TComparing, value: TApplied):
         LikeColumnComparisonOperation<
             TDbType,
@@ -104,7 +107,7 @@ function generateLikeComparison<TComparisonType extends LikeComparisonOperationT
         >
     function likeComparison<
         TComparing extends IQueryExpression<TDbType, any, string, any, any, any, any>,
-        TDbType extends DbType = TComparing extends IQueryExpression<infer DbType, any, any, any, any, any, any> ? DbType : never,
+        TDbType extends DbType = TDbTypeGenerator extends undefined ? TComparing extends IQueryExpression<infer DbType, any, any, any, any, any, any> ? DbType : never : TDbTypeGenerator,
     >(this: TComparing, value: string):
         LikeColumnComparisonOperation<
             TDbType,
@@ -116,10 +119,8 @@ function generateLikeComparison<TComparisonType extends LikeComparisonOperationT
         this: TComparing,
         value: any
     ) {
-        const dbType = this.dbType;
-
         return new LikeColumnComparisonOperation(
-            dbType,
+            this.dbType,
             operation,
             this,
             value,
@@ -131,12 +132,16 @@ function generateLikeComparison<TComparisonType extends LikeComparisonOperationT
     return likeComparison;
 }
 
-const like = generateLikeComparison(likeComparisonOperations.like);
-const notLike = generateLikeComparison(likeComparisonOperations.notLike);
+const like = generateLikeComparison<typeof likeComparisonOperations.like>(likeComparisonOperations.like);
+const notLike = generateLikeComparison<typeof likeComparisonOperations.notLike>(likeComparisonOperations.notLike);
+const iLike = generateLikeComparison<typeof likeComparisonOperations.iLike, typeof dbTypes.postgresql>(likeComparisonOperations.iLike);
+const notILike = generateLikeComparison<typeof likeComparisonOperations.notILike, typeof dbTypes.postgresql>(likeComparisonOperations.notILike);
 
 export default LikeColumnComparisonOperation;
 
 export {
     like,
-    notLike
+    notLike,
+    iLike,
+    notILike
 }

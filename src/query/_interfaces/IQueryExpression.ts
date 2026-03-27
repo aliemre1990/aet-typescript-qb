@@ -8,7 +8,7 @@ import type { eq, gt, gte, lt, lte, notEq } from "../comparisons/_basicColumnCom
 import type { between, notBetween } from "../comparisons/_betweenColumnComparisonOperation.js";
 import type { sqlIn, sqlNotIn } from "../comparisons/_inColumnComparisonOperation.js";
 import type { isNotNull, isNull } from "../comparisons/_isNullColumnComparisonOperation.js";
-import type { like, notLike } from "../comparisons/_likeColumnComparisonOperation.js";
+import type { iLike, like, notILike, notLike } from "../comparisons/_likeColumnComparisonOperation.js";
 
 type DetermineValueType<TCastType extends PgColumnType | undefined, TValueType extends DbValueTypes | null> =
     TCastType extends undefined ?
@@ -65,6 +65,8 @@ interface IQueryExpression<
     isNotNull: typeof isNotNull;
     like: typeof like;
     notLike: typeof notLike;
+    iLike: typeof iLike;
+    notILike: typeof notILike;
 
     as<TAs extends string>(asName: TAs): IQueryExpression<TDbType, TParams, TValueType, TFinalValueType, TFieldName, TAs, TCastType>
     cast<TCastType extends PgColumnType>(type: TCastType): IQueryExpression<TDbType, TParams, any, any, TFieldName, TAs, TCastType>

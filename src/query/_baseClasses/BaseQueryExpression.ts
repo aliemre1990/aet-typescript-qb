@@ -7,7 +7,7 @@ import type { eq, gt, gte, lt, lte, notEq } from "../comparisons/_basicColumnCom
 import type { between, notBetween } from "../comparisons/_betweenColumnComparisonOperation.js";
 import type { sqlIn, sqlNotIn } from "../comparisons/_inColumnComparisonOperation.js";
 import type { isNotNull, isNull } from "../comparisons/_isNullColumnComparisonOperation.js";
-import type { like, notLike } from "../comparisons/_likeColumnComparisonOperation.js";
+import type { iLike, like, notILike, notLike } from "../comparisons/_likeColumnComparisonOperation.js";
 
 class BaseQueryExpression<
     TDbType extends DbType,
@@ -74,6 +74,8 @@ interface BaseQueryExpression<
     isNotNull: typeof isNotNull;
     like: typeof like;
     notLike: typeof notLike;
+    iLike: typeof iLike;
+    notILike: typeof notILike;
 }
 
 export default BaseQueryExpression;
