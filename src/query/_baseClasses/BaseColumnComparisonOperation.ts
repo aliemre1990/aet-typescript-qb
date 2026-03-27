@@ -81,18 +81,25 @@ const likeComparisonOperations = {
     notILike: { name: 'NOT_ILIKE', symbol: "NOT ILIKE" }
 } as const;
 
+const existsComparisonOperations = {
+    exists: { name: 'EXISTS', symbol: "EXISTS" },
+    notExists: { name: 'NOT_EXISTS', symbol: "NOT EXISTS" }
+} as const;
+
 type BasicComparisonOperationType = (typeof basicComparisonOperations)[keyof typeof basicComparisonOperations];
 type BetweenComparisonOperationType = (typeof betweenComparisonOperations)[keyof typeof betweenComparisonOperations];
 type InComparisonOperationType = (typeof inComparisonOperations)[keyof typeof inComparisonOperations];
 type IsNullComparisonOperationType = (typeof isNullComparisonOperations)[keyof typeof isNullComparisonOperations];
 type LikeComparisonOperationType = (typeof likeComparisonOperations)[keyof typeof likeComparisonOperations];
+type ExistsComparisonOperationType = (typeof existsComparisonOperations)[keyof typeof existsComparisonOperations];
 
 type ComparisonOperationType =
     BasicComparisonOperationType |
     BetweenComparisonOperationType |
     IsNullComparisonOperationType |
     LikeComparisonOperationType |
-    InComparisonOperationType;
+    InComparisonOperationType |
+    ExistsComparisonOperationType;
 
 
 class BaseColumnComparisonOperation<
@@ -128,6 +135,7 @@ export type {
     InComparisonOperationType,
     IsNullComparisonOperationType,
     LikeComparisonOperationType,
+    ExistsComparisonOperationType,
     ComparisonOperationType,
 
     ConvertComparisonParamToTyped,
@@ -144,6 +152,7 @@ export {
     betweenComparisonOperations,
     inComparisonOperations,
     isNullComparisonOperations,
-    likeComparisonOperations
+    likeComparisonOperations,
+    existsComparisonOperations
 }
 

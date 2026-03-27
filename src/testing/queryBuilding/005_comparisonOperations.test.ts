@@ -55,7 +55,7 @@ test.suite("COMPARISON OPERATIONS TESTS", () => {
 
         assert.equal(`"customers"."name" LIKE 'A%'`, query);
     });
-    
+
     test("Literal at left side of basic eq comparison.", () => {
         const qb = customersTable.select()
             .where((tables, { literal }) => literal(10).eq(tables.customers.id));
@@ -196,5 +196,19 @@ test.suite("COMPARISON OPERATIONS TESTS", () => {
         const query = buildRes.query;
 
         assert.equal(`SELECT * FROM "customers" WHERE 50 BETWEEN "customers"."id" AND 100`, query);
+    });
+
+    test("Basic exists comparison.", () => {
+        const qb = customersTable
+            .select()
+            .where((tables, { exists }) =>
+                exists(ordersTable.select().where((innerTables) => innerTables.orders.customerId.eq(tables.customers.id)))
+            );
+        const buildRes = qb.buildSQL();
+        const query = buildRes.query;
+
+        const expected = `SELECT * FROM "customers" WHERE EXISTS(SELECT * FROM "orders" WHERE "orders"."customerId"="customers"."id")`;
+
+        assert.equal(query, expected);
     });
 });

@@ -7,3 +7,4 @@
 - SubQueryEntry - Represents an entry in a subquery result
 - CTEObjectEntry - Represents an entry in a Common Table Expression (CTE)
 - LiteralValue - Used to represent literal value
+- SQLCaseExpression - Used to represent sql case expression.

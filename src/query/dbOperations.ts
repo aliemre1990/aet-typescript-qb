@@ -1,4 +1,5 @@
 import { dbTypes, type DbType, type MySQLDbType, type PgDbType } from "../db.js"
+import { existsComparisonOperations } from "./_baseClasses/BaseColumnComparisonOperation.js"
 import type { AggregationFunctions, ArithmeticOperations, DbOperations, LogicalOperators } from "./_types/ops.js"
 import generateAvgFn from "./aggregation/avg.js"
 import { jsonAggFn, jsonbAggFn } from "./aggregation/json/jsonAgg.js"
@@ -10,6 +11,7 @@ import { generateArithmeticModulo } from "./arithmetic/modulo.js"
 import { generateArithmeticMultiplication } from "./arithmetic/multiplication.js"
 import { generateArithmeticSubtraction } from "./arithmetic/subtract.js"
 import { generateSQLCaseFn } from "./caseExpression.js"
+import { generateExistsComparison } from "./comparisons/_existsColumnComparisonOperation.js"
 import { generateCoalesceFn } from "./functions/coalesce.js"
 import { jsonbBuildObjectFn, jsonBuildObjectFn } from "./functions/jsonFunctions/jsonBuildObject.js"
 import generateRoundFn from "./functions/round.js"
@@ -71,6 +73,8 @@ function generateCommonFunctions<TDbType extends DbType>(dbType: TDbType) {
         literal: generateLiteralValueFn(dbType),
         sqlCase: generateSQLCaseFn(dbType),
         sql: generateSqlOperatorFn(dbType),
+        exists: generateExistsComparison(dbType, existsComparisonOperations.exists),
+        notExists: generateExistsComparison(dbType, existsComparisonOperations.notExists),
 
         coalesce: generateCoalesceFn(dbType),
         round: generateRoundFn(dbType),

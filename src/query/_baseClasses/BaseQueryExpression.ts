@@ -1,6 +1,6 @@
 import type { DbType } from "../../db.js";
 import type { DbValueTypes } from "../../table/column.js";
-import type { PgColumnType, PgTypeToJsType } from "../../table/columnTypes.js";
+import type { PgColumnType } from "../../table/columnTypes.js";
 import { IQueryExpressionFinalValueDummySymbol, IQueryExpressionValueDummySymbol, type IQueryExpression, type QueryBuilderContext } from "../_interfaces/IQueryExpression.js";
 import type QueryParam from "../param.js";
 import type { eq, gt, gte, lt, lte, notEq } from "../comparisons/_basicColumnComparisonOperation.js";

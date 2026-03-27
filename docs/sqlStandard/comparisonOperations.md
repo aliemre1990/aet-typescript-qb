@@ -36,5 +36,3 @@ Here are the common comparison operations used in SQL:
 8. **Set Operations**
    - `EXISTS` (Checks if subquery returns rows)
    - `NOT EXISTS` (Checks if subquery returns no rows)
-
-Based on your code, I can see you're implementing the `NOT IN` operation in your query builder library. The `comparisonOperations` object in your codebase likely contains references to these operations.

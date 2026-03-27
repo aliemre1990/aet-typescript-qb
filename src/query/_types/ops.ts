@@ -1,4 +1,5 @@
 import type { DbType, MySQLDbType, PgDbType } from "../../db.js"
+import type { existsComparisonOperations } from "../_baseClasses/BaseColumnComparisonOperation.js"
 import type generateAvgFn from "../aggregation/avg.js"
 import type { jsonAggFn, jsonbAggFn } from "../aggregation/json/jsonAgg.js"
 import type generateSumFn from "../aggregation/sum.js"
@@ -9,6 +10,7 @@ import type { generateArithmeticModulo } from "../arithmetic/modulo.js"
 import type { generateArithmeticMultiplication } from "../arithmetic/multiplication.js"
 import type { generateArithmeticSubtraction } from "../arithmetic/subtract.js"
 import type { generateSQLCaseFn } from "../caseExpression.js"
+import type { generateExistsComparison } from "../comparisons/_existsColumnComparisonOperation.js"
 import type { generateCoalesceFn } from "../functions/coalesce.js"
 import type { jsonbBuildObjectFn, jsonBuildObjectFn } from "../functions/jsonFunctions/jsonBuildObject.js"
 import type generateRoundFn from "../functions/round.js"
@@ -57,6 +59,10 @@ type MySQLRoundFn = ReturnType<typeof generateRoundFn<MySQLDbType>>;
 type PgSQLFn = ReturnType<typeof generateSqlOperatorFn<PgDbType>>;
 type MySQLSQLFn = ReturnType<typeof generateSqlOperatorFn<MySQLDbType>>;
 
+type PgExistsFn = ReturnType<typeof generateExistsComparison<PgDbType, typeof existsComparisonOperations.exists>>;
+type MySQLExistsFn = ReturnType<typeof generateExistsComparison<MySQLDbType, typeof existsComparisonOperations.exists>>;
+type PgNotExistsFn = ReturnType<typeof generateExistsComparison<PgDbType, typeof existsComparisonOperations.notExists>>;
+type MySQLNotExistsFn = ReturnType<typeof generateExistsComparison<MySQLDbType, typeof existsComparisonOperations.notExists>>;
 
 
 /**
@@ -105,6 +111,8 @@ type DbOperations<TDbType extends DbType> =
         literal: TDbType extends PgDbType ? PgLiteralFn : TDbType extends MySQLDbType ? MySQLLiteralFn : never;
         sqlCase: TDbType extends PgDbType ? PgCaseFn : TDbType extends MySQLDbType ? MySQLCaseFn : never;
         sql: TDbType extends PgDbType ? PgSQLFn : TDbType extends MySQLDbType ? MySQLSQLFn : never;
+        exists: TDbType extends PgDbType ? PgExistsFn : TDbType extends MySQLDbType ? MySQLExistsFn : never;
+        notExists: TDbType extends PgDbType ? PgNotExistsFn : TDbType extends MySQLDbType ? MySQLNotExistsFn : never;
     } &
     {
         coalesce: TDbType extends PgDbType ? PgCoalesceFn : TDbType extends MySQLDbType ? MySQLCoalesceFn : never,
