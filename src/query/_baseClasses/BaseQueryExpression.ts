@@ -2,15 +2,14 @@ import type { DbType } from "../../db.js";
 import type { DbValueTypes } from "../../table/column.js";
 import type { PgColumnType, PgTypeToJsType } from "../../table/columnTypes.js";
 import { IQueryExpressionFinalValueDummySymbol, IQueryExpressionValueDummySymbol, type IQueryExpression, type QueryBuilderContext } from "../_interfaces/IQueryExpression.js";
-import type sqlIn from "../comparisons/in.js";
 import type isNotNull from "../comparisons/isNotNull.js";
 import type isNull from "../comparisons/isNull.js";
 import type like from "../comparisons/like.js";
-import type sqlNotIn from "../comparisons/notIn.js";
 import type notLike from "../comparisons/notLike.js";
 import type QueryParam from "../param.js";
 import type { eq, gt, gte, lt, lte, notEq } from "../comparisons/_basicColumnComparisonOperation.js";
 import type { between, notBetween } from "../comparisons/_betweenColumnComparisonOperation.js";
+import type { sqlIn, sqlNotIn } from "../comparisons/_inColumnComparisonOperation.js";
 
 class BaseQueryExpression<
     TDbType extends DbType,

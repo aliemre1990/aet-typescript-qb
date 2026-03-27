@@ -1,11 +1,10 @@
 import BaseQueryExpression from "./query/_baseClasses/BaseQueryExpression.js";
 import { eq, gt, gte, lt, lte, notEq } from "./query/comparisons/_basicColumnComparisonOperation.js";
 import { between, notBetween } from "./query/comparisons/_betweenColumnComparisonOperation.js";
-import sqlIn from "./query/comparisons/in.js";
+import { sqlIn, sqlNotIn } from "./query/comparisons/_inColumnComparisonOperation.js";
 import isNotNull from "./query/comparisons/isNotNull.js";
 import isNull from "./query/comparisons/isNull.js";
 import like from "./query/comparisons/like.js";
-import sqlNotIn from "./query/comparisons/notIn.js";
 import notLike from "./query/comparisons/notLike.js";
 
 BaseQueryExpression.prototype.eq = eq;

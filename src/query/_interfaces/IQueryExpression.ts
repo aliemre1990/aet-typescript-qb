@@ -1,7 +1,6 @@
 import type { DbType } from "../../db.js";
 import type { DbValueTypes } from "../../table/column.js";
 import type QueryParam from "../param.js";
-import type sqlIn from "../comparisons/in.js";
 import type { IDbType } from "./IDbType.js";
 import type { PgColumnType, PgTypeToJsType } from "../../table/columnTypes.js";
 import type { IsAny } from "../../utility/common.js";
@@ -11,6 +10,7 @@ import type like from "../comparisons/like.js";
 import type notLike from "../comparisons/notLike.js";
 import type { eq, gt, gte, lt, lte, notEq } from "../comparisons/_basicColumnComparisonOperation.js";
 import type { between, notBetween } from "../comparisons/_betweenColumnComparisonOperation.js";
+import type { sqlIn, sqlNotIn } from "../comparisons/_inColumnComparisonOperation.js";
 
 type DetermineValueType<TCastType extends PgColumnType | undefined, TValueType extends DbValueTypes | null> =
     TCastType extends undefined ?
@@ -60,6 +60,7 @@ interface IQueryExpression<
     lt: typeof lt;
     lte: typeof lte;
     sqlIn: typeof sqlIn;
+    sqlNotIn: typeof sqlNotIn;
     between: typeof between;
     notBetween: typeof notBetween;
     isNull: typeof isNull;
