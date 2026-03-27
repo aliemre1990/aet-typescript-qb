@@ -3,8 +3,7 @@ import { eq, gt, gte, lt, lte, notEq } from "./query/comparisons/_basicColumnCom
 import { between, notBetween } from "./query/comparisons/_betweenColumnComparisonOperation.js";
 import { sqlIn, sqlNotIn } from "./query/comparisons/_inColumnComparisonOperation.js";
 import { isNotNull, isNull } from "./query/comparisons/_isNullColumnComparisonOperation.js";
-import like from "./query/comparisons/like.js";
-import notLike from "./query/comparisons/notLike.js";
+import { like, notLike } from "./query/comparisons/_likeColumnComparisonOperation.js";
 
 BaseQueryExpression.prototype.eq = eq;
 BaseQueryExpression.prototype.notEq = notEq;

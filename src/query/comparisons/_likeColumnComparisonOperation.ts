@@ -1,8 +1,8 @@
 import type { DbType } from "../../db.js";
 import type { PgColumnType } from "../../table/columnTypes.js";
 import type { UndefinedIfLengthZero } from "../../utility/common.js";
-import type { InferComparisonParams, InferFinalValueTypeFromApplied, InferFinalValueTypeFromExpression, LikeComparisonOperationType } from "../_baseClasses/BaseColumnComparisonOperation.js";
-import BaseColumnComparisonOperation from "../_baseClasses/BaseColumnComparisonOperation.js";
+import type { ConvertComparisonParamToNonNullTyped, InferComparisonParams, InferFinalValueTypeFromApplied, InferFinalValueTypeFromExpression, InferValueTypeFromExpression, LikeComparisonOperationType } from "../_baseClasses/BaseColumnComparisonOperation.js";
+import BaseColumnComparisonOperation, { likeComparisonOperations } from "../_baseClasses/BaseColumnComparisonOperation.js";
 import { IQueryExpressionFinalValueDummySymbol, IQueryExpressionValueDummySymbol, queryBuilderContextFactory, type DetermineValueType, type IQueryExpression, type QueryBuilderContext } from "../_interfaces/IQueryExpression.js";
 import QueryParam from "../param.js";
 import QueryBuilder from "../queryBuilder.js";
@@ -77,4 +77,66 @@ class LikeColumnComparisonOperation<
     }
 }
 
+function generateLikeComparison<TComparisonType extends LikeComparisonOperationType>(operation: TComparisonType) {
+
+    function likeComparison<
+        TComparing extends IQueryExpression<TDbType, any, string, any, any, any, any>,
+        TParamMedian extends QueryParam<TDbType, string, any, any, any>,
+        TParamValue extends TParamMedian extends QueryParam<any, any, infer TVal, any, any> ? TVal : never,
+        TDbType extends DbType = TComparing extends IQueryExpression<infer DbType, any, any, any, any, any, any> ? DbType : never,
+    >(this: TComparing, value: TParamValue extends string ? TParamMedian : never
+    ): LikeColumnComparisonOperation<
+        TDbType,
+        TComparisonType,
+        TComparing,
+        ConvertComparisonParamToNonNullTyped<TParamMedian, string>
+    >
+    function likeComparison<
+        TComparing extends IQueryExpression<TDbType, any, string, any, any, any, any>,
+        TApplied extends IQueryExpression<TDbType, any, string, any, any, any, any>,
+        TDbType extends DbType = TComparing extends IQueryExpression<infer DbType, any, any, any, any, any, any> ? DbType : never,
+    >(this: TComparing, value: TApplied):
+        LikeColumnComparisonOperation<
+            TDbType,
+            TComparisonType,
+            TComparing,
+            TApplied
+        >
+    function likeComparison<
+        TComparing extends IQueryExpression<TDbType, any, string, any, any, any, any>,
+        TDbType extends DbType = TComparing extends IQueryExpression<infer DbType, any, any, any, any, any, any> ? DbType : never,
+    >(this: TComparing, value: string):
+        LikeColumnComparisonOperation<
+            TDbType,
+            TComparisonType,
+            TComparing,
+            InferValueTypeFromExpression<TDbType, TComparing>
+        >
+    function likeComparison<TComparing extends IQueryExpression<any, any, any, any, any, any, any>,>(
+        this: TComparing,
+        value: any
+    ) {
+        const dbType = this.dbType;
+
+        return new LikeColumnComparisonOperation(
+            dbType,
+            operation,
+            this,
+            value,
+            undefined,
+            undefined
+        );
+    }
+
+    return likeComparison;
+}
+
+const like = generateLikeComparison(likeComparisonOperations.like);
+const notLike = generateLikeComparison(likeComparisonOperations.notLike);
+
 export default LikeColumnComparisonOperation;
+
+export {
+    like,
+    notLike
+}
