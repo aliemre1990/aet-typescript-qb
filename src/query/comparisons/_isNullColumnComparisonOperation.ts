@@ -1,7 +1,7 @@
 import type { DbType } from "../../db.js";
 import type { PgColumnType } from "../../table/columnTypes.js";
 import type { UndefinedIfLengthZero } from "../../utility/common.js";
-import BaseColumnComparisonOperation, { type InferComparisonParams, type IsNullComparisonOperationType } from "../_baseClasses/BaseColumnComparisonOperation.js";
+import BaseColumnComparisonOperation, { isNullComparisonOperations, type InferComparisonParams, type IsNullComparisonOperationType } from "../_baseClasses/BaseColumnComparisonOperation.js";
 import { IQueryExpressionFinalValueDummySymbol, IQueryExpressionValueDummySymbol, queryBuilderContextFactory, type DetermineValueType, type IQueryExpression, type QueryBuilderContext } from "../_interfaces/IQueryExpression.js";
 import type QueryParam from "../param.js";
 import QueryBuilder from "../queryBuilder.js";
@@ -60,4 +60,36 @@ class IsNullColumnComparisonOperation<
     }
 }
 
+function generateIsNullComparison<TComparisonType extends IsNullComparisonOperationType>(operation: TComparisonType) {
+    function isNullComparison<
+        TComparing extends IQueryExpression<TDbType, any, any, any, any, any, any>,
+        TDbType extends DbType = TComparing extends IQueryExpression<infer DbType, any, any, any, any, any, any> ? DbType : never,
+    >(this: TComparing): IsNullColumnComparisonOperation<
+        TDbType,
+        TComparisonType,
+        TComparing,
+        undefined
+    > {
+        const dbType = this.dbType;
+
+        return new IsNullColumnComparisonOperation(
+            dbType,
+            operation,
+            this,
+            undefined,
+            undefined
+        );
+    }
+
+    return isNullComparison;
+}
+
+const isNull = generateIsNullComparison(isNullComparisonOperations.isNull);
+const isNotNull = generateIsNullComparison(isNullComparisonOperations.isNotNull);
+
 export default IsNullColumnComparisonOperation;
+
+export {
+    isNull,
+    isNotNull
+}

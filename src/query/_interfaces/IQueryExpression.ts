@@ -4,13 +4,12 @@ import type QueryParam from "../param.js";
 import type { IDbType } from "./IDbType.js";
 import type { PgColumnType, PgTypeToJsType } from "../../table/columnTypes.js";
 import type { IsAny } from "../../utility/common.js";
-import type isNull from "../comparisons/isNull.js";
-import type isNotNull from "../comparisons/isNotNull.js";
 import type like from "../comparisons/like.js";
 import type notLike from "../comparisons/notLike.js";
 import type { eq, gt, gte, lt, lte, notEq } from "../comparisons/_basicColumnComparisonOperation.js";
 import type { between, notBetween } from "../comparisons/_betweenColumnComparisonOperation.js";
 import type { sqlIn, sqlNotIn } from "../comparisons/_inColumnComparisonOperation.js";
+import type { isNotNull, isNull } from "../comparisons/_isNullColumnComparisonOperation.js";
 
 type DetermineValueType<TCastType extends PgColumnType | undefined, TValueType extends DbValueTypes | null> =
     TCastType extends undefined ?
