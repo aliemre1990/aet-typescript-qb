@@ -2,7 +2,7 @@ import type { DbType } from "../db.js";
 import type { DbValueTypes } from "../table/column.js";
 import type { PgColumnType } from "../table/columnTypes.js";
 import BaseQueryExpression from "./_baseClasses/BaseQueryExpression.js";
-import { IQueryExpressionFinalValueDummySymbol, IQueryExpressionValueDummySymbol, queryBuilderContextFactory, type DetermineFinalValueType, type DetermineValueType, type IQueryExpression, type QueryBuilderContext } from "./_interfaces/IQueryExpression.js";
+import { queryBuilderContextFactory, type DetermineFinalValueType, type DetermineValueType, type IQueryExpression, type QueryBuilderContext } from "./_interfaces/IQueryExpression.js";
 import type { IDbType } from "./_interfaces/IDbType.js";
 import type { IName } from "./_interfaces/IName.js";
 import type { MapToCTEObject, MapToCTEObjectForRecursive } from "./_types/cteUtility.js";
