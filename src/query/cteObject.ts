@@ -9,6 +9,7 @@ import type { MapToCTEObject, MapToCTEObjectForRecursive } from "./_types/cteUti
 import type QueryParam from "./param.js";
 import type { CTEType, MapQueryResultForCombine, ResultShape, UNION_TYPE } from "./queryBuilder.js";
 import QueryBuilder, { cteTypes } from "./queryBuilder.js";
+import { extractParams } from "./utility.js";
 
 type MapResultToCTEObjectEntry<TDbType extends DbType, TExpressions extends ResultShape<TDbType>> =
     TExpressions extends readonly [infer First, ...infer Rest] ?
@@ -221,9 +222,9 @@ function withRecursiveAs<
 
         for (let i = 0; i < columnNames.length; i++) {
             let currName = columnNames[i];
-            let currComp = selectResult[i];
+            let currExp = selectResult[i];
 
-            finalCTEentries.push(new CTEObjectEntry(anchorQb.dbType, currComp, undefined, undefined, cteName, currName));
+            finalCTEentries.push(new CTEObjectEntry(anchorQb.dbType, currExp, undefined, undefined, cteName, currName));
         }
 
         cte = new CTEObject(anchorQb.dbType, anchorQb, cteName, cteTypes.RECURSIVE, finalCTEentries) as TFinalCTE;
@@ -243,7 +244,6 @@ function withRecursiveAs<
     type TParams = [...(TAnchorParams extends undefined ? [] : TAnchorParams), ...(TRecursiveParams extends undefined ? [] : TRecursiveParams)];
     type TParamsResult = TParams["length"] extends 0 ? undefined : TParams;
 
-
     const cteObject = new CTEObject(
         anchorQb.dbType,
         finalQb,
@@ -255,11 +255,7 @@ function withRecursiveAs<
     ) as TFinalCTE;
     const cteSpecs = [cteObject] as const;
 
-    let params: readonly QueryParam<TDbType, any, any, any, any>[] | undefined = finalQb.params;
-    if (params && params.length === 0) {
-        params = undefined;
-    }
-
+    let params = extractParams([finalQb]);
 
     return new QueryBuilder<
         TDbType,

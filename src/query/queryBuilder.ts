@@ -19,7 +19,7 @@ import { columnsSelectionFactory, ColumnsSelectionQueryObjectSymbol } from "./Co
 import { IQueryExpressionFinalValueDummySymbol, IQueryExpressionValueDummySymbol, queryBuilderContextFactory, type DetermineFinalValueType, type DetermineValueType, type IQueryExpression, type QueryBuilderContext } from "./_interfaces/IQueryExpression.js";
 import SubQueryObject from "./subQueryObject.js";
 import CTEObject, { CTEObjectEntry } from "./cteObject.js";
-import { mapCTESpecsToSelection } from "./utility.js";
+import { extractParams, mapCTESpecsToSelection } from "./utility.js";
 import type { PgColumnType } from "../table/columnTypes.js";
 import { getDbFunctions } from "./uitlity/dbOperations.js";
 import type { MapToCTEObjectForRecursive } from "./_types/cteUtility.js";
@@ -526,22 +526,11 @@ class QueryBuilder<
             selectRes = cb(columnsSelection, functions);
         }
 
-        let params: readonly QueryParam<TDbType, any, any, any, any>[] | undefined = this.params;
+        let params: readonly QueryParam<TDbType, any, any, any, any>[] | undefined;
         if (selectRes) {
-            let tmpParams = selectRes.reduce((acc, it) => {
-                if (it.params) {
-                    return [...acc, ...it.params];
-                } else if (it instanceof QueryParam) {
-                    return [...acc, it];
-                } else {
-                    return acc;
-                }
-            }, [] as readonly QueryParam<TDbType, any, any, any, any>[]);
-
-            params = [...(params || []), ...tmpParams];
-            if (params.length === 0) {
-                params = undefined;
-            }
+            params = extractParams(selectRes, this.params);
+        } else {
+            params = this.params;
         }
 
         if (isNullOrUndefined(cb) || selectRes.length === 0) {
@@ -690,8 +679,6 @@ class QueryBuilder<
 
         let columnsSelection = this.#getColumnsSelection();
 
-        let params: readonly QueryParam<TDbType, any, any, any, any>[] | undefined = this.params;
-        let joinParams: readonly QueryParam<TDbType, any, any, any, any>[] | undefined = undefined;
         let joinTable: TJoinResult;
         if (table instanceof Table) {
             const queryColumns = table.columnsList.map((col: Column<TDbType, any, any, any, any, any, any>) => {
@@ -728,8 +715,6 @@ class QueryBuilder<
             }
 
             joinTable = tmpTable as TJoinResult;
-
-            joinParams = table.params;
         } else if (table instanceof CTEObject) {
             let ownerName = table.name;
             let selection = columnsSelectionFactory<TDbType>(table, table.cteObjectEntries);
@@ -751,12 +736,7 @@ class QueryBuilder<
             dbOperators
         );
 
-        // Comparison params should come before join table params to match TParams.
-        params = [...(params || []), ...(comparison.params || []), ...(joinParams || [])];
-        if (params.length === 0) {
-            params = undefined;
-        }
-
+        const params = extractParams([comparison, table], this.params);
 
         const newJoinSpec = { joinType: type, table: joinTable, comparison };
         let mergedJoinSpecs: JoinSpecsType<TDbType> = [];
@@ -810,11 +790,7 @@ class QueryBuilder<
 
         const comparison = cb(columnsSelection, ops as DbOperations<TDbType>)
 
-        let params: readonly QueryParam<TDbType, any, any, any, any>[] | undefined = this.params;
-        params = [...(params || []), ...(comparison.params || [])];
-        if (params.length === 0) {
-            params = undefined;
-        }
+        const params = extractParams([comparison], this.params);
 
         return new QueryBuilder<
             TDbType,
@@ -832,6 +808,7 @@ class QueryBuilder<
             this.castType,
             {
                 queryType: this.queryType,
+                params: params as AccumulateComparisonParams<TCbResult, TParams>,
                 cteSpecs: this.cteSpecs,
                 joinSpecs: this.joinSpecs,
                 whereComparison: comparison,
@@ -865,20 +842,7 @@ class QueryBuilder<
         const functions = getDbFunctions(this.dbType);
         const res = cb(columnsSelection, functions);
 
-        let params: readonly QueryParam<TDbType, any, any, any, any>[] | undefined = this.params;
-        let groupByParams: readonly QueryParam<TDbType, any, any, any, any>[] = res.reduce((acc, it) => {
-            if (it.params) {
-                return [...acc, ...it.params];
-            } else if (it instanceof QueryParam) {
-                return [...acc, it];
-            } else {
-                return acc;
-            }
-        }, [] as readonly QueryParam<TDbType, any, any, any, any>[]);
-        params = [...(params || []), ...groupByParams];
-        if (params.length === 0) {
-            params = undefined;
-        }
+        const params = extractParams(res, this.params);
 
         return new QueryBuilder<
             TDbType,
@@ -930,11 +894,7 @@ class QueryBuilder<
         const operators = getDbFunctions(this.dbType);
         const res = cb(columnsSelection, operators);
 
-        let params: readonly QueryParam<TDbType, any, any, any, any>[] | undefined = this.params;
-        params = [...(params || []), ...(res.params || [])];
-        if (params.length === 0) {
-            params = undefined;
-        }
+        const params = extractParams([res], this.params);
 
         return new QueryBuilder<
             TDbType,
@@ -987,31 +947,14 @@ class QueryBuilder<
         const functions = getDbFunctions(this.dbType);
         const res = cb(columnsSelection, functions);
 
-        let params: readonly QueryParam<TDbType, any, any, any, any>[] | undefined = this.params;
-        let orderByParams: readonly QueryParam<TDbType, any, any, any, any>[] = res.reduce((acc, it) => {
+        let orderByExpressions: IQueryExpression<any, any, any, any, any, any, any>[] = res.reduce((acc, it) => {
             if (Array.isArray(it)) {
-                let expression = it[0];
-                if (expression.params) {
-                    return [...acc, ...expression.params];
-                } else if (expression instanceof QueryParam) {
-                    return [...acc, expression];
-                } else {
-                    return acc;
-                }
+                return [...acc, it[0]];
             } else {
-                if (it.params) {
-                    return [...acc, ...it.params];
-                } else if (it instanceof QueryParam) {
-                    return [...acc, it];
-                } else {
-                    return acc;
-                }
+                return [...acc, it];
             }
-        }, [] as readonly QueryParam<TDbType, any, any, any, any>[]);
-        params = [...(params || []), ...orderByParams];
-        if (params.length === 0) {
-            params = undefined;
-        }
+        }, [] as IQueryExpression<any, any, any, any, any, any, any>[]);
+        const params = extractParams(orderByExpressions, this.params);
 
         return new QueryBuilder<
             TDbType,
@@ -1111,8 +1054,6 @@ class QueryBuilder<
             res = args;
         }
 
-        let params: readonly QueryParam<TDbType, any, any, any, any>[] | undefined = this.params;
-        let fromParams: readonly QueryParam<TDbType, any, any, any, any>[] = [];
         const fromResult = res.map(item => {
             if (item instanceof Table) {
                 const queryColumns = item.columnsList.map((col: Column<TDbType, any, any, any, any, any, any>) => {
@@ -1121,18 +1062,14 @@ class QueryBuilder<
 
                 return new QueryTable(item.dbType, item, queryColumns);
             } if (item instanceof QueryBuilder) {
-                fromParams = [...(fromParams || []), ...(item.params || [])];
-
                 return new SubQueryObject(item.dbType, item);
             }
             else {
                 return item;
             }
         });
-        params = [...(params || []), ...fromParams];
-        if (params.length === 0) {
-            params = undefined;
-        }
+
+        const params = extractParams(fromResult, this.params);
 
         return new QueryBuilder<TDbType, any, any, any, any, any, any, any>(
             this.dbType,
@@ -1203,11 +1140,7 @@ class QueryBuilder<
         }
         newCteSpecs.push(newSpec);
 
-        let params: readonly QueryParam<TDbType, any, any, any, any>[] | undefined = this.params;
-        params = [...(params || []), ...(res.params || [])];
-        if (params.length === 0) {
-            params = undefined;
-        }
+        const params = extractParams([res], this.params);
 
         return new QueryBuilder<
             TDbType,
@@ -1308,9 +1241,9 @@ class QueryBuilder<
 
             for (let i = 0; i < columnNames.length; i++) {
                 let currName = columnNames[i];
-                let currComp = selectResult[i];
+                let currentExp = selectResult[i];
 
-                finalCTEentries.push(new CTEObjectEntry(anchorQb.dbType, currComp, undefined, undefined, cteName, currName));
+                finalCTEentries.push(new CTEObjectEntry(anchorQb.dbType, currentExp, undefined, undefined, cteName, currName));
             }
 
             cte = new CTEObject(anchorQb.dbType, anchorQb, cteName, cteTypes.RECURSIVE, finalCTEentries) as TFinalCTE;
@@ -1341,11 +1274,7 @@ class QueryBuilder<
             finalCTEs = [cteObject];
         }
 
-        let params: readonly QueryParam<TDbType, any, any, any, any>[] | undefined = this.params;
-        params = [...(params || []), ...(finalQb.params || [])];
-        if (params.length === 0) {
-            params = undefined;
-        }
+        const params = extractParams([finalQb.params], this.params);
 
         return new QueryBuilder<
             TDbType,
@@ -1473,11 +1402,7 @@ class QueryBuilder<
             newCombineSpecs = [...this.combineSpecs, ...newCombineSpecs];
         }
 
-        let params: readonly QueryParam<TDbType, any, any, any, any>[] | undefined = this.params;
-        params = [...(params || []), ...(res.params || [])];
-        if (params.length === 0) {
-            params = undefined;
-        }
+        const params = extractParams([res.params], this.params);
 
         return new QueryBuilder<
             TDbType,

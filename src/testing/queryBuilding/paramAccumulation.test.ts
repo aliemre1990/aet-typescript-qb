@@ -36,10 +36,10 @@ test.suite("Param accumulation tests.", () => {
         assert.ok(qb.params);
 
         const param = qb.params[0];
-        assert.equal("param", param.name);
+        assert.equal(param.name, "param");
 
         const paramOuter = qb.params[1];
-        assert.equal("paramOuter", paramOuter.name);
+        assert.equal(paramOuter.name, "paramOuter");
     });
 
 });

@@ -13,7 +13,10 @@ function mapCTESpecsToSelection<TDbType extends DbType, TCTESpecs extends CTESpe
     return res;
 }
 
-function extractParams<TReturn extends readonly QueryParam<any, any, any, any, any>[] | undefined>(args: readonly any[]): TReturn {
+function extractParams<TReturn extends readonly QueryParam<any, any, any, any, any>[] | undefined>(
+    args: readonly any[],
+    paramsToMerge?: readonly QueryParam<any, any, any, any, any>[]
+): TReturn {
     let params: readonly QueryParam<any, any, any, any, any>[] | undefined = [];
 
     for (const arg of args) {
@@ -24,6 +27,9 @@ function extractParams<TReturn extends readonly QueryParam<any, any, any, any, a
             params = [...params, ...arg.params];
         }
     }
+    // paramsToMerge must be at the beginning.
+    params = [...(paramsToMerge || []), ...(params || [])];
+
     if (params.length === 0) {
         params = undefined;
     }
