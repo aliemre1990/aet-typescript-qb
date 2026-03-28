@@ -1,4 +1,4 @@
-import type { DbType } from "../db.js";
+import type { DbType, PgDbType } from "../db.js";
 import type { DbValueTypes } from "../table/column.js";
 import type { PgColumnType } from "../table/columnTypes.js";
 import BaseQueryExpression from "./_baseClasses/BaseQueryExpression.js";
@@ -144,6 +144,76 @@ class CTEObject<
     }
 }
 
+function withAsMaterialized<
+    TCTEName extends string,
+    TQb extends QueryBuilder<TDbType, any, any, any, any, any, any, any>,
+    TDbType extends DbType = TQb extends IDbType<infer TDbTypeInner> ? TDbTypeInner : never
+>(as: TCTEName, qb: TQb) {
+    type TCTEObject = MapToCTEObject<TDbType, TCTEName, typeof cteTypes.MATERIALIZED, TQb>;
+    type TParams = TQb extends QueryBuilder<TDbType, any, any, any, any, infer TParams, any, any> ? TParams : never;
+
+    const cteObject = new CTEObject(qb.dbType, qb, as, cteTypes.MATERIALIZED) as TCTEObject;
+    const cteSpecs = [cteObject] as const;
+
+    let params: readonly QueryParam<TDbType, any, any, any, any>[] | undefined = qb.params;
+    if (params && params.length === 0) {
+        params = undefined;
+    }
+
+    return new QueryBuilder<
+        TDbType,
+        undefined,
+        undefined,
+        typeof cteSpecs,
+        undefined,
+        TParams
+    >(
+        qb.dbType,
+        undefined,
+        undefined,
+        undefined,
+        {
+            params: params as TParams,
+            cteSpecs
+        }
+    );
+}
+
+
+function withAsNotMaterialized<
+    TCTEName extends string,
+    TQb extends QueryBuilder<TDbType, any, any, any, any, any, any, any>,
+    TDbType extends DbType = TQb extends IDbType<infer TDbTypeInner> ? TDbTypeInner : never
+>(as: TCTEName, qb: TQb) {
+    type TCTEObject = MapToCTEObject<TDbType, TCTEName, typeof cteTypes.NOT_MATERIALIZED, TQb>;
+    type TParams = TQb extends QueryBuilder<TDbType, any, any, any, any, infer TParams, any, any> ? TParams : never;
+
+    const cteObject = new CTEObject(qb.dbType, qb, as, cteTypes.NOT_MATERIALIZED) as TCTEObject;
+    const cteSpecs = [cteObject] as const;
+
+    let params: readonly QueryParam<TDbType, any, any, any, any>[] | undefined = qb.params;
+    if (params && params.length === 0) {
+        params = undefined;
+    }
+
+    return new QueryBuilder<
+        TDbType,
+        undefined,
+        undefined,
+        typeof cteSpecs,
+        undefined,
+        TParams
+    >(
+        qb.dbType,
+        undefined,
+        undefined,
+        undefined,
+        {
+            params: params as TParams,
+            cteSpecs
+        }
+    );
+}
 
 function withAs<
     TCTEName extends string,
@@ -281,6 +351,8 @@ export default CTEObject;
 
 export {
     CTEObjectEntry,
+    withAsMaterialized,
+    withAsNotMaterialized,
     withAs,
     withRecursiveAs
 }

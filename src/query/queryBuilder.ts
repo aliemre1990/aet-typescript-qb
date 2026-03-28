@@ -128,10 +128,20 @@ type ComparisonType<TDbType extends DbType> = BaseColumnComparisonOperation<TDbT
 
 const cteTypes = {
     NON_RECURSIVE: {
-        name: 'NON_RECURSIVE'
+        name: 'NON_RECURSIVE',
+        query: ''
     },
     RECURSIVE: {
-        name: 'RECURSIVE'
+        name: 'RECURSIVE',
+        query: 'RECURSIVE'
+    },
+    MATERIALIZED: {
+        name: 'MATERIALIZED',
+        query: 'MATERIALIZED'
+    },
+    NOT_MATERIALIZED: {
+        name: 'NOT_MATERIALIZED',
+        query: 'NOT MATERIALIZED'
     }
 } as const;
 type CTEType = (typeof cteTypes)[keyof typeof cteTypes];
@@ -443,7 +453,9 @@ class QueryBuilder<
                         result = `${result}${columnList}`
                     }
 
-                    result = `${result} AS (${qbResult.query})`;
+                    result = `${result} AS`;
+                    result = `${result} ${cte.cteType.name === "MATERIALIZED" || cte.cteType.name === "NOT_MATERIALIZED" ? cte.cteType.query : ''}`;
+                    result = `${result}(${qbResult.query})`
 
                     return result;
                 }).join(', ');
@@ -1089,6 +1101,166 @@ class QueryBuilder<
                 orderBySpecs: this.orderBySpecs,
                 combineSpecs: this.combineSpecs
             })
+    }
+
+    withAsMaterialized<
+        TCTEName extends string,
+        TQb extends QueryBuilder<TDbType, any, any, any, any, any, any, any>,
+        TCTEObject extends CTEObject<TDbType, any, any, any, any, any> = CTEObject<TDbType, TCTEName, typeof cteTypes.NON_RECURSIVE, TQb>,
+        TFinalCTESpec extends readonly CTEObject<TDbType, any, any, any, any, any>[] = readonly [...(TCTESpecs extends CTESpecsType<TDbType> ? TCTESpecs : []), TCTEObject],
+        TCTEParams extends readonly QueryParam<TDbType, any, any, any, any>[] | undefined = TQb extends QueryBuilder<TDbType, any, any, any, any, infer TParams, any, any> ? TParams : never,
+        TParamsAccumulated extends readonly QueryParam<TDbType, any, any, any, any>[] | undefined = UndefinedIfLengthZero<
+            [
+                ...(TParams extends readonly QueryParam<TDbType, any, any, any, any>[] ? TParams : []),
+                ...(TCTEParams extends readonly QueryParam<TDbType, any, any, any, any>[] ? TCTEParams : [])
+            ]>
+    >(
+        as: TCTEName,
+        pick: TQb | ((ctes: MapCtesToSelectionType<TDbType, TCTESpecs>) => TQb)
+    ):
+        QueryBuilder<
+            TDbType,
+            TFrom,
+            TJoinSpecs,
+            TFinalCTESpec,
+            TResult,
+            TParamsAccumulated,
+            TAs,
+            TCastType
+        > {
+
+        let res: TQb;
+        if (typeof pick === "function") {
+
+            let cteSelection: MapCtesToSelectionType<TDbType, TCTESpecs>;
+            if (this.cteSpecs === undefined) {
+                cteSelection = {} as MapCtesToSelectionType<TDbType, TCTESpecs>;
+            } else {
+                cteSelection = mapCTESpecsToSelection(this.cteSpecs);
+            }
+            res = pick(cteSelection);
+        } else {
+            res = pick;
+        }
+
+        let newCteSpecs = [...(this.cteSpecs || [] as CTESpecsType<TDbType>)];
+        const newSpec = new CTEObject(this.dbType, res, as, cteTypes.MATERIALIZED);
+
+        let foundIndex = newCteSpecs.findIndex(spec => spec.name === newSpec.name) || -1;
+        if (foundIndex >= 0) {
+            newCteSpecs.toSpliced(foundIndex, 1);
+        }
+        newCteSpecs.push(newSpec);
+
+        const params = extractParams([res], this.params);
+
+        return new QueryBuilder<
+            TDbType,
+            TFrom,
+            TJoinSpecs,
+            TFinalCTESpec,
+            TResult,
+            TParamsAccumulated,
+            TAs,
+            TCastType
+        >(
+            this.dbType,
+            this.fromSpecs,
+            this.asName,
+            this.castType,
+            {
+                queryType: this.queryType,
+                params: params as TParamsAccumulated,
+                cteSpecs: newCteSpecs as CTESpecsType<TDbType> as TFinalCTESpec,
+                joinSpecs: this.joinSpecs,
+                whereComparison: this.whereComparison,
+                selectResult: this.selectResult,
+                groupedColumns: this.groupedColumns,
+                havingSpec: this.havingSpec,
+                orderBySpecs: this.orderBySpecs,
+                combineSpecs: this.combineSpecs
+            }
+        );
+    }
+
+    withAsNotMaterialized<
+        TCTEName extends string,
+        TQb extends QueryBuilder<TDbType, any, any, any, any, any, any, any>,
+        TCTEObject extends CTEObject<TDbType, any, any, any, any, any> = CTEObject<TDbType, TCTEName, typeof cteTypes.NON_RECURSIVE, TQb>,
+        TFinalCTESpec extends readonly CTEObject<TDbType, any, any, any, any, any>[] = readonly [...(TCTESpecs extends CTESpecsType<TDbType> ? TCTESpecs : []), TCTEObject],
+        TCTEParams extends readonly QueryParam<TDbType, any, any, any, any>[] | undefined = TQb extends QueryBuilder<TDbType, any, any, any, any, infer TParams, any, any> ? TParams : never,
+        TParamsAccumulated extends readonly QueryParam<TDbType, any, any, any, any>[] | undefined = UndefinedIfLengthZero<
+            [
+                ...(TParams extends readonly QueryParam<TDbType, any, any, any, any>[] ? TParams : []),
+                ...(TCTEParams extends readonly QueryParam<TDbType, any, any, any, any>[] ? TCTEParams : [])
+            ]>
+    >(
+        as: TCTEName,
+        pick: TQb | ((ctes: MapCtesToSelectionType<TDbType, TCTESpecs>) => TQb)
+    ):
+        QueryBuilder<
+            TDbType,
+            TFrom,
+            TJoinSpecs,
+            TFinalCTESpec,
+            TResult,
+            TParamsAccumulated,
+            TAs,
+            TCastType
+        > {
+
+        let res: TQb;
+        if (typeof pick === "function") {
+
+            let cteSelection: MapCtesToSelectionType<TDbType, TCTESpecs>;
+            if (this.cteSpecs === undefined) {
+                cteSelection = {} as MapCtesToSelectionType<TDbType, TCTESpecs>;
+            } else {
+                cteSelection = mapCTESpecsToSelection(this.cteSpecs);
+            }
+            res = pick(cteSelection);
+        } else {
+            res = pick;
+        }
+
+        let newCteSpecs = [...(this.cteSpecs || [] as CTESpecsType<TDbType>)];
+        const newSpec = new CTEObject(this.dbType, res, as, cteTypes.NOT_MATERIALIZED);
+
+        let foundIndex = newCteSpecs.findIndex(spec => spec.name === newSpec.name) || -1;
+        if (foundIndex >= 0) {
+            newCteSpecs.toSpliced(foundIndex, 1);
+        }
+        newCteSpecs.push(newSpec);
+
+        const params = extractParams([res], this.params);
+
+        return new QueryBuilder<
+            TDbType,
+            TFrom,
+            TJoinSpecs,
+            TFinalCTESpec,
+            TResult,
+            TParamsAccumulated,
+            TAs,
+            TCastType
+        >(
+            this.dbType,
+            this.fromSpecs,
+            this.asName,
+            this.castType,
+            {
+                queryType: this.queryType,
+                params: params as TParamsAccumulated,
+                cteSpecs: newCteSpecs as CTESpecsType<TDbType> as TFinalCTESpec,
+                joinSpecs: this.joinSpecs,
+                whereComparison: this.whereComparison,
+                selectResult: this.selectResult,
+                groupedColumns: this.groupedColumns,
+                havingSpec: this.havingSpec,
+                orderBySpecs: this.orderBySpecs,
+                combineSpecs: this.combineSpecs
+            }
+        );
     }
 
     withAs<
