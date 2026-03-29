@@ -12,7 +12,6 @@ import { extractParams } from "../utility.js";
 
 class BasicColumnComparisonOperation<
     TDbType extends DbType,
-    TOperation extends BasicComparisonOperationType,
     TComparing extends IQueryExpression<TDbType, any, any, any, any, any, any>,
     TApplied extends TValueType | null | IQueryExpression<TDbType, any, any, any, any, any, any>,
     TValueType extends DbValueTypes = InferValueTypeFromExpression<TDbType, TComparing>,
@@ -21,7 +20,7 @@ class BasicColumnComparisonOperation<
     TCastType extends PgColumnType | undefined = undefined,
 > extends BaseColumnComparisonOperation<
     TDbType,
-    TOperation,
+    BasicComparisonOperationType,
     TParams,
     DetermineValueType<TCastType, boolean>,
     DetermineValueType<TCastType, boolean>,
@@ -32,10 +31,10 @@ class BasicColumnComparisonOperation<
     value: TApplied
 
     as<TAs extends string>(asName: TAs) {
-        return new BasicColumnComparisonOperation<TDbType, TOperation, TComparing, TApplied, TValueType, TParams, TAs, TCastType>(this.dbType, this.operation, this.comparing, this.value, asName, this.castType);
+        return new BasicColumnComparisonOperation<TDbType, TComparing, TApplied, TValueType, TParams, TAs, TCastType>(this.dbType, this.operation, this.comparing, this.value, asName, this.castType);
     }
     cast<TCastType extends PgColumnType>(type: TCastType) {
-        return new BasicColumnComparisonOperation<TDbType, TOperation, TComparing, TApplied, TValueType, TParams, TAs, TCastType>(this.dbType, this.operation, this.comparing, this.value, this.asName, type);
+        return new BasicColumnComparisonOperation<TDbType, TComparing, TApplied, TValueType, TParams, TAs, TCastType>(this.dbType, this.operation, this.comparing, this.value, this.asName, type);
     }
 
     buildSQL(context?: QueryBuilderContext) {
@@ -57,7 +56,7 @@ class BasicColumnComparisonOperation<
 
     constructor(
         dbType: TDbType,
-        operation: TOperation,
+        operation: BasicComparisonOperationType,
         comparing: TComparing,
         value: TApplied,
         asName: TAs,
@@ -72,7 +71,7 @@ class BasicColumnComparisonOperation<
 }
 
 
-function generateBasicComparison<TComparisonType extends BasicComparisonOperationType>(operation: TComparisonType) {
+function generateBasicComparison(operation: BasicComparisonOperationType) {
 
     function basicComparison<
         TComparing extends IQueryExpression<TDbType, any, any, any, any, any, any>,
@@ -83,7 +82,6 @@ function generateBasicComparison<TComparisonType extends BasicComparisonOperatio
     >(this: TComparing, value: TParamValue extends (LiteralToBase<TValueType> | null) ? TParamMedian : never):
         BasicColumnComparisonOperation<
             TDbType,
-            TComparisonType,
             TComparing,
             ConvertComparisonParamToTyped<TParamMedian, TValueType>
 
@@ -96,7 +94,6 @@ function generateBasicComparison<TComparisonType extends BasicComparisonOperatio
     >(this: TComparing, value: TApplied):
         BasicColumnComparisonOperation<
             TDbType,
-            TComparisonType,
             TComparing,
             TApplied
         >
@@ -107,7 +104,6 @@ function generateBasicComparison<TComparisonType extends BasicComparisonOperatio
     >(this: TComparing, value: LiteralToBase<TValueType> | null):
         BasicColumnComparisonOperation<
             TDbType,
-            TComparisonType,
             TComparing,
             TValueType | null
         >

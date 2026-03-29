@@ -59,10 +59,10 @@ type MySQLRoundFn = ReturnType<typeof generateRoundFn<MySQLDbType>>;
 type PgSQLFn = ReturnType<typeof generateSqlOperatorFn<PgDbType>>;
 type MySQLSQLFn = ReturnType<typeof generateSqlOperatorFn<MySQLDbType>>;
 
-type PgExistsFn = ReturnType<typeof generateExistsComparison<PgDbType, typeof existsComparisonOperations.exists>>;
-type MySQLExistsFn = ReturnType<typeof generateExistsComparison<MySQLDbType, typeof existsComparisonOperations.exists>>;
-type PgNotExistsFn = ReturnType<typeof generateExistsComparison<PgDbType, typeof existsComparisonOperations.notExists>>;
-type MySQLNotExistsFn = ReturnType<typeof generateExistsComparison<MySQLDbType, typeof existsComparisonOperations.notExists>>;
+type PgExistsFn = ReturnType<typeof generateExistsComparison<PgDbType>>;
+type MySQLExistsFn = ReturnType<typeof generateExistsComparison<MySQLDbType>>;
+type PgNotExistsFn = ReturnType<typeof generateExistsComparison<PgDbType>>;
+type MySQLNotExistsFn = ReturnType<typeof generateExistsComparison<MySQLDbType>>;
 
 
 /**

@@ -9,14 +9,13 @@ import { extractParams } from "../utility.js";
 
 class IsNullColumnComparisonOperation<
     TDbType extends DbType,
-    TOperation extends IsNullComparisonOperationType,
     TComparing extends IQueryExpression<TDbType, any, any, any, any, any, any>,
     TParams extends readonly QueryParam<TDbType, string, any, any, any>[] | undefined = UndefinedIfLengthZero<InferComparisonParams<TComparing, []>>,
     TAs extends string | undefined = undefined,
     TCastType extends PgColumnType | undefined = undefined,
 > extends BaseColumnComparisonOperation<
     TDbType,
-    TOperation,
+    IsNullComparisonOperationType,
     TParams,
     DetermineValueType<TCastType, boolean>,
     DetermineValueType<TCastType, boolean>,
@@ -26,10 +25,10 @@ class IsNullColumnComparisonOperation<
     comparing: TComparing;
 
     as<TAs extends string>(asName: TAs) {
-        return new IsNullColumnComparisonOperation<TDbType, TOperation, TComparing, TParams, TAs, TCastType>(this.dbType, this.operation, this.comparing, asName, this.castType);
+        return new IsNullColumnComparisonOperation<TDbType, TComparing, TParams, TAs, TCastType>(this.dbType, this.operation, this.comparing, asName, this.castType);
     }
     cast<TCastType extends PgColumnType>(type: TCastType) {
-        return new IsNullColumnComparisonOperation<TDbType, TOperation, TComparing, TParams, TAs, TCastType>(this.dbType, this.operation, this.comparing, this.asName, type);
+        return new IsNullColumnComparisonOperation<TDbType, TComparing, TParams, TAs, TCastType>(this.dbType, this.operation, this.comparing, this.asName, type);
     }
 
     buildSQL(context?: QueryBuilderContext) {
@@ -48,7 +47,7 @@ class IsNullColumnComparisonOperation<
 
     constructor(
         dbType: TDbType,
-        operation: TOperation,
+        operation: IsNullComparisonOperationType,
         comparing: TComparing,
         asName: TAs,
         castType: TCastType
@@ -60,13 +59,12 @@ class IsNullColumnComparisonOperation<
     }
 }
 
-function generateIsNullComparison<TComparisonType extends IsNullComparisonOperationType>(operation: TComparisonType) {
+function generateIsNullComparison(operation: IsNullComparisonOperationType) {
     function isNullComparison<
         TComparing extends IQueryExpression<TDbType, any, any, any, any, any, any>,
         TDbType extends DbType = TComparing extends IQueryExpression<infer DbType, any, any, any, any, any, any> ? DbType : never,
     >(this: TComparing): IsNullColumnComparisonOperation<
         TDbType,
-        TComparisonType,
         TComparing,
         undefined
     > {

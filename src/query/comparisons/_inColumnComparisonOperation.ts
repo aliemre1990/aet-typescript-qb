@@ -32,7 +32,6 @@ type MapParamsToTypeRecursively<
 
 class InColumnComparisonOperation<
     TDbType extends DbType,
-    TOperation extends InComparisonOperationType,
     TComparing extends IQueryExpression<TDbType, any, any, any, any, any, any>,
     TApplied extends readonly (TValueType | null | IQueryExpression<TDbType, any, any, any, any, any, any>)[] | undefined,
     TValueType extends DbValueTypes = InferValueTypeFromExpression<TDbType, TComparing>,
@@ -41,7 +40,7 @@ class InColumnComparisonOperation<
     TCastType extends PgColumnType | undefined = undefined
 > extends BaseColumnComparisonOperation<
     TDbType,
-    TOperation,
+    InComparisonOperationType,
     TParams,
     DetermineValueType<TCastType, boolean>,
     DetermineValueType<TCastType, boolean>,
@@ -52,10 +51,10 @@ class InColumnComparisonOperation<
     value: TApplied;
 
     as<TAs extends string>(asName: TAs) {
-        return new InColumnComparisonOperation<TDbType, TOperation, TComparing, TApplied, TValueType, TParams, TAs, TCastType>(this.dbType, this.operation, this.comparing, this.value, asName, this.castType);
+        return new InColumnComparisonOperation<TDbType, TComparing, TApplied, TValueType, TParams, TAs, TCastType>(this.dbType, this.operation, this.comparing, this.value, asName, this.castType);
     }
     cast<TCastType extends PgColumnType>(type: TCastType) {
-        return new InColumnComparisonOperation<TDbType, TOperation, TComparing, TApplied, TValueType, TParams, TAs, TCastType>(this.dbType, this.operation, this.comparing, this.value, this.asName, type);
+        return new InColumnComparisonOperation<TDbType, TComparing, TApplied, TValueType, TParams, TAs, TCastType>(this.dbType, this.operation, this.comparing, this.value, this.asName, type);
     }
 
     buildSQL(context?: QueryBuilderContext) {
@@ -80,7 +79,7 @@ class InColumnComparisonOperation<
 
     constructor(
         dbType: TDbType,
-        operation: TOperation,
+        operation: InComparisonOperationType,
         comparing: TComparing,
         value: TApplied,
         asName: TAs,
@@ -94,7 +93,7 @@ class InColumnComparisonOperation<
     }
 }
 
-function generateInComparison<TComparisonType extends InComparisonOperationType>(operation: TComparisonType) {
+function generateInComparison(operation: InComparisonOperationType) {
 
     function inComparison<
         TComparing extends IQueryExpression<TDbType, any, any, any, any, any, any>,
@@ -106,7 +105,6 @@ function generateInComparison<TComparisonType extends InComparisonOperationType>
         val: TQb & IQueryExpression<TDbType, any, LiteralToBase<TValueType>, any, any, any, any>
     ): InColumnComparisonOperation<
         TDbType,
-        TComparisonType,
         TComparing,
         [TQb]
     >
@@ -121,7 +119,6 @@ function generateInComparison<TComparisonType extends InComparisonOperationType>
         ...val: TValues
     ): InColumnComparisonOperation<
         TDbType,
-        TComparisonType,
         TComparing,
         [...TFinalValues]
     >

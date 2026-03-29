@@ -10,14 +10,13 @@ import { extractParams } from "../utility.js";
 
 class ExistsColumnComparionOperation<
     TDbType extends DbType,
-    TOperation extends ExistsComparisonOperationType,
     TCompared extends QueryBuilder<TDbType, any, any, any, any, any, any>,
     TParams extends readonly QueryParam<TDbType, string, any, any, any>[] | undefined = UndefinedIfLengthZero<ExtractParams<TCompared>>,
     TAs extends string | undefined = undefined,
     TCastType extends PgColumnType | undefined = undefined,
 > extends BaseColumnComparisonOperation<
     TDbType,
-    TOperation,
+    ExistsComparisonOperationType,
     TParams,
     DetermineValueType<TCastType, boolean>,
     DetermineValueType<TCastType, boolean>,
@@ -27,10 +26,10 @@ class ExistsColumnComparionOperation<
     compared: TCompared;
 
     as<TAs extends string>(asName: TAs) {
-        return new ExistsColumnComparionOperation<TDbType, TOperation, TCompared, TParams, TAs, TCastType>(this.dbType, this.operation, this.compared, asName, this.castType);
+        return new ExistsColumnComparionOperation<TDbType, TCompared, TParams, TAs, TCastType>(this.dbType, this.operation, this.compared, asName, this.castType);
     }
     cast<TCastType extends PgColumnType>(type: TCastType) {
-        return new ExistsColumnComparionOperation<TDbType, TOperation, TCompared, TParams, TAs, TCastType>(this.dbType, this.operation, this.compared, this.asName, type);
+        return new ExistsColumnComparionOperation<TDbType, TCompared, TParams, TAs, TCastType>(this.dbType, this.operation, this.compared, this.asName, type);
     }
 
     buildSQL(context?: QueryBuilderContext) {
@@ -46,7 +45,7 @@ class ExistsColumnComparionOperation<
 
     constructor(
         dbType: TDbType,
-        operation: TOperation,
+        operation: ExistsComparisonOperationType,
         compared: TCompared,
         asName: TAs,
         castType: TCastType
@@ -59,14 +58,12 @@ class ExistsColumnComparionOperation<
 }
 
 function generateExistsComparison<
-    TDbType extends DbType,
-    TComparisonType extends ExistsComparisonOperationType
->(dbType: TDbType, operation: TComparisonType) {
+    TDbType extends DbType
+>(dbType: TDbType, operation: ExistsComparisonOperationType) {
     function existsComparison<
         TCompared extends QueryBuilder<TDbType, any, any, any, any, any, any>,
     >(subQuery: TCompared): ExistsColumnComparionOperation<
         TDbType,
-        TComparisonType,
         TCompared,
         undefined
     > {

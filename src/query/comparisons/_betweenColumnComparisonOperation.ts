@@ -11,7 +11,6 @@ import { extractParams } from "../utility.js";
 
 class BetweenColumnComparisonOperation<
     TDbType extends DbType,
-    TOperation extends BetweenComparisonOperationType,
     TComparing extends IQueryExpression<TDbType, any, any, any, any, any, any>,
     TLApplied extends TValueType | null | IQueryExpression<TDbType, any, any, any, any, any, any>,
     TRApplied extends TValueType | null | IQueryExpression<TDbType, any, any, any, any, any, any>,
@@ -21,7 +20,7 @@ class BetweenColumnComparisonOperation<
     TCastType extends PgColumnType | undefined = undefined,
 > extends BaseColumnComparisonOperation<
     TDbType,
-    TOperation,
+    BetweenComparisonOperationType,
     TParams,
     DetermineValueType<TCastType, boolean>,
     DetermineValueType<TCastType, boolean>,
@@ -33,10 +32,10 @@ class BetweenColumnComparisonOperation<
     rValue: TRApplied;
 
     as<TAs extends string>(asName: TAs) {
-        return new BetweenColumnComparisonOperation<TDbType, TOperation, TComparing, TLApplied, TRApplied, TValueType, TParams, TAs, TCastType>(this.dbType, this.operation, this.comparing, this.lValue, this.rValue, asName, this.castType);
+        return new BetweenColumnComparisonOperation<TDbType, TComparing, TLApplied, TRApplied, TValueType, TParams, TAs, TCastType>(this.dbType, this.operation, this.comparing, this.lValue, this.rValue, asName, this.castType);
     }
     cast<TCastType extends PgColumnType>(type: TCastType) {
-        return new BetweenColumnComparisonOperation<TDbType, TOperation, TComparing, TLApplied, TRApplied, TValueType, TParams, TAs, TCastType>(this.dbType, this.operation, this.comparing, this.lValue, this.rValue, this.asName, type);
+        return new BetweenColumnComparisonOperation<TDbType, TComparing, TLApplied, TRApplied, TValueType, TParams, TAs, TCastType>(this.dbType, this.operation, this.comparing, this.lValue, this.rValue, this.asName, type);
     }
 
     buildSQL(context?: QueryBuilderContext) {
@@ -58,7 +57,7 @@ class BetweenColumnComparisonOperation<
 
     constructor(
         dbType: TDbType,
-        operation: TOperation,
+        operation: BetweenComparisonOperationType,
         comparing: TComparing,
         lValue: TLApplied,
         rValue: TRApplied,
@@ -75,8 +74,8 @@ class BetweenColumnComparisonOperation<
 }
 
 
-function generateBetweenComparison<TComparisonType extends BetweenComparisonOperationType>(
-    operation: TComparisonType
+function generateBetweenComparison(
+    operation: BetweenComparisonOperationType
 ) {
 
     // params
@@ -94,7 +93,6 @@ function generateBetweenComparison<TComparisonType extends BetweenComparisonOper
         rightValue: TRParamValue extends (LiteralToBase<TValueType> | null) ? TRParamMedian : never
     ): BetweenColumnComparisonOperation<
         TDbType,
-        TComparisonType,
         TComparing,
         ConvertComparisonParamToTyped<TLParamMedian, TValueType>,
         ConvertComparisonParamToTyped<TRParamMedian, TValueType>
@@ -111,7 +109,6 @@ function generateBetweenComparison<TComparisonType extends BetweenComparisonOper
         rightValue: LiteralToBase<TValueType> | null
     ): BetweenColumnComparisonOperation<
         TDbType,
-        TComparisonType,
         TComparing,
         ConvertComparisonParamToTyped<TLParamMedian, TValueType>,
         TValueType | null
@@ -129,7 +126,6 @@ function generateBetweenComparison<TComparisonType extends BetweenComparisonOper
         rightValue: TRParamValue extends (LiteralToBase<TValueType> | null) ? TRParamMedian : never
     ): BetweenColumnComparisonOperation<
         TDbType,
-        TComparisonType,
         TComparing,
         TValueType | null,
         ConvertComparisonParamToTyped<TRParamMedian, TValueType>
@@ -147,7 +143,6 @@ function generateBetweenComparison<TComparisonType extends BetweenComparisonOper
         rightValue: TRApplied
     ): BetweenColumnComparisonOperation<
         TDbType,
-        TComparisonType,
         TComparing,
         ConvertComparisonParamToTyped<TLParamMedian, TValueType>,
         TRApplied
@@ -165,7 +160,6 @@ function generateBetweenComparison<TComparisonType extends BetweenComparisonOper
         rightValue: TRParamValue extends (LiteralToBase<TValueType> | null) ? TRParamMedian : never
     ): BetweenColumnComparisonOperation<
         TDbType,
-        TComparisonType,
         TComparing,
         TLApplied,
         ConvertComparisonParamToTyped<TRParamMedian, TValueType>
@@ -178,7 +172,6 @@ function generateBetweenComparison<TComparisonType extends BetweenComparisonOper
     >(this: TComparing, leftValue: LiteralToBase<TValueType> | null, rightValue: LiteralToBase<TValueType> | null):
         BetweenColumnComparisonOperation<
             TDbType,
-            TComparisonType,
             TComparing,
             TValueType | null,
             TValueType | null
@@ -192,7 +185,6 @@ function generateBetweenComparison<TComparisonType extends BetweenComparisonOper
     >(this: TComparing, leftValue: TLApplied, rightValue: TRApplied):
         BetweenColumnComparisonOperation<
             TDbType,
-            TComparisonType,
             TComparing,
             TLApplied,
             TRApplied
@@ -205,7 +197,6 @@ function generateBetweenComparison<TComparisonType extends BetweenComparisonOper
     >(this: TComparing, leftValue: TLApplied, rightValue: LiteralToBase<TValueType> | null):
         BetweenColumnComparisonOperation<
             TDbType,
-            TComparisonType,
             TComparing,
             TLApplied,
             TValueType | null
@@ -218,7 +209,6 @@ function generateBetweenComparison<TComparisonType extends BetweenComparisonOper
     >(this: TComparing, leftValue: LiteralToBase<TValueType> | null, rightValue: TRApplied):
         BetweenColumnComparisonOperation<
             TDbType,
-            TComparisonType,
             TComparing,
             TValueType | null,
             TRApplied
