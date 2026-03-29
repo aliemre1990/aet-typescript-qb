@@ -7,7 +7,7 @@ import type SubQueryObject from "../subQueryObject.js";
 
 type MapCtesToSelectionType<TDbType extends DbType, TCTESpecs extends CTESpecsType<TDbType> | undefined> =
     TCTESpecs extends undefined ? {} :
-    TCTESpecs extends readonly CTEObject<TDbType, any, any, any, any, any>[] ?
+    TCTESpecs extends readonly CTEObject<TDbType, any, any, any, any>[] ?
     {
         [C in TCTESpecs[number]as C extends { name: infer N extends string } ? N : never]: C
     } :
@@ -24,7 +24,7 @@ type TableToColumnsMap<
             T[K] extends SubQueryObject<TDbType, any, infer TSubQueryEntries, string> ?
             TSubQueryEntries extends undefined ? never :
             TSubQueryEntries :
-            T[K] extends CTEObject<TDbType, any, any, any, any, any> ?
+            T[K] extends CTEObject<TDbType, any, any, any, any> ?
             T[K]["cteObjectEntries"] extends undefined ? never :
             T[K]["cteObjectEntries"] :
             never
@@ -47,7 +47,7 @@ type TablesToObject<
             T["name"] :
             T extends SubQueryObject<TDbType, any, any, any> ?
             T["name"] :
-            T extends CTEObject<TDbType, any, any, any, any, any> ?
+            T extends CTEObject<TDbType, any, any, any, any> ?
             T["name"] :
             never
             ]: T
@@ -63,7 +63,7 @@ type TablesToObject<
             T["table"]["name"] :
             T["table"] extends SubQueryObject<TDbType, any, any, any> ?
             T["table"]["name"] :
-            T["table"] extends CTEObject<TDbType, any, any, any, any, any> ?
+            T["table"] extends CTEObject<TDbType, any, any, any, any> ?
             T["table"]["name"] :
             never
             ]: T["table"]

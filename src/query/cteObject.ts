@@ -79,7 +79,6 @@ class CTEObjectEntry<
 class CTEObject<
     TDbType extends DbType,
     TCTEName extends string,
-    TCTEType extends CTEType,
     TQb extends QueryBuilder<TDbType, any, any, any, ResultShape<TDbType>, any, any, any>,
     TEntries extends readonly CTEObjectEntry<TDbType, any, any, any, any, any, any>[] = TQb extends QueryBuilder<TDbType, any, any, any, infer TRes, any, any, any> ? TRes extends ResultShape<TDbType> ? MapResultToCTEObjectEntry<TDbType, TRes> : never : never,
     TAs extends string | undefined = undefined
@@ -93,7 +92,7 @@ class CTEObject<
     cteName: TCTEName;
     isColumnListPresent?: boolean;
 
-    cteType: TCTEType;
+    cteType: CTEType;
     cteObjectEntries: TEntries;
 
     buildSQL(context?: QueryBuilderContext) {
@@ -109,7 +108,7 @@ class CTEObject<
         dbType: TDbType,
         qb: TQb,
         cteName: TCTEName,
-        cteType: TCTEType,
+        cteType: CTEType,
         entries?: TEntries,
         asName?: TAs,
         isColumnListPresent?: boolean
@@ -140,7 +139,7 @@ class CTEObject<
         const newEntries = this.cteObjectEntries
             .map(ent => new CTEObjectEntry(ent.dbType, ent.expression, ent.asName, ent.castType, ent.fieldName, val)) as readonly CTEObjectEntry<TDbType, any, any, any, any, any>[] as TEntries;
 
-        return new CTEObject<TDbType, TCTEName, TCTEType, TQb, TEntries, TAs>(this.dbType, this.qb, this.cteName, this.cteType, newEntries, val);
+        return new CTEObject<TDbType, TCTEName, TQb, TEntries, TAs>(this.dbType, this.qb, this.cteName, this.cteType, newEntries, val);
     }
 }
 
@@ -149,7 +148,7 @@ function withAsMaterialized<
     TQb extends QueryBuilder<TDbType, any, any, any, any, any, any, any>,
     TDbType extends DbType = TQb extends IDbType<infer TDbTypeInner> ? TDbTypeInner : never
 >(as: TCTEName, qb: TQb) {
-    type TCTEObject = MapToCTEObject<TDbType, TCTEName, typeof cteTypes.MATERIALIZED, TQb>;
+    type TCTEObject = MapToCTEObject<TDbType, TCTEName, TQb>;
     type TParams = TQb extends QueryBuilder<TDbType, any, any, any, any, infer TParams, any, any> ? TParams : never;
 
     const cteObject = new CTEObject(qb.dbType, qb, as, cteTypes.MATERIALIZED) as TCTEObject;
@@ -185,7 +184,7 @@ function withAsNotMaterialized<
     TQb extends QueryBuilder<TDbType, any, any, any, any, any, any, any>,
     TDbType extends DbType = TQb extends IDbType<infer TDbTypeInner> ? TDbTypeInner : never
 >(as: TCTEName, qb: TQb) {
-    type TCTEObject = MapToCTEObject<TDbType, TCTEName, typeof cteTypes.NOT_MATERIALIZED, TQb>;
+    type TCTEObject = MapToCTEObject<TDbType, TCTEName, TQb>;
     type TParams = TQb extends QueryBuilder<TDbType, any, any, any, any, infer TParams, any, any> ? TParams : never;
 
     const cteObject = new CTEObject(qb.dbType, qb, as, cteTypes.NOT_MATERIALIZED) as TCTEObject;
@@ -220,7 +219,7 @@ function withAs<
     TQb extends QueryBuilder<TDbType, any, any, any, any, any, any, any>,
     TDbType extends DbType = TQb extends IDbType<infer TDbTypeInner> ? TDbTypeInner : never
 >(as: TCTEName, qb: TQb) {
-    type TCTEObject = MapToCTEObject<TDbType, TCTEName, typeof cteTypes.NON_RECURSIVE, TQb>;
+    type TCTEObject = MapToCTEObject<TDbType, TCTEName, TQb>;
     type TParams = TQb extends QueryBuilder<TDbType, any, any, any, any, infer TParams, any, any> ? TParams : never;
 
     const cteObject = new CTEObject(qb.dbType, qb, as, cteTypes.NON_RECURSIVE) as TCTEObject;
@@ -265,7 +264,7 @@ function withRecursiveAs<
         any
     >,
     TDbType extends DbType = TAnchorQb extends IDbType<infer TDbTypeInner> ? TDbTypeInner : never,
-    TFinalCTE extends CTEObject<TDbType, any, any, any, any, any> = MapToCTEObjectForRecursive<TDbType, TCTEName, typeof cteTypes.RECURSIVE, TColumnNames, TAnchorQb>
+    TFinalCTE extends CTEObject<TDbType, any, any, any, any> = MapToCTEObjectForRecursive<TDbType, TCTEName, TColumnNames, TAnchorQb>
 >(
     cteName: TCTEName,
     columnNames: TColumnNames,

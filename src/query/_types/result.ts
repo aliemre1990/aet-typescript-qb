@@ -88,7 +88,7 @@ type JoinToAllColumnsMapRecursively<
     FRest extends readonly [any, ...any[]] ?
     [...TEntries, ...JoinToAllColumnsMapRecursively<TDbType, FRest>] :
     [...TEntries] :
-    TTable extends CTEObject<TDbType, any, any, any, any, any> ?
+    TTable extends CTEObject<TDbType, any, any, any, any> ?
     FRest extends readonly [any, ...any[]] ?
     [...TTable["cteObjectEntries"], ...JoinToAllColumnsMapRecursively<TDbType, FRest>] :
     [...TTable["cteObjectEntries"]] :
@@ -108,7 +108,7 @@ type FromToAllColumnsMapRecursively<
     FRest extends readonly [any, ...any[]] ?
     [...TEntries, ...FromToAllColumnsMapRecursively<TDbType, FRest>] :
     [...TEntries] :
-    FFirst extends CTEObject<TDbType, any, any, any, any, any> ?
+    FFirst extends CTEObject<TDbType, any, any, any, any> ?
     FRest extends readonly [any, ...any[]] ?
     [...FFirst["cteObjectEntries"], ...FromToAllColumnsMapRecursively<TDbType, FRest>] :
     [...FFirst["cteObjectEntries"]] :
