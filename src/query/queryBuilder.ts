@@ -1,4 +1,4 @@
-import { DbType, dbTypes } from "../db.js";
+import { DbType } from "../db.js";
 import QueryColumn from "./queryColumn.js";
 import Table, { type MapToQueryColumns } from "../table/table.js";
 import { isNullOrUndefined } from "../utility/guards.js";
@@ -9,14 +9,13 @@ import QueryTable from "./queryTable.js";
 import type Column from "../table/column.js";
 import type { DbOperations } from "./_types/ops.js";
 import QueryParam from "./param.js";
-import type { IDbType } from "./_interfaces/IDbType.js";
 import type { AccumulateSubQueryParams, ConvertElementsToSubQueryCompliant, InferDbTypeFromFromFirstIDbType, MapToSubQueryObject } from "./_types/subQueryUtility.js";
 import type { AccumulateComparisonParams } from "./_types/paramAccumulationComparison.js";
 import type { AccumulateOrderByParams } from "./_types/paramAccumulationOrderBy.js";
 import type { AccumulateColumnParams } from "./_types/paramAccumulationSelect.js";
 import type ColumnsSelection from "./ColumnsSelection.js";
 import { columnsSelectionFactory, ColumnsSelectionQueryObjectSymbol } from "./ColumnsSelection.js";
-import { IQueryExpressionFinalValueDummySymbol, IQueryExpressionValueDummySymbol, queryBuilderContextFactory, type DetermineFinalValueType, type DetermineValueType, type IQueryExpression, type QueryBuilderContext } from "./_interfaces/IQueryExpression.js";
+import { queryBuilderContextFactory, type DetermineFinalValueType, type DetermineValueType, type IQueryExpression, type QueryBuilderContext } from "./_interfaces/IQueryExpression.js";
 import SubQueryObject from "./subQueryObject.js";
 import CTEObject, { CTEObjectEntry } from "./cteObject.js";
 import { extractParams, mapCTESpecsToSelection } from "./utility.js";
@@ -27,6 +26,7 @@ import type { UndefinedIfLengthZero } from "../utility/common.js";
 import type { ExtractParams } from "./param.js";
 import type BaseColumnComparisonOperation from "./_baseClasses/BaseColumnComparisonOperation.js";
 import BaseQueryExpression from "./_baseClasses/BaseQueryExpression.js";
+import type { exceptAllFn, exceptFn, intersectAllFn, intersectFn, unionAllFn, unionFn } from "./combining.js";
 
 type CombineExpressions<
     TLeft extends ResultShapeItem<any>,
@@ -190,7 +190,7 @@ const combineTypes = {
     EXCEPT: { name: 'EXCEPT', query: 'EXCEPT' },
     EXCEPT_ALL: { name: 'EXCEPT_ALL', query: 'EXCEPT ALL' }
 } as const;
-type COMBINE_TYPE = typeof combineTypes[keyof typeof combineTypes]["name"];
+type CombineType = typeof combineTypes[keyof typeof combineTypes];
 type CombineSpecsType<TDbType extends DbType> = readonly { type: typeof combineTypes[keyof typeof combineTypes], qb: QueryBuilder<TDbType, any, any, any, any, any, any> }[];
 
 const queryTypes = {
@@ -1476,536 +1476,6 @@ class QueryBuilder<
         );
     }
 
-    #combine <
-        TCombineType extends COMBINE_TYPE,
-        TQbResult extends QueryBuilder<TDbType, any, any, any, MapQueryResultForCombine<TResult>, any, any, any>,
-        TCombineParams extends readonly QueryParam<TDbType, any, any, any, any>[] | undefined = TQbResult extends QueryBuilder<TDbType, any, any, any, any, infer TParams, any, any> ? TParams : never,
-        TParamsAccumulated extends readonly QueryParam<TDbType, any, any, any, any>[] =
-        [
-            ...(TParams extends readonly QueryParam<TDbType, any, any, any, any>[] ? TParams : []),
-            ...(TCombineParams extends readonly QueryParam<TDbType, any, any, any, any>[] ? TCombineParams : [])
-        ],
-        TFinalParamsAccumulated extends readonly QueryParam<TDbType, any, any, any, any>[] | undefined = TParamsAccumulated["length"] extends 0 ? undefined : TParamsAccumulated
-
-    >(
-        combineType: TCombineType,
-        qbSelectionCb: (ctes: MapCtesToSelectionType<TDbType, TCTESpecs>) => TQbResult
-    ): QueryBuilder<
-        TDbType,
-        TFrom,
-        TJoinSpecs,
-        TCTESpecs,
-        CalculateCombineResult<TQbResult, TResult>,
-        TFinalParamsAccumulated,
-        TAs,
-        TCastType
-    >
-    #combine <
-        TCombineType extends COMBINE_TYPE,
-        TQbResult extends QueryBuilder<TDbType, any, any, any, MapQueryResultForCombine<TResult>, any, any, any>,
-        TCombineParams extends readonly QueryParam<TDbType, any, any, any, any>[] | undefined = TQbResult extends QueryBuilder<TDbType, any, any, any, any, infer TParams, any, any> ? TParams : never,
-        TParamsAccumulated extends readonly QueryParam<TDbType, any, any, any, any>[] =
-        [
-            ...(TParams extends readonly QueryParam<TDbType, any, any, any, any>[] ? TParams : []),
-            ...(TCombineParams extends readonly QueryParam<TDbType, any, any, any, any>[] ? TCombineParams : [])
-        ],
-        TFinalParamsAccumulated extends readonly QueryParam<TDbType, any, any, any, any>[] | undefined = TParamsAccumulated["length"] extends 0 ? undefined : TParamsAccumulated
-
-    >(
-        combineType: TCombineType,
-        qbSelectionCb: TQbResult
-    ): QueryBuilder<
-        TDbType,
-        TFrom,
-        TJoinSpecs,
-        TCTESpecs,
-        CalculateCombineResult<TQbResult, TResult>,
-        TFinalParamsAccumulated,
-        TAs,
-        TCastType
-    >
-    #combine <
-        TCombineType extends COMBINE_TYPE,
-        TQbResult extends QueryBuilder<TDbType, any, any, any, MapQueryResultForCombine<TResult>, any, any, any>,
-        TCombineParams extends readonly QueryParam<TDbType, any, any, any, any>[] | undefined = TQbResult extends QueryBuilder<TDbType, any, any, any, any, infer TParams, any, any> ? TParams : never,
-        TParamsAccumulated extends readonly QueryParam<TDbType, any, any, any, any>[] =
-        [
-            ...(TParams extends readonly QueryParam<TDbType, any, any, any, any>[] ? TParams : []),
-            ...(TCombineParams extends readonly QueryParam<TDbType, any, any, any, any>[] ? TCombineParams : [])
-        ],
-        TFinalParamsAccumulated extends readonly QueryParam<TDbType, any, any, any, any>[] | undefined = TParamsAccumulated["length"] extends 0 ? undefined : TParamsAccumulated
-
-    >(
-        combineType: TCombineType,
-        cteSelectionCb: TQbResult | ((ctes: MapCtesToSelectionType<TDbType, TCTESpecs>) => TQbResult)
-    ): QueryBuilder<
-        TDbType,
-        TFrom,
-        TJoinSpecs,
-        TCTESpecs,
-        CalculateCombineResult<TQbResult, TResult>,
-        TFinalParamsAccumulated,
-        TAs,
-        TCastType
-    > {
-        let res: TQbResult;
-        if (typeof cteSelectionCb === "function") {
-            let cteSpecs: MapCtesToSelectionType<TDbType, TCTESpecs>;
-            if (this.cteSpecs === undefined) {
-                cteSpecs = {} as MapCtesToSelectionType<TDbType, TCTESpecs>;
-            } else {
-                cteSpecs = mapCTESpecsToSelection(this.cteSpecs);
-            }
-            res = cteSelectionCb(cteSpecs);
-        } else {
-            res = cteSelectionCb;
-        }
-
-        let actualCombineType = Object.entries(combineTypes).find(ent => ent[1].name === combineType)?.[1];
-        if (isNullOrUndefined(actualCombineType)) {
-            throw Error('Invalid combine type.')
-        }
-
-        let newCombine = { type: actualCombineType, qb: res };
-
-        let newCombineSpecs: CombineSpecsType<TDbType> = [newCombine];
-        if (this.combineSpecs !== undefined) {
-            newCombineSpecs = [...this.combineSpecs, ...newCombineSpecs];
-        }
-
-        const params = extractParams([res.params], this.params);
-
-        return new QueryBuilder<
-            TDbType,
-            TFrom,
-            TJoinSpecs,
-            TCTESpecs,
-            CalculateCombineResult<TQbResult, TResult>,
-            TFinalParamsAccumulated,
-            TAs,
-            TCastType
-        >(
-            this.dbType,
-            this.fromSpecs,
-            this.asName,
-            this.castType,
-            {
-                queryType: this.queryType,
-                params: params as TFinalParamsAccumulated,
-                cteSpecs: this.cteSpecs,
-                joinSpecs: this.joinSpecs,
-                whereComparison: this.whereComparison,
-                selectResult: this.selectResult as CalculateCombineResult<TQbResult, TResult>,
-                selectSpecs: this.selectSpecs,
-                groupedColumns: this.groupedColumns,
-                havingSpec: this.havingSpec,
-                orderBySpecs: this.orderBySpecs,
-                combineSpecs: newCombineSpecs
-            });
-    }
-
-
-    union<
-        TQbResult extends QueryBuilder<TDbType, any, any, any, MapQueryResultForCombine<TResult>, any, any, any>,
-        TCombineParams extends readonly QueryParam<TDbType, any, any, any, any>[] | undefined = TQbResult extends QueryBuilder<TDbType, any, any, any, any, infer TParams, any, any> ? TParams : never,
-        TParamsAccumulated extends readonly QueryParam<TDbType, any, any, any, any>[] =
-        [
-            ...(TParams extends readonly QueryParam<TDbType, any, any, any, any>[] ? TParams : []),
-            ...(TCombineParams extends readonly QueryParam<TDbType, any, any, any, any>[] ? TCombineParams : [])
-        ],
-        TFinalParamsAccumulated extends readonly QueryParam<TDbType, any, any, any, any>[] | undefined = TParamsAccumulated["length"] extends 0 ? undefined : TParamsAccumulated
-    >(
-        qbSelectionCb: (ctes: MapCtesToSelectionType<TDbType, TCTESpecs>) => TQbResult
-    ): QueryBuilder<
-        TDbType,
-        TFrom,
-        TJoinSpecs,
-        TCTESpecs,
-        CalculateCombineResult<TQbResult, TResult>,
-        TFinalParamsAccumulated,
-        TAs,
-        TCastType
-    >
-    union<
-        TQbResult extends QueryBuilder<TDbType, any, any, any, MapQueryResultForCombine<TResult>, any, any, any>,
-        TCombineParams extends readonly QueryParam<TDbType, any, any, any, any>[] | undefined = TQbResult extends QueryBuilder<TDbType, any, any, any, any, infer TParams, any, any> ? TParams : never,
-        TParamsAccumulated extends readonly QueryParam<TDbType, any, any, any, any>[] =
-        [
-            ...(TParams extends readonly QueryParam<TDbType, any, any, any, any>[] ? TParams : []),
-            ...(TCombineParams extends readonly QueryParam<TDbType, any, any, any, any>[] ? TCombineParams : [])
-        ],
-        TFinalParamsAccumulated extends readonly QueryParam<TDbType, any, any, any, any>[] | undefined = TParamsAccumulated["length"] extends 0 ? undefined : TParamsAccumulated
-    >(
-        qbSelectionCb: TQbResult
-    ): QueryBuilder<
-        TDbType,
-        TFrom,
-        TJoinSpecs,
-        TCTESpecs,
-        CalculateCombineResult<TQbResult, TResult>,
-        TFinalParamsAccumulated,
-        TAs,
-        TCastType
-    >
-    union<
-        TQbResult extends QueryBuilder<TDbType, any, any, any, MapQueryResultForCombine<TResult>, any, any, any>,
-        TCombineParams extends readonly QueryParam<TDbType, any, any, any, any>[] | undefined = TQbResult extends QueryBuilder<TDbType, any, any, any, any, infer TParams, any, any> ? TParams : never,
-        TParamsAccumulated extends readonly QueryParam<TDbType, any, any, any, any>[] =
-        [
-            ...(TParams extends readonly QueryParam<TDbType, any, any, any, any>[] ? TParams : []),
-            ...(TCombineParams extends readonly QueryParam<TDbType, any, any, any, any>[] ? TCombineParams : [])
-        ],
-        TFinalParamsAccumulated extends readonly QueryParam<TDbType, any, any, any, any>[] | undefined = TParamsAccumulated["length"] extends 0 ? undefined : TParamsAccumulated
-    >(
-        cb: (ctes: MapCtesToSelectionType<TDbType, TCTESpecs>) => TQbResult
-    ): QueryBuilder<
-        TDbType,
-        TFrom,
-        TJoinSpecs,
-        TCTESpecs,
-        CalculateCombineResult<TQbResult, TResult>,
-        TFinalParamsAccumulated,
-        TAs,
-        TCastType
-    > {
-        return this.#combine(combineTypes.UNION.name, cb);
-    }
-
-    unionAll<
-        TQbResult extends QueryBuilder<TDbType, any, any, any, MapQueryResultForCombine<TResult>, any, any, any>,
-        TCombineParams extends readonly QueryParam<TDbType, any, any, any, any>[] | undefined = TQbResult extends QueryBuilder<TDbType, any, any, any, any, infer TParams, any, any> ? TParams : never,
-        TParamsAccumulated extends readonly QueryParam<TDbType, any, any, any, any>[] =
-        [
-            ...(TParams extends readonly QueryParam<TDbType, any, any, any, any>[] ? TParams : []),
-            ...(TCombineParams extends readonly QueryParam<TDbType, any, any, any, any>[] ? TCombineParams : [])
-        ],
-        TFinalParamsAccumulated extends readonly QueryParam<TDbType, any, any, any, any>[] | undefined = TParamsAccumulated["length"] extends 0 ? undefined : TParamsAccumulated
-    >(
-        cb: (ctes: MapCtesToSelectionType<TDbType, TCTESpecs>) => TQbResult
-    ): QueryBuilder<
-        TDbType,
-        TFrom,
-        TJoinSpecs,
-        TCTESpecs,
-        CalculateCombineResult<TQbResult, TResult>,
-        TFinalParamsAccumulated,
-        TAs,
-        TCastType
-    >
-    unionAll<
-        TQbResult extends QueryBuilder<TDbType, any, any, any, MapQueryResultForCombine<TResult>, any, any, any>,
-        TCombineParams extends readonly QueryParam<TDbType, any, any, any, any>[] | undefined = TQbResult extends QueryBuilder<TDbType, any, any, any, any, infer TParams, any, any> ? TParams : never,
-        TParamsAccumulated extends readonly QueryParam<TDbType, any, any, any, any>[] =
-        [
-            ...(TParams extends readonly QueryParam<TDbType, any, any, any, any>[] ? TParams : []),
-            ...(TCombineParams extends readonly QueryParam<TDbType, any, any, any, any>[] ? TCombineParams : [])
-        ],
-        TFinalParamsAccumulated extends readonly QueryParam<TDbType, any, any, any, any>[] | undefined = TParamsAccumulated["length"] extends 0 ? undefined : TParamsAccumulated
-    >(
-        cb: TQbResult
-    ): QueryBuilder<
-        TDbType,
-        TFrom,
-        TJoinSpecs,
-        TCTESpecs,
-        CalculateCombineResult<TQbResult, TResult>,
-        TFinalParamsAccumulated,
-        TAs,
-        TCastType
-    >
-    unionAll<
-        TQbResult extends QueryBuilder<TDbType, any, any, any, MapQueryResultForCombine<TResult>, any, any, any>,
-        TCombineParams extends readonly QueryParam<TDbType, any, any, any, any>[] | undefined = TQbResult extends QueryBuilder<TDbType, any, any, any, any, infer TParams, any, any> ? TParams : never,
-        TParamsAccumulated extends readonly QueryParam<TDbType, any, any, any, any>[] =
-        [
-            ...(TParams extends readonly QueryParam<TDbType, any, any, any, any>[] ? TParams : []),
-            ...(TCombineParams extends readonly QueryParam<TDbType, any, any, any, any>[] ? TCombineParams : [])
-        ],
-        TFinalParamsAccumulated extends readonly QueryParam<TDbType, any, any, any, any>[] | undefined = TParamsAccumulated["length"] extends 0 ? undefined : TParamsAccumulated
-    >(
-        cb: (ctes: MapCtesToSelectionType<TDbType, TCTESpecs>) => TQbResult
-    ): QueryBuilder<
-        TDbType,
-        TFrom,
-        TJoinSpecs,
-        TCTESpecs,
-        CalculateCombineResult<TQbResult, TResult>,
-        TFinalParamsAccumulated,
-        TAs,
-        TCastType
-    > {
-        return this.#combine(combineTypes.UNION_ALL.name, cb);
-    }
-
-
-    intersect<
-        TQbResult extends QueryBuilder<TDbType, any, any, any, MapQueryResultForCombine<TResult>, any, any, any>,
-        TCombineParams extends readonly QueryParam<TDbType, any, any, any, any>[] | undefined = TQbResult extends QueryBuilder<TDbType, any, any, any, any, infer TParams, any, any> ? TParams : never,
-        TParamsAccumulated extends readonly QueryParam<TDbType, any, any, any, any>[] =
-        [
-            ...(TParams extends readonly QueryParam<TDbType, any, any, any, any>[] ? TParams : []),
-            ...(TCombineParams extends readonly QueryParam<TDbType, any, any, any, any>[] ? TCombineParams : [])
-        ],
-        TFinalParamsAccumulated extends readonly QueryParam<TDbType, any, any, any, any>[] | undefined = TParamsAccumulated["length"] extends 0 ? undefined : TParamsAccumulated
-    >(
-        qbSelectionCb: (ctes: MapCtesToSelectionType<TDbType, TCTESpecs>) => TQbResult
-    ): QueryBuilder<
-        TDbType,
-        TFrom,
-        TJoinSpecs,
-        TCTESpecs,
-        CalculateCombineResult<TQbResult, TResult>,
-        TFinalParamsAccumulated,
-        TAs,
-        TCastType
-    >
-    intersect<
-        TQbResult extends QueryBuilder<TDbType, any, any, any, MapQueryResultForCombine<TResult>, any, any, any>,
-        TCombineParams extends readonly QueryParam<TDbType, any, any, any, any>[] | undefined = TQbResult extends QueryBuilder<TDbType, any, any, any, any, infer TParams, any, any> ? TParams : never,
-        TParamsAccumulated extends readonly QueryParam<TDbType, any, any, any, any>[] =
-        [
-            ...(TParams extends readonly QueryParam<TDbType, any, any, any, any>[] ? TParams : []),
-            ...(TCombineParams extends readonly QueryParam<TDbType, any, any, any, any>[] ? TCombineParams : [])
-        ],
-        TFinalParamsAccumulated extends readonly QueryParam<TDbType, any, any, any, any>[] | undefined = TParamsAccumulated["length"] extends 0 ? undefined : TParamsAccumulated
-    >(
-        qbSelectionCb: TQbResult
-    ): QueryBuilder<
-        TDbType,
-        TFrom,
-        TJoinSpecs,
-        TCTESpecs,
-        CalculateCombineResult<TQbResult, TResult>,
-        TFinalParamsAccumulated,
-        TAs,
-        TCastType
-    >
-    intersect<
-        TQbResult extends QueryBuilder<TDbType, any, any, any, MapQueryResultForCombine<TResult>, any, any, any>,
-        TCombineParams extends readonly QueryParam<TDbType, any, any, any, any>[] | undefined = TQbResult extends QueryBuilder<TDbType, any, any, any, any, infer TParams, any, any> ? TParams : never,
-        TParamsAccumulated extends readonly QueryParam<TDbType, any, any, any, any>[] =
-        [
-            ...(TParams extends readonly QueryParam<TDbType, any, any, any, any>[] ? TParams : []),
-            ...(TCombineParams extends readonly QueryParam<TDbType, any, any, any, any>[] ? TCombineParams : [])
-        ],
-        TFinalParamsAccumulated extends readonly QueryParam<TDbType, any, any, any, any>[] | undefined = TParamsAccumulated["length"] extends 0 ? undefined : TParamsAccumulated
-    >(
-        cb: (ctes: MapCtesToSelectionType<TDbType, TCTESpecs>) => TQbResult
-    ): QueryBuilder<
-        TDbType,
-        TFrom,
-        TJoinSpecs,
-        TCTESpecs,
-        CalculateCombineResult<TQbResult, TResult>,
-        TFinalParamsAccumulated,
-        TAs,
-        TCastType
-    > {
-        return this.#combine(combineTypes.INTERSECT.name, cb);
-    }
-
-
-    intersectAll<
-        TQbResult extends QueryBuilder<TDbType, any, any, any, MapQueryResultForCombine<TResult>, any, any, any>,
-        TCombineParams extends readonly QueryParam<TDbType, any, any, any, any>[] | undefined = TQbResult extends QueryBuilder<TDbType, any, any, any, any, infer TParams, any, any> ? TParams : never,
-        TParamsAccumulated extends readonly QueryParam<TDbType, any, any, any, any>[] =
-        [
-            ...(TParams extends readonly QueryParam<TDbType, any, any, any, any>[] ? TParams : []),
-            ...(TCombineParams extends readonly QueryParam<TDbType, any, any, any, any>[] ? TCombineParams : [])
-        ],
-        TFinalParamsAccumulated extends readonly QueryParam<TDbType, any, any, any, any>[] | undefined = TParamsAccumulated["length"] extends 0 ? undefined : TParamsAccumulated
-    >(
-        qbSelectionCb: (ctes: MapCtesToSelectionType<TDbType, TCTESpecs>) => TQbResult
-    ): QueryBuilder<
-        TDbType,
-        TFrom,
-        TJoinSpecs,
-        TCTESpecs,
-        CalculateCombineResult<TQbResult, TResult>,
-        TFinalParamsAccumulated,
-        TAs,
-        TCastType
-    >
-    intersectAll<
-        TQbResult extends QueryBuilder<TDbType, any, any, any, MapQueryResultForCombine<TResult>, any, any, any>,
-        TCombineParams extends readonly QueryParam<TDbType, any, any, any, any>[] | undefined = TQbResult extends QueryBuilder<TDbType, any, any, any, any, infer TParams, any, any> ? TParams : never,
-        TParamsAccumulated extends readonly QueryParam<TDbType, any, any, any, any>[] =
-        [
-            ...(TParams extends readonly QueryParam<TDbType, any, any, any, any>[] ? TParams : []),
-            ...(TCombineParams extends readonly QueryParam<TDbType, any, any, any, any>[] ? TCombineParams : [])
-        ],
-        TFinalParamsAccumulated extends readonly QueryParam<TDbType, any, any, any, any>[] | undefined = TParamsAccumulated["length"] extends 0 ? undefined : TParamsAccumulated
-    >(
-        qbSelectionCb: TQbResult
-    ): QueryBuilder<
-        TDbType,
-        TFrom,
-        TJoinSpecs,
-        TCTESpecs,
-        CalculateCombineResult<TQbResult, TResult>,
-        TFinalParamsAccumulated,
-        TAs,
-        TCastType
-    >
-    intersectAll<
-        TQbResult extends QueryBuilder<TDbType, any, any, any, MapQueryResultForCombine<TResult>, any, any, any>,
-        TCombineParams extends readonly QueryParam<TDbType, any, any, any, any>[] | undefined = TQbResult extends QueryBuilder<TDbType, any, any, any, any, infer TParams, any, any> ? TParams : never,
-        TParamsAccumulated extends readonly QueryParam<TDbType, any, any, any, any>[] =
-        [
-            ...(TParams extends readonly QueryParam<TDbType, any, any, any, any>[] ? TParams : []),
-            ...(TCombineParams extends readonly QueryParam<TDbType, any, any, any, any>[] ? TCombineParams : [])
-        ],
-        TFinalParamsAccumulated extends readonly QueryParam<TDbType, any, any, any, any>[] | undefined = TParamsAccumulated["length"] extends 0 ? undefined : TParamsAccumulated
-    >(
-        cb: (ctes: MapCtesToSelectionType<TDbType, TCTESpecs>) => TQbResult
-    ): QueryBuilder<
-        TDbType,
-        TFrom,
-        TJoinSpecs,
-        TCTESpecs,
-        CalculateCombineResult<TQbResult, TResult>,
-        TFinalParamsAccumulated,
-        TAs,
-        TCastType
-    > {
-        return this.#combine(combineTypes.INTERSECT_ALL.name, cb);
-    }
-
-
-    expect<
-        TQbResult extends QueryBuilder<TDbType, any, any, any, MapQueryResultForCombine<TResult>, any, any, any>,
-        TCombineParams extends readonly QueryParam<TDbType, any, any, any, any>[] | undefined = TQbResult extends QueryBuilder<TDbType, any, any, any, any, infer TParams, any, any> ? TParams : never,
-        TParamsAccumulated extends readonly QueryParam<TDbType, any, any, any, any>[] =
-        [
-            ...(TParams extends readonly QueryParam<TDbType, any, any, any, any>[] ? TParams : []),
-            ...(TCombineParams extends readonly QueryParam<TDbType, any, any, any, any>[] ? TCombineParams : [])
-        ],
-        TFinalParamsAccumulated extends readonly QueryParam<TDbType, any, any, any, any>[] | undefined = TParamsAccumulated["length"] extends 0 ? undefined : TParamsAccumulated
-    >(
-        qbSelectionCb: (ctes: MapCtesToSelectionType<TDbType, TCTESpecs>) => TQbResult
-    ): QueryBuilder<
-        TDbType,
-        TFrom,
-        TJoinSpecs,
-        TCTESpecs,
-        CalculateCombineResult<TQbResult, TResult>,
-        TFinalParamsAccumulated,
-        TAs,
-        TCastType
-    >
-    expect<
-        TQbResult extends QueryBuilder<TDbType, any, any, any, MapQueryResultForCombine<TResult>, any, any, any>,
-        TCombineParams extends readonly QueryParam<TDbType, any, any, any, any>[] | undefined = TQbResult extends QueryBuilder<TDbType, any, any, any, any, infer TParams, any, any> ? TParams : never,
-        TParamsAccumulated extends readonly QueryParam<TDbType, any, any, any, any>[] =
-        [
-            ...(TParams extends readonly QueryParam<TDbType, any, any, any, any>[] ? TParams : []),
-            ...(TCombineParams extends readonly QueryParam<TDbType, any, any, any, any>[] ? TCombineParams : [])
-        ],
-        TFinalParamsAccumulated extends readonly QueryParam<TDbType, any, any, any, any>[] | undefined = TParamsAccumulated["length"] extends 0 ? undefined : TParamsAccumulated
-    >(
-        qbSelectionCb: TQbResult
-    ): QueryBuilder<
-        TDbType,
-        TFrom,
-        TJoinSpecs,
-        TCTESpecs,
-        CalculateCombineResult<TQbResult, TResult>,
-        TFinalParamsAccumulated,
-        TAs,
-        TCastType
-    >
-    expect<
-        TQbResult extends QueryBuilder<TDbType, any, any, any, MapQueryResultForCombine<TResult>, any, any, any>,
-        TCombineParams extends readonly QueryParam<TDbType, any, any, any, any>[] | undefined = TQbResult extends QueryBuilder<TDbType, any, any, any, any, infer TParams, any, any> ? TParams : never,
-        TParamsAccumulated extends readonly QueryParam<TDbType, any, any, any, any>[] =
-        [
-            ...(TParams extends readonly QueryParam<TDbType, any, any, any, any>[] ? TParams : []),
-            ...(TCombineParams extends readonly QueryParam<TDbType, any, any, any, any>[] ? TCombineParams : [])
-        ],
-        TFinalParamsAccumulated extends readonly QueryParam<TDbType, any, any, any, any>[] | undefined = TParamsAccumulated["length"] extends 0 ? undefined : TParamsAccumulated
-    >(
-        cb: (ctes: MapCtesToSelectionType<TDbType, TCTESpecs>) => TQbResult
-    ): QueryBuilder<
-        TDbType,
-        TFrom,
-        TJoinSpecs,
-        TCTESpecs,
-        CalculateCombineResult<TQbResult, TResult>,
-        TFinalParamsAccumulated,
-        TAs,
-        TCastType
-    > {
-        return this.#combine(combineTypes.EXCEPT.name, cb);
-    }
-
-
-    expectAll<
-        TQbResult extends QueryBuilder<TDbType, any, any, any, MapQueryResultForCombine<TResult>, any, any, any>,
-        TCombineParams extends readonly QueryParam<TDbType, any, any, any, any>[] | undefined = TQbResult extends QueryBuilder<TDbType, any, any, any, any, infer TParams, any, any> ? TParams : never,
-        TParamsAccumulated extends readonly QueryParam<TDbType, any, any, any, any>[] =
-        [
-            ...(TParams extends readonly QueryParam<TDbType, any, any, any, any>[] ? TParams : []),
-            ...(TCombineParams extends readonly QueryParam<TDbType, any, any, any, any>[] ? TCombineParams : [])
-        ],
-        TFinalParamsAccumulated extends readonly QueryParam<TDbType, any, any, any, any>[] | undefined = TParamsAccumulated["length"] extends 0 ? undefined : TParamsAccumulated
-    >(
-        qbSelectionCb: (ctes: MapCtesToSelectionType<TDbType, TCTESpecs>) => TQbResult
-    ): QueryBuilder<
-        TDbType,
-        TFrom,
-        TJoinSpecs,
-        TCTESpecs,
-        CalculateCombineResult<TQbResult, TResult>,
-        TFinalParamsAccumulated,
-        TAs,
-        TCastType
-    >
-    expectAll<
-        TQbResult extends QueryBuilder<TDbType, any, any, any, MapQueryResultForCombine<TResult>, any, any, any>,
-        TCombineParams extends readonly QueryParam<TDbType, any, any, any, any>[] | undefined = TQbResult extends QueryBuilder<TDbType, any, any, any, any, infer TParams, any, any> ? TParams : never,
-        TParamsAccumulated extends readonly QueryParam<TDbType, any, any, any, any>[] =
-        [
-            ...(TParams extends readonly QueryParam<TDbType, any, any, any, any>[] ? TParams : []),
-            ...(TCombineParams extends readonly QueryParam<TDbType, any, any, any, any>[] ? TCombineParams : [])
-        ],
-        TFinalParamsAccumulated extends readonly QueryParam<TDbType, any, any, any, any>[] | undefined = TParamsAccumulated["length"] extends 0 ? undefined : TParamsAccumulated
-    >(
-        qbSelectionCb: TQbResult
-    ): QueryBuilder<
-        TDbType,
-        TFrom,
-        TJoinSpecs,
-        TCTESpecs,
-        CalculateCombineResult<TQbResult, TResult>,
-        TFinalParamsAccumulated,
-        TAs,
-        TCastType
-    >
-    expectAll<
-        TQbResult extends QueryBuilder<TDbType, any, any, any, MapQueryResultForCombine<TResult>, any, any, any>,
-        TCombineParams extends readonly QueryParam<TDbType, any, any, any, any>[] | undefined = TQbResult extends QueryBuilder<TDbType, any, any, any, any, infer TParams, any, any> ? TParams : never,
-        TParamsAccumulated extends readonly QueryParam<TDbType, any, any, any, any>[] =
-        [
-            ...(TParams extends readonly QueryParam<TDbType, any, any, any, any>[] ? TParams : []),
-            ...(TCombineParams extends readonly QueryParam<TDbType, any, any, any, any>[] ? TCombineParams : [])
-        ],
-        TFinalParamsAccumulated extends readonly QueryParam<TDbType, any, any, any, any>[] | undefined = TParamsAccumulated["length"] extends 0 ? undefined : TParamsAccumulated
-    >(
-        cb: (ctes: MapCtesToSelectionType<TDbType, TCTESpecs>) => TQbResult
-    ): QueryBuilder<
-        TDbType,
-        TFrom,
-        TJoinSpecs,
-        TCTESpecs,
-        CalculateCombineResult<TQbResult, TResult>,
-        TFinalParamsAccumulated,
-        TAs,
-        TCastType
-    > {
-        return this.#combine(combineTypes.EXCEPT.name, cb);
-    }
-
-
     exec(
         ...args: TParams extends undefined
             ? [] | [{ [key: string]: any }]
@@ -2022,6 +1492,27 @@ class QueryBuilder<
 
         return "x" as any;
     }
+}
+
+/**
+ * Initialized at moduleInitializer.js to avoid circular dependency issues.
+ */
+interface QueryBuilder<
+    TDbType extends DbType,
+    TFrom extends FromType<TDbType> | undefined,
+    TJoinSpecs extends JoinSpecsType<TDbType> | undefined,
+    TCTESpecs extends CTESpecsType<TDbType> | undefined,
+    TResult extends ResultShape<TDbType> | undefined = undefined,
+    TParams extends readonly QueryParam<TDbType, any, any, any, any>[] | undefined = undefined,
+    TAs extends string | undefined = undefined,
+    TCastType extends PgColumnType | undefined = undefined
+> {
+    union: typeof unionFn;
+    unionAll: typeof unionAllFn;
+    intersect: typeof intersectFn;
+    intersectAll: typeof intersectAllFn;
+    except: typeof exceptFn;
+    exceptAll: typeof exceptAllFn;
 }
 
 
@@ -2099,7 +1590,9 @@ export type {
     OrderType,
     CTEType,
     CTESpecsType,
-    COMBINE_TYPE,
+    CombineType,
     UNION_TYPE,
-    MapQueryResultForCombine
+    MapQueryResultForCombine,
+    CalculateCombineResult,
+    CombineSpecsType
 }

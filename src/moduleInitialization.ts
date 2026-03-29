@@ -1,9 +1,11 @@
 import BaseQueryExpression from "./query/_baseClasses/BaseQueryExpression.js";
+import { exceptAllFn, exceptFn, intersectAllFn, intersectFn, unionAllFn, unionFn } from "./query/combining.js";
 import { eq, gt, gte, lt, lte, notEq } from "./query/comparisons/_basicColumnComparisonOperation.js";
 import { between, notBetween } from "./query/comparisons/_betweenColumnComparisonOperation.js";
 import { sqlIn, sqlNotIn } from "./query/comparisons/_inColumnComparisonOperation.js";
 import { isNotNull, isNull } from "./query/comparisons/_isNullColumnComparisonOperation.js";
 import { iLike, like, notILike, notLike } from "./query/comparisons/_likeColumnComparisonOperation.js";
+import QueryBuilder, { combineTypes } from "./query/queryBuilder.js";
 
 BaseQueryExpression.prototype.eq = eq;
 BaseQueryExpression.prototype.notEq = notEq;
@@ -21,3 +23,10 @@ BaseQueryExpression.prototype.like = like;
 BaseQueryExpression.prototype.notLike = notLike;
 BaseQueryExpression.prototype.iLike = iLike;
 BaseQueryExpression.prototype.notILike = notILike;
+
+QueryBuilder.prototype.union = unionFn;
+QueryBuilder.prototype.unionAll = unionAllFn;
+QueryBuilder.prototype.intersect = intersectFn;
+QueryBuilder.prototype.intersectAll = intersectAllFn;
+QueryBuilder.prototype.except = exceptFn;
+QueryBuilder.prototype.exceptAll = exceptAllFn;

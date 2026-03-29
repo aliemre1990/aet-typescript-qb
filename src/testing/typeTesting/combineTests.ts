@@ -1,3 +1,4 @@
+import { withAs } from "../../query/cteObject.js";
 import { customersTable, employeesTable } from "../_tables.js";
 import type { AssertEqual, AssertTrue } from "../_typeTestingUtilities.js";
 
@@ -56,3 +57,8 @@ const unionValid_NullableResult_NullBefore = customersTable
 type typeof_UnionValid_NullableResult_NullBefore_Result = (typeof unionValid_NullableResult_NullBefore.exec) extends () => Array<infer TResult> ? TResult : never;
 type expected_UnionValid_NullableResult_NullBefore_Result = { nullable: number | null, name: string };
 type unionValid_NullableResult_NullBefore_Test = AssertTrue<AssertEqual<typeof_UnionValid_NullableResult_NullBefore_Result, expected_UnionValid_NullableResult_NullBefore_Result>>;
+
+const unionValid_WithCTE = withAs("cteTable", customersTable.select())
+    .from((ctes) => [ctes.cteTable])
+    .select((tables) => [tables.cteTable.id, tables.cteTable.name])
+    .unionAll(() => customersTable.select((tables) => [tables.customers.id, tables.customers.name]));
