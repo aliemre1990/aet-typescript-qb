@@ -4,7 +4,7 @@ import test from "node:test";
 import assert from "node:assert";
 
 import { customersTable, ordersTable } from "../_tables.js";
-import { from, withAs } from "../../query/queryBuilder.js";
+import { withAs } from '../../query/withAs.js';
 
 test.suite("Param accumulation tests.", () => {
 

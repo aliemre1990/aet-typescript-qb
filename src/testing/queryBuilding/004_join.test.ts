@@ -4,7 +4,7 @@ import test from "node:test";
 import assert from "node:assert";
 
 import { customersTable, orderDetailsTable, ordersTable, shipmentsTable } from "../_tables.js";
-import { withAs } from '../../query/queryBuilder.js';
+import { withAs } from '../../query/withAs.js';
 
 
 test.suite("JOIN TESTS", () => {
