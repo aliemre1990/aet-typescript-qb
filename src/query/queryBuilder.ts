@@ -21,12 +21,12 @@ import CTEObject, { CTEObjectEntry } from "./cteObject.js";
 import { extractParams, mapCTESpecsToSelection } from "./utility.js";
 import type { PgColumnType } from "../table/columnTypes.js";
 import { getDbFunctions } from "./uitlity/dbOperations.js";
-import type { MapToCTEObjectForRecursive } from "./_types/cteUtility.js";
+import type { MapToCTEObject, MapToCTEObjectForRecursive } from "./_types/cteUtility.js";
 import type { UndefinedIfLengthZero } from "../utility/common.js";
 import type { ExtractParams } from "./param.js";
 import type BaseColumnComparisonOperation from "./_baseClasses/BaseColumnComparisonOperation.js";
 import BaseQueryExpression from "./_baseClasses/BaseQueryExpression.js";
-import type { exceptAllFn, exceptFn, intersectAllFn, intersectFn, unionAllFn, unionFn } from "./combining.js";
+import type { IDbType } from "./_interfaces/IDbType.js";
 
 type CombineExpressions<
     TLeft extends ResultShapeItem<any>,
@@ -1102,246 +1102,17 @@ class QueryBuilder<
             })
     }
 
-    withAsMaterialized<
-        TCTEName extends string,
-        TQb extends QueryBuilder<TDbType, any, any, any, any, any, any, any>,
-        TCTEObject extends CTEObject<TDbType, any, any, any, any> = CTEObject<TDbType, TCTEName, TQb>,
-        TFinalCTESpec extends readonly CTEObject<TDbType, any, any, any, any>[] = readonly [...(TCTESpecs extends CTESpecsType<TDbType> ? TCTESpecs : []), TCTEObject],
-        TCTEParams extends readonly QueryParam<TDbType, any, any, any, any>[] | undefined = TQb extends QueryBuilder<TDbType, any, any, any, any, infer TParams, any, any> ? TParams : never,
-        TParamsAccumulated extends readonly QueryParam<TDbType, any, any, any, any>[] | undefined = UndefinedIfLengthZero<
-            [
-                ...(TParams extends readonly QueryParam<TDbType, any, any, any, any>[] ? TParams : []),
-                ...(TCTEParams extends readonly QueryParam<TDbType, any, any, any, any>[] ? TCTEParams : [])
-            ]>
-    >(
-        as: TCTEName,
-        pick: TQb | ((ctes: MapCtesToSelectionType<TDbType, TCTESpecs>) => TQb)
-    ):
-        QueryBuilder<
-            TDbType,
-            TFrom,
-            TJoinSpecs,
-            TFinalCTESpec,
-            TResult,
-            TParamsAccumulated,
-            TAs,
-            TCastType
-        > {
 
-        let res: TQb;
-        if (typeof pick === "function") {
+    union = unionFn;
+    unionAll = unionAllFn;
+    intersect = intersectFn;
+    intersectAll = intersectAllFn;
+    except = exceptFn;
+    exceptAll = exceptAllFn;
 
-            let cteSelection: MapCtesToSelectionType<TDbType, TCTESpecs>;
-            if (this.cteSpecs === undefined) {
-                cteSelection = {} as MapCtesToSelectionType<TDbType, TCTESpecs>;
-            } else {
-                cteSelection = mapCTESpecsToSelection(this.cteSpecs);
-            }
-            res = pick(cteSelection);
-        } else {
-            res = pick;
-        }
-
-        let newCteSpecs = [...(this.cteSpecs || [] as CTESpecsType<TDbType>)];
-        const newSpec = new CTEObject(this.dbType, res, as, cteTypes.MATERIALIZED);
-
-        let foundIndex = newCteSpecs.findIndex(spec => spec.name === newSpec.name) || -1;
-        if (foundIndex >= 0) {
-            newCteSpecs.toSpliced(foundIndex, 1);
-        }
-        newCteSpecs.push(newSpec);
-
-        const params = extractParams([res], this.params);
-
-        return new QueryBuilder<
-            TDbType,
-            TFrom,
-            TJoinSpecs,
-            TFinalCTESpec,
-            TResult,
-            TParamsAccumulated,
-            TAs,
-            TCastType
-        >(
-            this.dbType,
-            this.fromSpecs,
-            this.asName,
-            this.castType,
-            {
-                queryType: this.queryType,
-                params: params as TParamsAccumulated,
-                cteSpecs: newCteSpecs as CTESpecsType<TDbType> as TFinalCTESpec,
-                joinSpecs: this.joinSpecs,
-                whereComparison: this.whereComparison,
-                selectResult: this.selectResult,
-                groupedColumns: this.groupedColumns,
-                havingSpec: this.havingSpec,
-                orderBySpecs: this.orderBySpecs,
-                combineSpecs: this.combineSpecs
-            }
-        );
-    }
-
-    withAsNotMaterialized<
-        TCTEName extends string,
-        TQb extends QueryBuilder<TDbType, any, any, any, any, any, any, any>,
-        TCTEObject extends CTEObject<TDbType, any, any, any, any> = CTEObject<TDbType, TCTEName, TQb>,
-        TFinalCTESpec extends readonly CTEObject<TDbType, any, any, any, any>[] = readonly [...(TCTESpecs extends CTESpecsType<TDbType> ? TCTESpecs : []), TCTEObject],
-        TCTEParams extends readonly QueryParam<TDbType, any, any, any, any>[] | undefined = TQb extends QueryBuilder<TDbType, any, any, any, any, infer TParams, any, any> ? TParams : never,
-        TParamsAccumulated extends readonly QueryParam<TDbType, any, any, any, any>[] | undefined = UndefinedIfLengthZero<
-            [
-                ...(TParams extends readonly QueryParam<TDbType, any, any, any, any>[] ? TParams : []),
-                ...(TCTEParams extends readonly QueryParam<TDbType, any, any, any, any>[] ? TCTEParams : [])
-            ]>
-    >(
-        as: TCTEName,
-        pick: TQb | ((ctes: MapCtesToSelectionType<TDbType, TCTESpecs>) => TQb)
-    ):
-        QueryBuilder<
-            TDbType,
-            TFrom,
-            TJoinSpecs,
-            TFinalCTESpec,
-            TResult,
-            TParamsAccumulated,
-            TAs,
-            TCastType
-        > {
-
-        let res: TQb;
-        if (typeof pick === "function") {
-
-            let cteSelection: MapCtesToSelectionType<TDbType, TCTESpecs>;
-            if (this.cteSpecs === undefined) {
-                cteSelection = {} as MapCtesToSelectionType<TDbType, TCTESpecs>;
-            } else {
-                cteSelection = mapCTESpecsToSelection(this.cteSpecs);
-            }
-            res = pick(cteSelection);
-        } else {
-            res = pick;
-        }
-
-        let newCteSpecs = [...(this.cteSpecs || [] as CTESpecsType<TDbType>)];
-        const newSpec = new CTEObject(this.dbType, res, as, cteTypes.NOT_MATERIALIZED);
-
-        let foundIndex = newCteSpecs.findIndex(spec => spec.name === newSpec.name) || -1;
-        if (foundIndex >= 0) {
-            newCteSpecs.toSpliced(foundIndex, 1);
-        }
-        newCteSpecs.push(newSpec);
-
-        const params = extractParams([res], this.params);
-
-        return new QueryBuilder<
-            TDbType,
-            TFrom,
-            TJoinSpecs,
-            TFinalCTESpec,
-            TResult,
-            TParamsAccumulated,
-            TAs,
-            TCastType
-        >(
-            this.dbType,
-            this.fromSpecs,
-            this.asName,
-            this.castType,
-            {
-                queryType: this.queryType,
-                params: params as TParamsAccumulated,
-                cteSpecs: newCteSpecs as CTESpecsType<TDbType> as TFinalCTESpec,
-                joinSpecs: this.joinSpecs,
-                whereComparison: this.whereComparison,
-                selectResult: this.selectResult,
-                groupedColumns: this.groupedColumns,
-                havingSpec: this.havingSpec,
-                orderBySpecs: this.orderBySpecs,
-                combineSpecs: this.combineSpecs
-            }
-        );
-    }
-
-    withAs<
-        TCTEName extends string,
-        TQb extends QueryBuilder<TDbType, any, any, any, any, any, any, any>,
-        TCTEObject extends CTEObject<TDbType, any, any, any, any> = CTEObject<TDbType, TCTEName, TQb>,
-        TFinalCTESpec extends readonly CTEObject<TDbType, any, any, any, any>[] = readonly [...(TCTESpecs extends CTESpecsType<TDbType> ? TCTESpecs : []), TCTEObject],
-        TCTEParams extends readonly QueryParam<TDbType, any, any, any, any>[] | undefined = TQb extends QueryBuilder<TDbType, any, any, any, any, infer TParams, any, any> ? TParams : never,
-        TParamsAccumulated extends readonly QueryParam<TDbType, any, any, any, any>[] | undefined = UndefinedIfLengthZero<
-            [
-                ...(TParams extends readonly QueryParam<TDbType, any, any, any, any>[] ? TParams : []),
-                ...(TCTEParams extends readonly QueryParam<TDbType, any, any, any, any>[] ? TCTEParams : [])
-            ]>
-    >(
-        as: TCTEName,
-        pick: TQb | ((ctes: MapCtesToSelectionType<TDbType, TCTESpecs>) => TQb)
-    ):
-        QueryBuilder<
-            TDbType,
-            TFrom,
-            TJoinSpecs,
-            TFinalCTESpec,
-            TResult,
-            TParamsAccumulated,
-            TAs,
-            TCastType
-        > {
-
-        let res: TQb;
-        if (typeof pick === "function") {
-
-            let cteSelection: MapCtesToSelectionType<TDbType, TCTESpecs>;
-            if (this.cteSpecs === undefined) {
-                cteSelection = {} as MapCtesToSelectionType<TDbType, TCTESpecs>;
-            } else {
-                cteSelection = mapCTESpecsToSelection(this.cteSpecs);
-            }
-            res = pick(cteSelection);
-        } else {
-            res = pick;
-        }
-
-        let newCteSpecs = [...(this.cteSpecs || [] as CTESpecsType<TDbType>)];
-        const newSpec = new CTEObject(this.dbType, res, as, cteTypes.NON_RECURSIVE);
-
-        let foundIndex = newCteSpecs.findIndex(spec => spec.name === newSpec.name) || -1;
-        if (foundIndex >= 0) {
-            newCteSpecs.toSpliced(foundIndex, 1);
-        }
-        newCteSpecs.push(newSpec);
-
-        const params = extractParams([res], this.params);
-
-        return new QueryBuilder<
-            TDbType,
-            TFrom,
-            TJoinSpecs,
-            TFinalCTESpec,
-            TResult,
-            TParamsAccumulated,
-            TAs,
-            TCastType
-        >(
-            this.dbType,
-            this.fromSpecs,
-            this.asName,
-            this.castType,
-            {
-                queryType: this.queryType,
-                params: params as TParamsAccumulated,
-                cteSpecs: newCteSpecs as CTESpecsType<TDbType> as TFinalCTESpec,
-                joinSpecs: this.joinSpecs,
-                whereComparison: this.whereComparison,
-                selectResult: this.selectResult,
-                groupedColumns: this.groupedColumns,
-                havingSpec: this.havingSpec,
-                orderBySpecs: this.orderBySpecs,
-                combineSpecs: this.combineSpecs
-            }
-        );
-    }
-
+    withAs = withAsFnForQb;
+    withAsMaterialized = withAsMaterializedFnForQb;
+    withAsNotMaterialized = withAsNotMaterializedFnForQb;
     withRecursiveAs<
         TCTEName extends string,
         const TColumnNames extends readonly string[],
@@ -1507,14 +1278,484 @@ interface QueryBuilder<
     TAs extends string | undefined = undefined,
     TCastType extends PgColumnType | undefined = undefined
 > {
-    union: typeof unionFn;
-    unionAll: typeof unionAllFn;
-    intersect: typeof intersectFn;
-    intersectAll: typeof intersectAllFn;
-    except: typeof exceptFn;
-    exceptAll: typeof exceptAllFn;
+
 }
 
+
+
+function generateCTEFunctionForQb(cteType: CTEType) {
+
+    function cteFn<
+        TThis extends QueryBuilder<any, any, any, any, any, any, any, any>,
+        TCTEName extends string,
+        TQb extends QueryBuilder<TThisDbType, any, any, any, any, any, any, any>,
+
+        TThisDbType extends DbType = TThis extends QueryBuilder<infer TDbType, any, any, any, any, any, any, any> ? TDbType : never,
+        TThisFrom extends FromType<TThisDbType> | undefined = TThis extends QueryBuilder<any, infer TFrom, any, any, any, any, any, any> ? TFrom : never,
+        TThisJoinSpecs extends JoinSpecsType<TThisDbType> | undefined = TThis extends QueryBuilder<any, any, infer TJoinSpecs, any, any, any, any, any> ? TJoinSpecs : never,
+        TThisCTESpecs extends CTESpecsType<TThisDbType> | undefined = TThis extends QueryBuilder<any, any, any, infer TCTESpecs, any, any, any, any> ? TCTESpecs : never,
+        TThisResultShape extends ResultShape<TThisDbType> | undefined = TThis extends QueryBuilder<any, any, any, any, infer TResultShape, any, any, any> ? TResultShape : never,
+        TThisParams extends readonly QueryParam<TThisDbType, any, any, any, any>[] | undefined = TThis extends QueryBuilder<any, any, any, any, any, infer TParams, any, any> ? TParams : never,
+        TThisAs extends string | undefined = TThis extends QueryBuilder<any, any, any, any, any, any, infer TAs, any> ? TAs : never,
+        TThisCastType extends PgColumnType | undefined = TThis extends QueryBuilder<any, any, any, any, any, any, any, infer TCastType> ? TCastType : never,
+
+        TCTEObject extends CTEObject<TThisDbType, any, any, any, any> = CTEObject<TThisDbType, TCTEName, TQb>,
+        TFinalCTESpec extends readonly CTEObject<TThisDbType, any, any, any, any>[] = readonly [...(TThisCTESpecs extends CTESpecsType<TThisDbType> ? TThisCTESpecs : []), TCTEObject],
+        TCTEParams extends readonly QueryParam<TThisDbType, any, any, any, any>[] | undefined = ExtractParams<TQb>,
+        TParamsAccumulated extends readonly QueryParam<TThisDbType, any, any, any, any>[] | undefined = UndefinedIfLengthZero<
+            [
+                ...(TThisParams extends readonly QueryParam<any, any, any, any, any>[] ? TThisParams : []),
+                ...(TCTEParams extends readonly QueryParam<any, any, any, any, any>[] ? TCTEParams : [])
+            ]>
+    >(
+        this: TThis,
+        as: TCTEName,
+        qb: TQb
+    ):
+        QueryBuilder<
+            TThisDbType,
+            TThisFrom,
+            TThisJoinSpecs,
+            TFinalCTESpec,
+            TThisResultShape,
+            TParamsAccumulated,
+            TThisAs,
+            TThisCastType
+        >
+    function cteFn<
+        TThis extends QueryBuilder<any, any, any, any, any, any, any, any>,
+        TCTEName extends string,
+        TQb extends QueryBuilder<TThisDbType, any, any, any, any, any, any, any>,
+
+        TThisDbType extends DbType = TThis extends QueryBuilder<infer TDbType, any, any, any, any, any, any, any> ? TDbType : never,
+        TThisFrom extends FromType<TThisDbType> | undefined = TThis extends QueryBuilder<any, infer TFrom, any, any, any, any, any, any> ? TFrom : never,
+        TThisJoinSpecs extends JoinSpecsType<TThisDbType> | undefined = TThis extends QueryBuilder<any, any, infer TJoinSpecs, any, any, any, any, any> ? TJoinSpecs : never,
+        TThisCTESpecs extends CTESpecsType<TThisDbType> | undefined = TThis extends QueryBuilder<any, any, any, infer TCTESpecs, any, any, any, any> ? TCTESpecs : never,
+        TThisResultShape extends ResultShape<TThisDbType> | undefined = TThis extends QueryBuilder<any, any, any, any, infer TResultShape, any, any, any> ? TResultShape : never,
+        TThisParams extends readonly QueryParam<TThisDbType, any, any, any, any>[] | undefined = TThis extends QueryBuilder<any, any, any, any, any, infer TParams, any, any> ? TParams : never,
+        TThisAs extends string | undefined = TThis extends QueryBuilder<any, any, any, any, any, any, infer TAs, any> ? TAs : never,
+        TThisCastType extends PgColumnType | undefined = TThis extends QueryBuilder<any, any, any, any, any, any, any, infer TCastType> ? TCastType : never,
+
+        TCTEObject extends CTEObject<TThisDbType, any, any, any, any> = CTEObject<TThisDbType, TCTEName, TQb>,
+        TFinalCTESpec extends readonly CTEObject<TThisDbType, any, any, any, any>[] = readonly [...(TThisCTESpecs extends CTESpecsType<TThisDbType> ? TThisCTESpecs : []), TCTEObject],
+        TCTEParams extends readonly QueryParam<TThisDbType, any, any, any, any>[] | undefined = ExtractParams<TQb>,
+        TParamsAccumulated extends readonly QueryParam<TThisDbType, any, any, any, any>[] | undefined = UndefinedIfLengthZero<
+            [
+                ...(TThisParams extends readonly QueryParam<any, any, any, any, any>[] ? TThisParams : []),
+                ...(TCTEParams extends readonly QueryParam<any, any, any, any, any>[] ? TCTEParams : [])
+            ]>
+    >(
+        this: TThis,
+        as: TCTEName,
+        qb: (ctes: MapCtesToSelectionType<TThisDbType, TThisCTESpecs>) => TQb
+    ):
+        QueryBuilder<
+            TThisDbType,
+            TThisFrom,
+            TThisJoinSpecs,
+            TFinalCTESpec,
+            TThisResultShape,
+            TParamsAccumulated,
+            TThisAs,
+            TThisCastType
+        >
+    function cteFn<
+        TThis extends QueryBuilder<any, any, any, any, any, any, any, any>,
+        TCTEName extends string,
+        TQb extends QueryBuilder<TThisDbType, any, any, any, any, any, any, any>,
+
+        TThisDbType extends DbType = TThis extends QueryBuilder<infer TDbType, any, any, any, any, any, any, any> ? TDbType : never,
+        TThisFrom extends FromType<TThisDbType> | undefined = TThis extends QueryBuilder<any, infer TFrom, any, any, any, any, any, any> ? TFrom : never,
+        TThisJoinSpecs extends JoinSpecsType<TThisDbType> | undefined = TThis extends QueryBuilder<any, any, infer TJoinSpecs, any, any, any, any, any> ? TJoinSpecs : never,
+        TThisCTESpecs extends CTESpecsType<TThisDbType> | undefined = TThis extends QueryBuilder<any, any, any, infer TCTESpecs, any, any, any, any> ? TCTESpecs : never,
+        TThisResultShape extends ResultShape<TThisDbType> | undefined = TThis extends QueryBuilder<any, any, any, any, infer TResultShape, any, any, any> ? TResultShape : never,
+        TThisParams extends readonly QueryParam<TThisDbType, any, any, any, any>[] | undefined = TThis extends QueryBuilder<any, any, any, any, any, infer TParams, any, any> ? TParams : never,
+        TThisAs extends string | undefined = TThis extends QueryBuilder<any, any, any, any, any, any, infer TAs, any> ? TAs : never,
+        TThisCastType extends PgColumnType | undefined = TThis extends QueryBuilder<any, any, any, any, any, any, any, infer TCastType> ? TCastType : never,
+
+        TCTEObject extends CTEObject<TThisDbType, any, any, any, any> = CTEObject<TThisDbType, TCTEName, TQb>,
+        TFinalCTESpec extends readonly CTEObject<TThisDbType, any, any, any, any>[] = readonly [...(TThisCTESpecs extends CTESpecsType<TThisDbType> ? TThisCTESpecs : []), TCTEObject],
+        TCTEParams extends readonly QueryParam<TThisDbType, any, any, any, any>[] | undefined = ExtractParams<TQb>,
+        TParamsAccumulated extends readonly QueryParam<TThisDbType, any, any, any, any>[] | undefined = UndefinedIfLengthZero<
+            [
+                ...(TThisParams extends readonly QueryParam<any, any, any, any, any>[] ? TThisParams : []),
+                ...(TCTEParams extends readonly QueryParam<any, any, any, any, any>[] ? TCTEParams : [])
+            ]>
+    >(
+        this: TThis,
+        as: TCTEName,
+        qb: TQb | ((ctes: MapCtesToSelectionType<TThisDbType, TThisCTESpecs>) => TQb)
+    ):
+        QueryBuilder<
+            TThisDbType,
+            TThisFrom,
+            TThisJoinSpecs,
+            TFinalCTESpec,
+            TThisResultShape,
+            TParamsAccumulated,
+            TThisAs,
+            TThisCastType
+        > {
+
+
+        let res: TQb;
+        if (typeof qb === "function") {
+
+            let cteSelection: MapCtesToSelectionType<TThisDbType, TThisCTESpecs>;
+            if (this.cteSpecs === undefined) {
+                cteSelection = {} as MapCtesToSelectionType<TThisDbType, TThisCTESpecs>;
+            } else {
+                cteSelection = mapCTESpecsToSelection(this.cteSpecs) as MapCtesToSelectionType<TThisDbType, TThisCTESpecs>;
+            }
+            res = qb(cteSelection);
+        } else {
+            res = qb;
+        }
+
+        let newCteSpecs = [...(this.cteSpecs || [] as CTESpecsType<TThisDbType>)];
+        const newSpec = new CTEObject(this.dbType, res, as, cteType);
+
+        let foundIndex = newCteSpecs.findIndex(spec => spec.name === newSpec.name) || -1;
+        if (foundIndex >= 0) {
+            newCteSpecs.toSpliced(foundIndex, 1);
+        }
+        newCteSpecs.push(newSpec);
+
+        const params = extractParams([res], this.params);
+
+        return new QueryBuilder<
+            TThisDbType,
+            TThisFrom,
+            TThisJoinSpecs,
+            TFinalCTESpec,
+            TThisResultShape,
+            TParamsAccumulated,
+            TThisAs,
+            TThisCastType
+        >(
+            this.dbType,
+            this.fromSpecs,
+            this.asName,
+            this.castType,
+            {
+                queryType: this.queryType,
+                params: params as TParamsAccumulated,
+                cteSpecs: newCteSpecs as CTESpecsType<TThisDbType> as TFinalCTESpec,
+                joinSpecs: this.joinSpecs,
+                whereComparison: this.whereComparison,
+                selectResult: this.selectResult,
+                groupedColumns: this.groupedColumns,
+                havingSpec: this.havingSpec,
+                orderBySpecs: this.orderBySpecs,
+                combineSpecs: this.combineSpecs
+            }
+        );
+    }
+
+    return cteFn;
+}
+
+const withAsFnForQb = generateCTEFunctionForQb(cteTypes.NON_RECURSIVE);
+const withAsMaterializedFnForQb = generateCTEFunctionForQb(cteTypes.MATERIALIZED);
+const withAsNotMaterializedFnForQb = generateCTEFunctionForQb(cteTypes.NOT_MATERIALIZED);
+
+
+function generateCTEFunctionForStandalone(cteType: CTEType) {
+
+    function cteFn<
+        TCTEName extends string,
+        TQb extends QueryBuilder<TDbType, any, any, any, any, any, any, any>,
+        TDbType extends DbType = TQb extends IDbType<infer TDbTypeInner> ? TDbTypeInner : never
+    >(as: TCTEName, qb: TQb) {
+        type TCTEObject = MapToCTEObject<TDbType, TCTEName, TQb>;
+        type TParams = TQb extends QueryBuilder<TDbType, any, any, any, any, infer TParams, any, any> ? TParams : never;
+
+        const cteObject = new CTEObject(qb.dbType, qb, as, cteType) as TCTEObject;
+        const cteSpecs = [cteObject] as const;
+
+        let params: readonly QueryParam<TDbType, any, any, any, any>[] | undefined = qb.params;
+        if (params && params.length === 0) {
+            params = undefined;
+        }
+
+        return new QueryBuilder<
+            TDbType,
+            undefined,
+            undefined,
+            typeof cteSpecs,
+            undefined,
+            TParams
+        >(
+            qb.dbType,
+            undefined,
+            undefined,
+            undefined,
+            {
+                params: params as TParams,
+                cteSpecs
+            }
+        );
+    }
+
+    return cteFn;
+}
+
+const withAs = generateCTEFunctionForStandalone(cteTypes.NON_RECURSIVE);
+const withAsMaterialized = generateCTEFunctionForStandalone(cteTypes.MATERIALIZED);
+const withAsNotMaterialized = generateCTEFunctionForStandalone(cteTypes.NOT_MATERIALIZED);
+
+
+function withRecursiveAs<
+    TCTEName extends string,
+    const TColumnNames extends readonly string[],
+    TAnchorQb extends QueryBuilder<TDbType, any, any, any, any, any, any, any>,
+    TRecursivePartResult extends QueryBuilder<
+        TDbType,
+        any,
+        any,
+        any,
+        MapQueryResultForCombine<TAnchorQb extends QueryBuilder<any, any, any, any, infer TResult, any, any, any> ? TResult : never>,
+        any,
+        any,
+        any
+    >,
+    TDbType extends DbType = TAnchorQb extends IDbType<infer TDbTypeInner> ? TDbTypeInner : never,
+    TFinalCTE extends CTEObject<TDbType, any, any, any, any> = MapToCTEObjectForRecursive<TDbType, TCTEName, TColumnNames, TAnchorQb>
+>(
+    cteName: TCTEName,
+    columnNames: TColumnNames,
+    anchorQb: TAnchorQb,
+    unionType: UNION_TYPE,
+    recursivePart: (self: TFinalCTE) => TRecursivePartResult
+
+) {
+    // Map anchorqb to cte object with name TCTEName and columns are TColumnsList if specified, else TAnchorQb columns
+    // Pass the cte object to recursive part
+    let cte: TFinalCTE;
+    let finalCTEentries: CTEObjectEntry<TDbType, any, any, any, any, any, any>[] = [];
+    if (columnNames.length === 0) {
+        cte = new CTEObject(anchorQb.dbType, anchorQb, cteName, cteTypes.RECURSIVE) as TFinalCTE;
+    } else {
+        let selectResult = anchorQb.selectResult;
+        if (selectResult === undefined) {
+            throw Error("Column list must match the selected columns.");
+        }
+
+        if (selectResult.length !== columnNames.length) {
+            throw Error("Column list must match the selected columns.");
+        }
+
+        for (let i = 0; i < columnNames.length; i++) {
+            let currName = columnNames[i];
+            let currExp = selectResult[i];
+
+            finalCTEentries.push(new CTEObjectEntry(anchorQb.dbType, currExp, undefined, undefined, cteName, currName));
+        }
+
+        cte = new CTEObject(anchorQb.dbType, anchorQb, cteName, cteTypes.RECURSIVE, finalCTEentries) as TFinalCTE;
+    }
+
+    let recursiveQb = recursivePart(cte);
+
+    let finalQb: QueryBuilder<TDbType, any, any, any, any, any, any, any>;
+    if (unionType === "UNION") {
+        finalQb = anchorQb.union(() => recursiveQb);
+    } else {
+        finalQb = anchorQb.unionAll(() => recursiveQb);
+    }
+
+    type TAnchorParams = TAnchorQb extends QueryBuilder<TDbType, any, any, any, any, infer TParams, any, any> ? TParams : never;
+    type TRecursiveParams = TRecursivePartResult extends QueryBuilder<TDbType, any, any, any, any, infer TParams, any, any> ? TParams : never;
+    type TParams = [...(TAnchorParams extends undefined ? [] : TAnchorParams), ...(TRecursiveParams extends undefined ? [] : TRecursiveParams)];
+    type TParamsResult = TParams["length"] extends 0 ? undefined : TParams;
+
+    const cteObject = new CTEObject(
+        anchorQb.dbType,
+        finalQb,
+        cteName,
+        cteTypes.RECURSIVE,
+        finalCTEentries.length === 0 ? undefined : finalCTEentries, // Override entries from column list if specified
+        undefined,
+        finalCTEentries.length === 0 ? false : true
+    ) as TFinalCTE;
+    const cteSpecs = [cteObject] as const;
+
+    let params = extractParams([finalQb]);
+
+    return new QueryBuilder<
+        TDbType,
+        undefined,
+        undefined,
+        typeof cteSpecs,
+        undefined,
+        TParamsResult
+    >(
+        anchorQb.dbType,
+        undefined,
+        undefined,
+        undefined,
+        {
+            params: params as TParamsResult,
+            cteSpecs
+        }
+    );
+}
+
+
+function generateCombineFunction(combineType: CombineType) {
+    function combine<
+        TThis extends QueryBuilder<any, any, any, any, any, any, any, any>,
+        TQbResult extends QueryBuilder<TThisDbType, any, any, any, MapQueryResultForCombine<TThisResult>, any, any, any>,
+        TThisDbType extends DbType = TThis extends QueryBuilder<infer DbType, any, any, any, any, any, any, any> ? DbType : never,
+        TThisFrom extends FromType<TThisDbType> | undefined = TThis extends QueryBuilder<any, infer TFrom, any, any, any, any, any, any> ? TFrom : never,
+        TThisJoinSpecs extends JoinSpecsType<TThisDbType> | undefined = TThis extends QueryBuilder<any, any, infer TJoinSpecs, any, any, any, any, any> ? TJoinSpecs : never,
+        TThisCTESpecs extends CTESpecsType<TThisDbType> = TThis extends QueryBuilder<any, any, any, infer TCTESpecs, any, any, any, any> ? TCTESpecs : never,
+        TThisResult extends ResultShape<TThisDbType> = TThis extends QueryBuilder<any, any, any, any, infer TResult, any, any, any> ? TResult : never,
+        TThisParams extends DbType = ExtractParams<TThis>,
+        TThisAs extends string | undefined = TThis extends QueryBuilder<any, any, any, any, any, any, infer TAs, any> ? TAs : never,
+        TThisCastType extends PgColumnType | undefined = TThis extends QueryBuilder<any, any, any, any, any, any, any, infer TCastType> ? TCastType : never,
+        TCombineParams extends readonly QueryParam<TThisDbType, any, any, any, any>[] | undefined = ExtractParams<TQbResult>,
+        TParamsAccumulated extends readonly QueryParam<TThisDbType, any, any, any, any>[] | undefined = UndefinedIfLengthZero<
+            [
+                ...(TThisParams extends readonly QueryParam<TThisDbType, any, any, any, any>[] ? TThisParams : []),
+                ...(TCombineParams extends readonly QueryParam<TThisDbType, any, any, any, any>[] ? TCombineParams : [])
+            ]
+        >
+    >(
+        this: TThis,
+        qbSelectionCb: (ctes: MapCtesToSelectionType<TThisDbType, TThisCTESpecs>) => TQbResult
+    ): QueryBuilder<
+        TThisDbType,
+        TThisFrom,
+        TThisJoinSpecs,
+        TThisCTESpecs,
+        CalculateCombineResult<TQbResult, TThisResult>,
+        TParamsAccumulated,
+        TThisAs,
+        TThisCastType
+    >
+    function combine<
+        TThis extends QueryBuilder<any, any, any, any, any, any, any, any>,
+        TQbResult extends QueryBuilder<TThisDbType, any, any, any, MapQueryResultForCombine<TThisResult>, any, any, any>,
+        TThisDbType extends DbType = TThis extends QueryBuilder<infer DbType, any, any, any, any, any, any, any> ? DbType : never,
+        TThisFrom extends FromType<TThisDbType> | undefined = TThis extends QueryBuilder<any, infer TFrom, any, any, any, any, any, any> ? TFrom : never,
+        TThisJoinSpecs extends JoinSpecsType<TThisDbType> | undefined = TThis extends QueryBuilder<any, any, infer TJoinSpecs, any, any, any, any, any> ? TJoinSpecs : never,
+        TThisCTESpecs extends CTESpecsType<TThisDbType> = TThis extends QueryBuilder<any, any, any, infer TCTESpecs, any, any, any, any> ? TCTESpecs : never,
+        TThisResult extends ResultShape<TThisDbType> = TThis extends QueryBuilder<any, any, any, any, infer TResult, any, any, any> ? TResult : never,
+        TThisParams extends DbType = ExtractParams<TThis>,
+        TThisAs extends string | undefined = TThis extends QueryBuilder<any, any, any, any, any, any, infer TAs, any> ? TAs : never,
+        TThisCastType extends PgColumnType | undefined = TThis extends QueryBuilder<any, any, any, any, any, any, any, infer TCastType> ? TCastType : never,
+        TCombineParams extends readonly QueryParam<TThisDbType, any, any, any, any>[] | undefined = ExtractParams<TQbResult>,
+        TParamsAccumulated extends readonly QueryParam<TThisDbType, any, any, any, any>[] | undefined = UndefinedIfLengthZero<
+            [
+                ...(TThisParams extends readonly QueryParam<TThisDbType, any, any, any, any>[] ? TThisParams : []),
+                ...(TCombineParams extends readonly QueryParam<TThisDbType, any, any, any, any>[] ? TCombineParams : [])
+            ]
+        >
+    >(
+        this: TThis,
+        qbSelectionCb: TQbResult
+    ): QueryBuilder<
+        TThisDbType,
+        TThisFrom,
+        TThisJoinSpecs,
+        TThisCTESpecs,
+        CalculateCombineResult<TQbResult, TThisResult>,
+        TParamsAccumulated,
+        TThisAs,
+        TThisCastType
+    >
+    function combine<
+        TThis extends QueryBuilder<any, any, any, any, any, any, any, any>,
+        TQbResult extends QueryBuilder<TThisDbType, any, any, any, MapQueryResultForCombine<TThisResult>, any, any, any>,
+        TThisDbType extends DbType = TThis extends QueryBuilder<infer DbType, any, any, any, any, any, any, any> ? DbType : never,
+        TThisFrom extends FromType<TThisDbType> | undefined = TThis extends QueryBuilder<any, infer TFrom, any, any, any, any, any, any> ? TFrom : never,
+        TThisJoinSpecs extends JoinSpecsType<TThisDbType> | undefined = TThis extends QueryBuilder<any, any, infer TJoinSpecs, any, any, any, any, any> ? TJoinSpecs : never,
+        TThisCTESpecs extends CTESpecsType<TThisDbType> = TThis extends QueryBuilder<any, any, any, infer TCTESpecs, any, any, any, any> ? TCTESpecs : never,
+        TThisResult extends ResultShape<TThisDbType> = TThis extends QueryBuilder<any, any, any, any, infer TResult, any, any, any> ? TResult : never,
+        TThisParams extends DbType = ExtractParams<TThis>,
+        TThisAs extends string | undefined = TThis extends QueryBuilder<any, any, any, any, any, any, infer TAs, any> ? TAs : never,
+        TThisCastType extends PgColumnType | undefined = TThis extends QueryBuilder<any, any, any, any, any, any, any, infer TCastType> ? TCastType : never,
+        TCombineParams extends readonly QueryParam<TThisDbType, any, any, any, any>[] | undefined = ExtractParams<TQbResult>,
+        TParamsAccumulated extends readonly QueryParam<TThisDbType, any, any, any, any>[] | undefined = UndefinedIfLengthZero<
+            [
+                ...(TThisParams extends readonly QueryParam<TThisDbType, any, any, any, any>[] ? TThisParams : []),
+                ...(TCombineParams extends readonly QueryParam<TThisDbType, any, any, any, any>[] ? TCombineParams : [])
+            ]
+        >
+    >(
+        this: TThis,
+        cteSelectionCb: TQbResult | ((ctes: MapCtesToSelectionType<TThisDbType, TThisCTESpecs>) => TQbResult)
+    ): QueryBuilder<
+        TThisDbType,
+        TThisFrom,
+        TThisJoinSpecs,
+        TThisCTESpecs,
+        CalculateCombineResult<TQbResult, TThisResult>,
+        TParamsAccumulated,
+        TThisAs,
+        TThisCastType
+    > {
+        let res: TQbResult;
+        if (typeof cteSelectionCb === "function") {
+            let cteSpecs: MapCtesToSelectionType<TThisDbType, TThisCTESpecs>;
+            if (this.cteSpecs === undefined) {
+                cteSpecs = {} as MapCtesToSelectionType<TThisDbType, TThisCTESpecs>;
+            } else {
+                cteSpecs = mapCTESpecsToSelection(this.cteSpecs) as MapCtesToSelectionType<TThisDbType, TThisCTESpecs>;
+            }
+            res = cteSelectionCb(cteSpecs);
+        } else {
+            res = cteSelectionCb;
+        }
+
+        let newCombine = { type: combineType, qb: res };
+
+        let newCombineSpecs: CombineSpecsType<TThisDbType> = [newCombine];
+        if (this.combineSpecs !== undefined) {
+            newCombineSpecs = [...this.combineSpecs, ...newCombineSpecs];
+        }
+
+        const params = extractParams([res.params], this.params);
+
+        return new QueryBuilder<
+            TThisDbType,
+            TThisFrom,
+            TThisJoinSpecs,
+            TThisCTESpecs,
+            CalculateCombineResult<TQbResult, TThisResult>,
+            TParamsAccumulated,
+            TThisAs,
+            TThisCastType
+        >(
+            this.dbType,
+            this.fromSpecs,
+            this.asName,
+            this.castType,
+            {
+                queryType: this.queryType,
+                params: params as TParamsAccumulated,
+                cteSpecs: this.cteSpecs,
+                joinSpecs: this.joinSpecs,
+                whereComparison: this.whereComparison,
+                selectResult: this.selectResult as CalculateCombineResult<TQbResult, TThisResult>,
+                selectSpecs: this.selectSpecs,
+                groupedColumns: this.groupedColumns,
+                havingSpec: this.havingSpec,
+                orderBySpecs: this.orderBySpecs,
+                combineSpecs: newCombineSpecs
+            });
+    }
+
+    return combine;
+}
+
+const unionFn = generateCombineFunction(combineTypes.UNION);
+const unionAllFn = generateCombineFunction(combineTypes.UNION_ALL);
+const intersectFn = generateCombineFunction(combineTypes.INTERSECT);
+const intersectAllFn = generateCombineFunction(combineTypes.INTERSECT_ALL);
+const exceptFn = generateCombineFunction(combineTypes.EXCEPT);
+const exceptAllFn = generateCombineFunction(combineTypes.EXCEPT_ALL);
 
 
 function from<
@@ -1569,6 +1810,10 @@ export default QueryBuilder;
 
 export {
     from,
+    withAs,
+    withAsMaterialized,
+    withAsNotMaterialized,
+    withRecursiveAs,
     joinTypes,
     cteTypes,
     unionTypes,

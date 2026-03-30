@@ -1,4 +1,4 @@
-import { withAs } from "../../query/cteObject.js";
+import { withAs } from "../../query/queryBuilder.js";
 import { customersTable, employeesTable } from "../_tables.js";
 import type { AssertEqual, AssertTrue } from "../_typeTestingUtilities.js";
 

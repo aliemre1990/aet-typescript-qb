@@ -4,8 +4,7 @@ import test from "node:test";
 import assert from "node:assert";
 
 import { employeesTable } from "../_tables.js";
-import { joinTypes, unionTypes } from "../../query/queryBuilder.js";
-import { withRecursiveAs } from "../../query/cteObject.js";
+import { joinTypes, unionTypes, withRecursiveAs } from "../../query/queryBuilder.js";
 
 test.suite("SIMPLE RECURSIVE CTE TESTS", () => {
 
