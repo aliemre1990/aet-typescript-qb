@@ -1,4 +1,4 @@
-import { from } from "../../query/queryBuilder.js";
+import from from "../../query/from.js";
 import { customersTable, employeesTable, ordersTable } from "../_tables.js";
 import type { AssertEqual, AssertTrue } from "../_typeTestingUtilities.js";
 
@@ -19,7 +19,7 @@ type multipleFromQuery_WithSubQuery_Params_Test = AssertTrue<AssertEqual<typeof_
 const subQueryJoin = customersTable
     .join('INNER', () => employeesTable, cols => cols.employees.id.eq(cols.customers.id))
     .join('LEFT', () => subQuery, cols => cols.sq1.id.eq(cols.customers.id))
-    .select(cols => [cols.sq1.id])    ;
+    .select(cols => [cols.sq1.id]);
 
 const selectSubQuery = customersTable
     .select((tables) => [

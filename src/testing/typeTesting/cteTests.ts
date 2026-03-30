@@ -1,6 +1,7 @@
 import type { ColumnsToResultMap } from "../../query/_types/result.js";
+import from from "../../query/from.js";
 import type QueryParam from "../../query/param.js";
-import QueryBuilder, { from, } from "../../query/queryBuilder.js";
+import QueryBuilder from "../../query/queryBuilder.js";
 import { withAs, withRecursiveAs } from "../../query/withAs.js";
 import { customersTable, employeesTable, ordersTable } from "../_tables.js";
 import type { AssertEqual, AssertTrue } from "../_typeTestingUtilities.js";
