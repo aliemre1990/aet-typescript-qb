@@ -1,6 +1,5 @@
 import { dbTypes, type DbType } from "../db.js";
-import type { DbValueTypes } from "../table/column.js";
-import type { PgColumnType } from "../table/columnTypes.js";
+import type { DbValueTypes, GetColumnTypes } from "../table/column.js";
 import type { IsAny } from "../utility/common.js";
 import BaseQueryExpression from "./_baseClasses/BaseQueryExpression.js";
 import { IQueryExpressionFinalValueDummySymbol, IQueryExpressionValueDummySymbol, queryBuilderContextFactory, type DetermineFinalValueType, type DetermineValueType, type IQueryExpression, type QueryBuilderContext } from "./_interfaces/IQueryExpression.js";
@@ -16,12 +15,12 @@ class QueryParam<
     TName extends string,
     TValueType extends DbValueTypes | null,
     TAs extends string | undefined = undefined,
-    TCastType extends PgColumnType | undefined = undefined
+    TCastType extends GetColumnTypes<TDbType> | undefined = undefined
 > extends BaseQueryExpression<
     TDbType,
     undefined,
-    DetermineValueType<TCastType, NonNullable<TValueType>>,
-    DetermineFinalValueType<IsAny<TValueType> extends true ? DetermineValueType<TCastType, TValueType> | null : TValueType, DetermineValueType<TCastType, NonNullable<TValueType>>>,
+    DetermineValueType<TDbType, TCastType, NonNullable<TValueType>>,
+    DetermineFinalValueType<IsAny<TValueType> extends true ? DetermineValueType<TDbType, TCastType, TValueType> | null : TValueType, DetermineValueType<TDbType, TCastType, NonNullable<TValueType>>>,
     undefined,
     TAs,
     TCastType
@@ -38,7 +37,7 @@ class QueryParam<
     as<TAs extends string>(asName: TAs) {
         return new QueryParam<TDbType, TName, TValueType, TAs, TCastType>(this.dbType, this.name, asName, this.castType, this.ownerName);
     }
-    cast<TCastType extends PgColumnType>(type: TCastType) {
+    cast<TCastType extends GetColumnTypes<TDbType>>(type: TCastType) {
         return new QueryParam<TDbType, TName, TValueType, TAs, TCastType>(this.dbType, this.name, this.asName, type, this.ownerName);
     }
 

@@ -37,8 +37,8 @@ class ForeignKey {
 
 type MapToQueryColumns<TDbType extends DbType, TTableName extends string, TColumns extends readonly any[], TAsTableName extends string | undefined = undefined> =
     TColumns extends readonly [infer First, ...infer Rest] ?
-    First extends Column<TDbType, infer TType, infer TColumnName, infer TTableSpecs, infer TIsNullable> ?
-    [QueryColumn<TDbType, Column<TDbType, TType, TColumnName, TTableSpecs, TIsNullable>, { tableName: TTableName, asTableName: TAsTableName }, undefined>, ...MapToQueryColumns<TDbType, TTableName, Rest>] :
+    First extends Column<TDbType, infer TType, infer TColumnName, infer TTableSpecs, infer TIsNullable, infer TValueType, infer TFinalValueType> ?
+    [QueryColumn<TDbType, Column<TDbType, TType, TColumnName, TTableSpecs, TIsNullable, TValueType, TFinalValueType>, { tableName: TTableName, asTableName: TAsTableName }, undefined>, ...MapToQueryColumns<TDbType, TTableName, Rest>] :
     never :
     []
     ;
@@ -262,7 +262,7 @@ class Table<
 
 function pgTable<
     TTableName extends string,
-    const TColumns extends Column<PgDbType, PgColumnType, string, TableSpecsType<string>, boolean>[],
+    const TColumns extends Column<PgDbType, PgColumnType, string, TableSpecsType<string>, boolean, any, any>[],
 >(
     name: TTableName,
     columns: TColumns,

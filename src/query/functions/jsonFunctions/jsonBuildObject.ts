@@ -1,10 +1,9 @@
 import { dbTypes, type DbType, type PgDbType } from "../../../db.js";
-import type { DbValueTypes } from "../../../table/column.js";
+import type { DbValueTypes, GetColumnTypes } from "../../../table/column.js";
 import type { RecordToTupleSafe } from "../../../utility/common.js";
 import { queryBuilderContextFactory, type DetermineFinalValueType, type DetermineValueType, type IQueryExpression, type QueryBuilderContext } from "../../_interfaces/IQueryExpression.js";
 import type { InferReturnTypeFromJSONBuildObjectParam } from "../../_types/args.js";
 import QueryParam from "../../param.js";
-import type { PgColumnType } from "../../../table/columnTypes.js";
 import type { ExtractParams } from "../../param.js";
 import BaseQueryExpression from "../../_baseClasses/BaseQueryExpression.js";
 import { extractParams } from "../../utility.js";
@@ -53,12 +52,12 @@ class JSONBuildObjectFunction<
     TReturnType extends DbValueTypes | null = TDbType extends PgDbType ? InferReturnTypeFromJSONBuildObjectParam<TDbType, TObj> : never,
     TParams extends QueryParam<TDbType, string, any, any, any>[] | undefined = InferParamsFromJsonBuildObjectArg<TDbType, TObj>,
     TAs extends string | undefined = undefined,
-    TCastType extends PgColumnType | undefined = undefined
+    TCastType extends GetColumnTypes<TDbType> | undefined = undefined
 > extends BaseQueryExpression<
     TDbType,
     TParams,
-    DetermineValueType<TCastType, NonNullable<TReturnType>>,
-    DetermineFinalValueType<TReturnType, DetermineValueType<TCastType, NonNullable<TReturnType>>>,
+    DetermineValueType<TDbType, TCastType, NonNullable<TReturnType>>,
+    DetermineFinalValueType<TReturnType, DetermineValueType<TDbType, TCastType, NonNullable<TReturnType>>>,
     undefined,
     TAs,
     TCastType
@@ -69,7 +68,7 @@ class JSONBuildObjectFunction<
     as<TAs extends string>(asName: TAs) {
         return new JSONBuildObjectFunction<TDbType, TObj, TReturnType, TParams, TAs, TCastType>(this.dbType, this.obj, this.isJsonB, asName, this.castType);
     }
-    cast<TCastType extends PgColumnType>(type: TCastType) {
+    cast<TCastType extends GetColumnTypes<TDbType>>(type: TCastType) {
         return new JSONBuildObjectFunction<TDbType, TObj, TReturnType, TParams, TAs, TCastType>(this.dbType, this.obj, this.isJsonB, this.asName, type);
     }
 

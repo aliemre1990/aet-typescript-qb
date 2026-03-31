@@ -19,7 +19,6 @@ import { queryBuilderContextFactory, type DetermineFinalValueType, type Determin
 import SubQueryObject from "./subQueryObject.js";
 import CTEObject, { CTEObjectEntry } from "./cteObject.js";
 import { extractParams, mapCTESpecsToSelection } from "./utility.js";
-import type { PgColumnType } from "../table/columnTypes.js";
 import { getDbFunctions } from "./uitlity/dbOperations.js";
 import type { MapToCTEObject, MapToCTEObjectForRecursive } from "./_types/cteUtility.js";
 import type { UndefinedIfLengthZero } from "../utility/common.js";
@@ -28,6 +27,7 @@ import type BaseColumnComparisonOperation from "./_baseClasses/BaseColumnCompari
 import BaseQueryExpression from "./_baseClasses/BaseQueryExpression.js";
 import type { withAsFnForQb, withAsMaterializedFnForQb, withAsNotMaterializedFnForQb } from "./withAsForQb.js";
 import type { exceptAllFn, exceptFn, intersectAllFn, intersectFn, unionAllFn, unionFn } from "./combining.js";
+import type { GetColumnTypes } from "../table/column.js";
 
 type CombineExpressions<
     TLeft extends ResultShapeItem<any>,
@@ -210,14 +210,14 @@ class QueryBuilder<
     TResult extends ResultShape<TDbType> | undefined = undefined,
     TParams extends readonly QueryParam<TDbType, any, any, any, any>[] | undefined = undefined,
     TAs extends string | undefined = undefined,
-    TCastType extends PgColumnType | undefined = undefined
+    TCastType extends GetColumnTypes<TDbType> | undefined = undefined
 >
     extends
     BaseQueryExpression<
         TDbType,
         TParams,
-        DetermineValueType<TCastType, GetFirstTypeFromResult<TDbType, TResult>>,
-        DetermineFinalValueType<GetFirstFinalTypeFromResult<TDbType, TResult>, DetermineValueType<TCastType, GetFirstTypeFromResult<TDbType, TResult>>>,
+        DetermineValueType<TDbType, TCastType, GetFirstTypeFromResult<TDbType, TResult>>,
+        DetermineFinalValueType<GetFirstFinalTypeFromResult<TDbType, TResult>, DetermineValueType<TDbType, TCastType, GetFirstTypeFromResult<TDbType, TResult>>>,
         GetFirstDefaultKeyFromResult<TDbType, TResult>,
         TAs,
         TCastType
@@ -293,7 +293,7 @@ class QueryBuilder<
                 combineSpecs: this.combineSpecs
             });
     }
-    cast<TCastType extends PgColumnType>(type: TCastType) {
+    cast<TCastType extends GetColumnTypes<TDbType>>(type: TCastType) {
         return new QueryBuilder<TDbType, TFrom, TJoinSpecs, TCTESpecs, TResult, TParams, TAs, TCastType>(
             this.dbType,
             this.fromSpecs,
@@ -1266,12 +1266,12 @@ interface QueryBuilder<
     TResult extends ResultShape<TDbType> | undefined = undefined,
     TParams extends readonly QueryParam<TDbType, any, any, any, any>[] | undefined = undefined,
     TAs extends string | undefined = undefined,
-    TCastType extends PgColumnType | undefined = undefined
+    TCastType extends GetColumnTypes<TDbType> | undefined = undefined
 > {
 
-    union :typeof unionFn;
-    unionAll : typeof unionAllFn;
-    intersect:typeof intersectFn;
+    union: typeof unionFn;
+    unionAll: typeof unionAllFn;
+    intersect: typeof intersectFn;
     intersectAll: typeof intersectAllFn;
     except: typeof exceptFn;
     exceptAll: typeof exceptAllFn;

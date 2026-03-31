@@ -1,6 +1,5 @@
 import { type DbType } from "../db.js";
-import type { DbValueTypes } from "../table/column.js";
-import type { PgColumnType } from "../table/columnTypes.js";
+import type { DbValueTypes, GetColumnTypes } from "../table/column.js";
 import type { IsAny, IsExact, IsExactAlt, LiteralToBase, UndefinedIfLengthZero } from "../utility/common.js";
 import type BaseColumnComparisonOperation from "./_baseClasses/BaseColumnComparisonOperation.js";
 import BaseQueryExpression from "./_baseClasses/BaseQueryExpression.js";
@@ -165,12 +164,12 @@ class SQLCaseExpression<
     TResult extends DbValueTypes | null = InferResultType<TWhenExpressions, TElseExpression>,
     TParams extends readonly QueryParam<TDbType, string, any, any, any>[] | undefined = UndefinedIfLengthZero<AccumulateCaseParams<TMainExpression, TElseExpression, TWhenExpressions>>,
     TAs extends string | undefined = undefined,
-    TCastType extends PgColumnType | undefined = undefined,
+    TCastType extends GetColumnTypes<TDbType> | undefined = undefined,
 > extends BaseQueryExpression<
     TDbType,
     TParams,
-    DetermineValueType<TCastType, NonNullable<TResult>>,
-    DetermineFinalValueType<TResult, DetermineValueType<TCastType, NonNullable<TResult>>>,
+    DetermineValueType<TDbType, TCastType, NonNullable<TResult>>,
+    DetermineFinalValueType<TResult, DetermineValueType<TDbType, TCastType, NonNullable<TResult>>>,
     undefined,
     TAs,
     TCastType
@@ -182,7 +181,7 @@ class SQLCaseExpression<
     as<TAs extends string>(asName: TAs) {
         return new SQLCaseExpression<TDbType, TMainExpression, TElseExpression, TWhenExpressions, TResult, TParams, TAs, TCastType>(this.dbType, asName, this.castType, this.mainExpression);
     }
-    cast<TCastType extends PgColumnType>(type: TCastType) {
+    cast<TCastType extends GetColumnTypes<TDbType>>(type: TCastType) {
         return new SQLCaseExpression<TDbType, TMainExpression, TElseExpression, TWhenExpressions, TResult, TParams, TAs, TCastType>(this.dbType, this.asName, type, this.mainExpression);
     }
     buildSQL(context?: QueryBuilderContext): { query: string; params: string[]; } {

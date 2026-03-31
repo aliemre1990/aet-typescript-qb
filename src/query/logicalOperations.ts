@@ -1,5 +1,5 @@
 import { type DbType } from "../db.js";
-import type { PgColumnType } from "../table/columnTypes.js";
+import type { GetColumnTypes } from "../table/column.js";
 import type { UndefinedIfLengthZero } from "../utility/common.js";
 import type BaseColumnComparisonOperation from "./_baseClasses/BaseColumnComparisonOperation.js";
 import BaseQueryExpression from "./_baseClasses/BaseQueryExpression.js";
@@ -31,12 +31,12 @@ class ColumnLogicalOperation<
     TComparisons extends readonly (BaseColumnComparisonOperation<TDbType, any, any, any, any, any, any> | ColumnLogicalOperation<TDbType, any, any, any, any>)[],
     TParams extends readonly QueryParam<TDbType, string, any, any, any>[] | undefined = UndefinedIfLengthZero<InferLogicalOperationParams<TComparisons>>,
     TAs extends string | undefined = undefined,
-    TCastType extends PgColumnType | undefined = undefined
+    TCastType extends GetColumnTypes<TDbType> | undefined = undefined
 > extends BaseQueryExpression<
     TDbType,
     TParams,
-    DetermineValueType<TCastType, boolean>,
-    DetermineValueType<TCastType, boolean>,
+    DetermineValueType<TDbType, TCastType, boolean>,
+    DetermineValueType<TDbType, TCastType, boolean>,
     undefined,
     TAs,
     TCastType
@@ -48,7 +48,7 @@ class ColumnLogicalOperation<
     as<TAs extends string>(asName: TAs) {
         return new ColumnLogicalOperation<TDbType, TComparisons, TParams, TAs, TCastType>(this.dbType, this.operator, this.comparisons, asName, this.castType);
     }
-    cast<TCastType extends PgColumnType>(type: TCastType) {
+    cast<TCastType extends GetColumnTypes<TDbType>>(type: TCastType) {
         return new ColumnLogicalOperation<TDbType, TComparisons, TParams, TAs, TCastType>(this.dbType, this.operator, this.comparisons, this.asName, type);
     }
 

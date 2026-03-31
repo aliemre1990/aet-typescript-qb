@@ -1,8 +1,7 @@
 import type { DbType } from "../db.js";
 import { IQueryExpressionFinalValueDummySymbol, IQueryExpressionValueDummySymbol, queryBuilderContextFactory, type DetermineFinalValueType, type DetermineValueType, type IQueryExpression, type QueryBuilderContext } from "./_interfaces/IQueryExpression.js";
 import type Column from "../table/column.js";
-import type { ColumnType, DbValueTypes } from "../table/column.js";
-import type { PgColumnType } from "../table/columnTypes.js";
+import type { ColumnType, DbValueTypes, GetColumnTypes } from "../table/column.js";
 import BaseQueryExpression from "./_baseClasses/BaseQueryExpression.js";
 
 class QueryColumn<
@@ -10,14 +9,14 @@ class QueryColumn<
     TColumn extends ColumnType<TDbType>,
     TQTableSpecs extends { tableName: string, asTableName?: string },
     TAsName extends string | undefined = undefined,
-    TCastType extends PgColumnType | undefined = undefined,
+    TCastType extends GetColumnTypes<TDbType> | undefined = undefined,
     TValueType extends DbValueTypes = TColumn extends Column<TDbType, any, any, any, any, infer TValType> ? TValType : never,
     TFinalValueType extends TValueType | null = TColumn extends Column<TDbType, any, any, any, any, any, infer TFinalValType> ? TFinalValType : never
 > extends BaseQueryExpression<
     TDbType,
     undefined,
-    DetermineValueType<TCastType, TValueType>,
-    DetermineFinalValueType<TFinalValueType, DetermineValueType<TCastType, TValueType>>,
+    DetermineValueType<TDbType, TCastType, TValueType>,
+    DetermineFinalValueType<TFinalValueType, DetermineValueType<TDbType, TCastType, TValueType>>,
     TColumn["name"],
     TAsName,
     TCastType
@@ -38,7 +37,7 @@ class QueryColumn<
     as<TAsName extends string>(val: TAsName) {
         return new QueryColumn<TDbType, TColumn, TQTableSpecs, TAsName, TCastType, TValueType, TFinalValueType>(this.dbType, this.column, this.qTableSpecs, val, this.castType);
     }
-    cast<TCastType extends PgColumnType>(type: TCastType) {
+    cast<TCastType extends GetColumnTypes<TDbType>>(type: TCastType) {
         return new QueryColumn<TDbType, TColumn, TQTableSpecs, TAsName, TCastType, TValueType, TFinalValueType>(this.dbType, this.column, this.qTableSpecs, this.asName, type);
     }
 

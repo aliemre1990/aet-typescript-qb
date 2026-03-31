@@ -1,5 +1,5 @@
 import type { DbType } from "../db.js";
-import type { PgColumnType } from "../table/columnTypes.js";
+import type { GetColumnTypes } from "../table/column.js";
 import type { UndefinedIfLengthZero } from "../utility/common.js";
 import type { MapCtesToSelectionType } from "./_types/miscellaneous.js";
 import type QueryParam from "./param.js";
@@ -18,7 +18,7 @@ function generateCombineFunction(combineType: CombineType) {
         TThisResult extends ResultShape<TThisDbType> = TThis extends QueryBuilder<any, any, any, any, infer TResult, any, any, any> ? TResult : never,
         TThisParams extends DbType = ExtractParams<TThis>,
         TThisAs extends string | undefined = TThis extends QueryBuilder<any, any, any, any, any, any, infer TAs, any> ? TAs : never,
-        TThisCastType extends PgColumnType | undefined = TThis extends QueryBuilder<any, any, any, any, any, any, any, infer TCastType> ? TCastType : never,
+        TThisCastType extends GetColumnTypes<TThisDbType> | undefined = TThis extends QueryBuilder<any, any, any, any, any, any, any, infer TCastType> ? TCastType : never,
         TCombineParams extends readonly QueryParam<TThisDbType, any, any, any, any>[] | undefined = ExtractParams<TQbResult>,
         TParamsAccumulated extends readonly QueryParam<TThisDbType, any, any, any, any>[] | undefined = UndefinedIfLengthZero<
             [
@@ -49,7 +49,7 @@ function generateCombineFunction(combineType: CombineType) {
         TThisResult extends ResultShape<TThisDbType> = TThis extends QueryBuilder<any, any, any, any, infer TResult, any, any, any> ? TResult : never,
         TThisParams extends DbType = ExtractParams<TThis>,
         TThisAs extends string | undefined = TThis extends QueryBuilder<any, any, any, any, any, any, infer TAs, any> ? TAs : never,
-        TThisCastType extends PgColumnType | undefined = TThis extends QueryBuilder<any, any, any, any, any, any, any, infer TCastType> ? TCastType : never,
+        TThisCastType extends GetColumnTypes<TThisDbType> | undefined = TThis extends QueryBuilder<any, any, any, any, any, any, any, infer TCastType> ? TCastType : never,
         TCombineParams extends readonly QueryParam<TThisDbType, any, any, any, any>[] | undefined = ExtractParams<TQbResult>,
         TParamsAccumulated extends readonly QueryParam<TThisDbType, any, any, any, any>[] | undefined = UndefinedIfLengthZero<
             [
@@ -80,7 +80,7 @@ function generateCombineFunction(combineType: CombineType) {
         TThisResult extends ResultShape<TThisDbType> = TThis extends QueryBuilder<any, any, any, any, infer TResult, any, any, any> ? TResult : never,
         TThisParams extends DbType = ExtractParams<TThis>,
         TThisAs extends string | undefined = TThis extends QueryBuilder<any, any, any, any, any, any, infer TAs, any> ? TAs : never,
-        TThisCastType extends PgColumnType | undefined = TThis extends QueryBuilder<any, any, any, any, any, any, any, infer TCastType> ? TCastType : never,
+        TThisCastType extends GetColumnTypes<TThisDbType> | undefined = TThis extends QueryBuilder<any, any, any, any, any, any, any, infer TCastType> ? TCastType : never,
         TCombineParams extends readonly QueryParam<TThisDbType, any, any, any, any>[] | undefined = ExtractParams<TQbResult>,
         TParamsAccumulated extends readonly QueryParam<TThisDbType, any, any, any, any>[] | undefined = UndefinedIfLengthZero<
             [

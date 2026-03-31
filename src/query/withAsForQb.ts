@@ -1,5 +1,5 @@
 import type { DbType } from "../db.js";
-import type { PgColumnType } from "../table/columnTypes.js";
+import type { GetColumnTypes } from "../table/column.js";
 import type { UndefinedIfLengthZero } from "../utility/common.js";
 import type { MapCtesToSelectionType } from "./_types/miscellaneous.js";
 import CTEObject from "./cteObject.js";
@@ -24,7 +24,7 @@ function generateCTEFunctionForQb(cteType: CTEType) {
         TThisResult extends ResultShape<TThisDbType> | undefined = TThis extends QueryBuilder<any, any, any, any, infer TResultShape, any, any, any> ? TResultShape : never,
         TThisParams extends readonly QueryParam<TThisDbType, any, any, any, any>[] | undefined = TThis extends QueryBuilder<any, any, any, any, any, infer TParams, any, any> ? TParams : never,
         TThisAs extends string | undefined = TThis extends QueryBuilder<any, any, any, any, any, any, infer TAs, any> ? TAs : never,
-        TThisCastType extends PgColumnType | undefined = TThis extends QueryBuilder<any, any, any, any, any, any, any, infer TCastType> ? TCastType : never,
+        TThisCastType extends GetColumnTypes<TThisDbType> | undefined = TThis extends QueryBuilder<any, any, any, any, any, any, any, infer TCastType> ? TCastType : never,
 
         TCTEObject extends CTEObject<TThisDbType, any, any, any, any> = CTEObject<TThisDbType, TCTEName, TQb>,
         TFinalCTESpec extends readonly CTEObject<TThisDbType, any, any, any, any>[] = readonly [...(TThisCTESpecs extends CTESpecsType<TThisDbType> ? TThisCTESpecs : []), TCTEObject],
@@ -61,7 +61,7 @@ function generateCTEFunctionForQb(cteType: CTEType) {
         TThisResult extends ResultShape<TThisDbType> | undefined = TThis extends QueryBuilder<any, any, any, any, infer TResultShape, any, any, any> ? TResultShape : never,
         TThisParams extends readonly QueryParam<TThisDbType, any, any, any, any>[] | undefined = TThis extends QueryBuilder<any, any, any, any, any, infer TParams, any, any> ? TParams : never,
         TThisAs extends string | undefined = TThis extends QueryBuilder<any, any, any, any, any, any, infer TAs, any> ? TAs : never,
-        TThisCastType extends PgColumnType | undefined = TThis extends QueryBuilder<any, any, any, any, any, any, any, infer TCastType> ? TCastType : never,
+        TThisCastType extends GetColumnTypes<TThisDbType> | undefined = TThis extends QueryBuilder<any, any, any, any, any, any, any, infer TCastType> ? TCastType : never,
 
         TCTEObject extends CTEObject<TThisDbType, any, any, any, any> = CTEObject<TThisDbType, TCTEName, TQb>,
         TFinalCTESpec extends readonly CTEObject<TThisDbType, any, any, any, any>[] = readonly [...(TThisCTESpecs extends CTESpecsType<TThisDbType> ? TThisCTESpecs : []), TCTEObject],
@@ -98,7 +98,7 @@ function generateCTEFunctionForQb(cteType: CTEType) {
         TThisResult extends ResultShape<TThisDbType> | undefined = TThis extends QueryBuilder<any, any, any, any, infer TResultShape, any, any, any> ? TResultShape : never,
         TThisParams extends readonly QueryParam<TThisDbType, any, any, any, any>[] | undefined = TThis extends QueryBuilder<any, any, any, any, any, infer TParams, any, any> ? TParams : never,
         TThisAs extends string | undefined = TThis extends QueryBuilder<any, any, any, any, any, any, infer TAs, any> ? TAs : never,
-        TThisCastType extends PgColumnType | undefined = TThis extends QueryBuilder<any, any, any, any, any, any, any, infer TCastType> ? TCastType : never,
+        TThisCastType extends GetColumnTypes<TThisDbType> | undefined = TThis extends QueryBuilder<any, any, any, any, any, any, any, infer TCastType> ? TCastType : never,
 
         TCTEObject extends CTEObject<TThisDbType, any, any, any, any> = CTEObject<TThisDbType, TCTEName, TQb>,
         TFinalCTESpec extends readonly CTEObject<TThisDbType, any, any, any, any>[] = readonly [...(TThisCTESpecs extends CTESpecsType<TThisDbType> ? TThisCTESpecs : []), TCTEObject],

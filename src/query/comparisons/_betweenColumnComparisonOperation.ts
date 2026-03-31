@@ -1,6 +1,5 @@
 import type { DbType } from "../../db.js";
-import type { DbValueTypes } from "../../table/column.js";
-import type { PgColumnType } from "../../table/columnTypes.js";
+import type { DbValueTypes, GetColumnTypes } from "../../table/column.js";
 import type { LiteralToBase, UndefinedIfLengthZero } from "../../utility/common.js";
 import BaseColumnComparisonOperation, { betweenComparisonOperations, type BetweenComparisonOperationType, type ConvertComparisonParamToTyped, type InferComparisonParams, type InferValueTypeFromExpression } from "../_baseClasses/BaseColumnComparisonOperation.js";
 import { queryBuilderContextFactory, type DetermineValueType, type IQueryExpression, type QueryBuilderContext } from "../_interfaces/IQueryExpression.js";
@@ -17,13 +16,13 @@ class BetweenColumnComparisonOperation<
     TValueType extends DbValueTypes = InferValueTypeFromExpression<TDbType, TComparing>,
     TParams extends readonly QueryParam<TDbType, string, any, any, any>[] | undefined = UndefinedIfLengthZero<InferComparisonParams<TComparing, [TLApplied, TRApplied]>>,
     TAs extends string | undefined = undefined,
-    TCastType extends PgColumnType | undefined = undefined,
+    TCastType extends GetColumnTypes<TDbType> | undefined = undefined,
 > extends BaseColumnComparisonOperation<
     TDbType,
     BetweenComparisonOperationType,
     TParams,
-    DetermineValueType<TCastType, boolean>,
-    DetermineValueType<TCastType, boolean>,
+    DetermineValueType<TDbType, TCastType, boolean>,
+    DetermineValueType<TDbType, TCastType, boolean>,
     TAs,
     TCastType
 > {
@@ -34,7 +33,7 @@ class BetweenColumnComparisonOperation<
     as<TAs extends string>(asName: TAs) {
         return new BetweenColumnComparisonOperation<TDbType, TComparing, TLApplied, TRApplied, TValueType, TParams, TAs, TCastType>(this.dbType, this.operation, this.comparing, this.lValue, this.rValue, asName, this.castType);
     }
-    cast<TCastType extends PgColumnType>(type: TCastType) {
+    cast<TCastType extends GetColumnTypes<TDbType>>(type: TCastType) {
         return new BetweenColumnComparisonOperation<TDbType, TComparing, TLApplied, TRApplied, TValueType, TParams, TAs, TCastType>(this.dbType, this.operation, this.comparing, this.lValue, this.rValue, this.asName, type);
     }
 

@@ -1,6 +1,5 @@
 import type { DbType } from "../../db.js";
-import type { DbValueTypes } from "../../table/column.js";
-import type { PgColumnType } from "../../table/columnTypes.js";
+import type { DbValueTypes, GetColumnTypes } from "../../table/column.js";
 import { IQueryExpressionFinalValueDummySymbol, IQueryExpressionValueDummySymbol, type IQueryExpression, type QueryBuilderContext } from "../_interfaces/IQueryExpression.js";
 import type QueryParam from "../param.js";
 import type { eq, gt, gte, lt, lte, notEq } from "../comparisons/_basicColumnComparisonOperation.js";
@@ -16,7 +15,7 @@ class BaseQueryExpression<
     TFinalValueType extends DbValueTypes | null,
     TFieldName extends string | undefined,
     TAs extends string | undefined,
-    TCastType extends PgColumnType | undefined
+    TCastType extends GetColumnTypes<TDbType> | undefined
 > implements IQueryExpression<TDbType, TParams, TValueType, TFinalValueType, TFieldName, TAs, TCastType> {
     dbType: TDbType;
 
@@ -31,7 +30,7 @@ class BaseQueryExpression<
     as<TAs extends string>(asName: TAs): BaseQueryExpression<TDbType, TParams, TValueType, TFinalValueType, TFieldName, TAs, TCastType> {
         throw new Error("Method not implemented.");
     }
-    cast<TCastType extends PgColumnType>(type: TCastType): BaseQueryExpression<TDbType, TParams, any, any, TFieldName, TAs, TCastType> {
+    cast<TCastType extends GetColumnTypes<TDbType>>(type: TCastType): BaseQueryExpression<TDbType, TParams, any, any, TFieldName, TAs, TCastType> {
         throw new Error("Method not implemented.");
     }
 
@@ -58,7 +57,7 @@ interface BaseQueryExpression<
     TFinalValueType extends DbValueTypes | null,
     TFieldName extends string | undefined,
     TAs extends string | undefined,
-    TCastType extends PgColumnType | undefined
+    TCastType extends GetColumnTypes<TDbType> | undefined
 > {
     eq: typeof eq;
     notEq: typeof notEq;

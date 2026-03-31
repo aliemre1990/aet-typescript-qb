@@ -1,4 +1,4 @@
-import type { DbType, PgDbType } from "../db.js";
+import type { DbType, MySQLDbType, PgDbType } from "../db.js";
 import type { DbValueTypes } from "./column.js";
 
 const pgColumnTypes = {
@@ -81,24 +81,24 @@ const pgColumnTypes = {
 type PgColumnType = typeof pgColumnTypes[keyof typeof pgColumnTypes];
 
 type PgTypeToJsType<T extends PgColumnType> =
-    T extends 'SMALLINT' | 'INTEGER' | 'SERIAL' | 'SMALLSERIAL' ? number :
-    T extends 'BIGINT' | 'BIGSERIAL' ? bigint :
-    T extends 'DECIMAL' | 'NUMERIC' | 'REAL' | 'DOUBLE PRECISION' | 'MONEY' ? number :
-    T extends 'VARCHAR' | 'CHAR' | 'TEXT' ? string :
-    T extends 'BYTEA' ? Buffer :
-    T extends 'TIMESTAMP' | 'TIMESTAMP WITH TIME ZONE' | 'TIMESTAMP WITHOUT TIME ZONE' | 'DATE' | 'TIME' | 'TIME WITH TIME ZONE' | 'TIME WITHOUT TIME ZONE' ? Date :
-    T extends 'INTERVAL' ? string :
-    T extends 'BOOLEAN' ? boolean :
-    T extends 'POINT' | 'LINE' | 'LSEG' | 'BOX' | 'PATH' | 'POLYGON' | 'CIRCLE' ? object :
-    T extends 'CIDR' | 'INET' | 'MACADDR' | 'MACADDR8' ? string :
-    T extends 'BIT' | 'BIT VARYING' ? string :
-    T extends 'TSVECTOR' | 'TSQUERY' ? string :
-    T extends 'UUID' ? string :
-    T extends 'XML' ? string :
-    T extends 'JSON' | 'JSONB' ? object :
-    T extends 'PG_LSN' ? string :
-    T extends 'PG_SNAPSHOT' | 'TXID_SNAPSHOT' ? string :
-    unknown;
+    [T] extends ['SMALLINT' | 'INTEGER' | 'SERIAL' | 'SMALLSERIAL'] ? number :
+    [T] extends ['BIGINT' | 'BIGSERIAL'] ? bigint :
+    [T] extends ['DECIMAL' | 'NUMERIC' | 'REAL' | 'DOUBLE PRECISION' | 'MONEY'] ? number :
+    [T] extends ['VARCHAR' | 'CHAR' | 'TEXT'] ? string :
+    [T] extends ['BYTEA'] ? Buffer :
+    [T] extends ['TIMESTAMP' | 'TIMESTAMP WITH TIME ZONE' | 'TIMESTAMP WITHOUT TIME ZONE' | 'DATE' | 'TIME' | 'TIME WITH TIME ZONE' | 'TIME WITHOUT TIME ZONE'] ? Date :
+    [T] extends ['INTERVAL'] ? string :
+    [T] extends ['BOOLEAN'] ? boolean :
+    [T] extends ['POINT' | 'LINE' | 'LSEG' | 'BOX' | 'PATH' | 'POLYGON' | 'CIRCLE'] ? object :
+    [T] extends ['CIDR' | 'INET' | 'MACADDR' | 'MACADDR8'] ? string :
+    [T] extends ['BIT' | 'BIT VARYING'] ? string :
+    [T] extends ['TSVECTOR' | 'TSQUERY'] ? string :
+    [T] extends ['UUID'] ? string :
+    [T] extends ['XML'] ? string :
+    [T] extends ['JSON' | 'JSONB'] ? object :
+    [T] extends ['PG_LSN'] ? string :
+    [T] extends ['PG_SNAPSHOT' | 'TXID_SNAPSHOT'] ? string :
+    never;
 
 type JsTypeToPgTypes<T extends DbValueTypes> =
     T extends number ?
@@ -173,18 +173,18 @@ const mySQLColumnTypes = {
 type MySQLColumnType = typeof mySQLColumnTypes[keyof typeof mySQLColumnTypes];
 
 type MySQLTypeToJsType<T extends MySQLColumnType> =
-    T extends 'TINYINT' | 'SMALLINT' | 'MEDIUMINT' | 'INT' ? number :
-    T extends 'BIGINT' ? bigint :
-    T extends 'DECIMAL' | 'NUMERIC' | 'FLOAT' | 'DOUBLE' ? number :
-    T extends 'BIT' ? boolean :
-    T extends 'DATE' | 'TIME' | 'DATETIME' | 'TIMESTAMP' ? Date :
-    T extends 'YEAR' ? number :
-    T extends 'CHAR' | 'VARCHAR' | 'TINYTEXT' | 'TEXT' | 'MEDIUMTEXT' | 'LONGTEXT' ? string :
-    T extends 'BINARY' | 'VARBINARY' | 'TINYBLOB' | 'BLOB' | 'MEDIUMBLOB' | 'LONGBLOB' ? Buffer :
-    T extends 'ENUM' | 'SET' ? string :
-    T extends 'JSON' ? object :
-    T extends 'GEOMETRY' | 'POINT' | 'LINESTRING' | 'POLYGON' | 'MULTIPOINT' | 'MULTILINESTRING' | 'MULTIPOLYGON' | 'GEOMETRYCOLLECTION' ? object :
-    unknown;
+    [T] extends ['TINYINT' | 'SMALLINT' | 'MEDIUMINT' | 'INT'] ? number :
+    [T] extends ['BIGINT'] ? bigint :
+    [T] extends ['DECIMAL' | 'NUMERIC' | 'FLOAT' | 'DOUBLE'] ? number :
+    [T] extends ['BIT'] ? boolean :
+    [T] extends ['DATE' | 'TIME' | 'DATETIME' | 'TIMESTAMP'] ? Date :
+    [T] extends ['YEAR'] ? number :
+    [T] extends ['CHAR' | 'VARCHAR' | 'TINYTEXT' | 'TEXT' | 'MEDIUMTEXT' | 'LONGTEXT'] ? string :
+    [T] extends ['BINARY' | 'VARBINARY' | 'TINYBLOB' | 'BLOB' | 'MEDIUMBLOB' | 'LONGBLOB'] ? Buffer :
+    [T] extends ['ENUM' | 'SET'] ? string :
+    [T] extends ['JSON'] ? object :
+    [T] extends ['GEOMETRY' | 'POINT' | 'LINESTRING' | 'POLYGON' | 'MULTIPOINT' | 'MULTILINESTRING' | 'MULTIPOLYGON' | 'GEOMETRYCOLLECTION'] ? object :
+    never;
 
 type JsTypeToMySQLTypes<T extends DbValueTypes> =
     T extends number ?
@@ -210,6 +210,20 @@ type GetArrayEquivalentPgValueType<T> =
     T extends object ? object[] :
     T;
 
+type GetValueTypeOfDbType<
+    TDbType extends DbType,
+    TColType
+> =
+    [TDbType] extends [PgDbType] ?
+    [TColType] extends [PgColumnType] ?
+    PgTypeToJsType<TColType> :
+    never :
+    [TDbType] extends [MySQLDbType] ?
+    [TColType] extends [MySQLColumnType] ?
+    MySQLTypeToJsType<TColType> :
+    never :
+    never;
+
 export type {
     PgColumnType,
     PgTypeToJsType,
@@ -217,7 +231,8 @@ export type {
     MySQLColumnType,
     MySQLTypeToJsType,
     JsTypeToMySQLTypes,
-    GetArrayEquivalentPgValueType
+    GetArrayEquivalentPgValueType,
+    GetValueTypeOfDbType
 }
 
 export {

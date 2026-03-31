@@ -1,6 +1,5 @@
 import type { DbType } from "../db.js";
-import type { DbValueTypes } from "../table/column.js";
-import type { PgColumnType } from "../table/columnTypes.js";
+import type { DbValueTypes, GetColumnTypes } from "../table/column.js";
 import type { IsExact, UndefinedIfLengthZero } from "../utility/common.js";
 import type BaseColumnComparisonOperation from "./_baseClasses/BaseColumnComparisonOperation.js";
 import BaseQueryExpression from "./_baseClasses/BaseQueryExpression.js";
@@ -32,13 +31,13 @@ class SQLOperator<
     TValueType extends DbValueTypes | null = any,
     TFieldName extends string | undefined = undefined,
     TAs extends string | undefined = undefined,
-    TCastType extends PgColumnType | undefined = undefined,
+    TCastType extends GetColumnTypes<TDbType> | undefined = undefined,
     TParams extends readonly QueryParam<TDbType, any, any, any, any>[] | undefined = UndefinedIfLengthZero<CalculateSQLParams<TValues>>
 > extends BaseQueryExpression<
     TDbType,
     TParams,
-    IsExact<TValueType, null> extends true ? null : DetermineValueType<TCastType, NonNullable<TValueType>>,
-    DetermineFinalValueType<TValueType, DetermineValueType<TCastType, TValueType>>,
+    IsExact<TValueType, null> extends true ? null : DetermineValueType<TDbType, TCastType, NonNullable<TValueType>>,
+    DetermineFinalValueType<TValueType, DetermineValueType<TDbType, TCastType, TValueType>>,
     TFieldName,
     TAs,
     TCastType
@@ -57,7 +56,7 @@ class SQLOperator<
     as<TAs extends string>(asName: TAs) {
         return new SQLOperator<TDbType, TValues, TValueType, TFieldName, TAs, TCastType, TParams>(this.dbType, this.strs, this.values, asName, this.castType);
     }
-    cast<TCastType extends PgColumnType>(type: TCastType) {
+    cast<TCastType extends GetColumnTypes<TDbType>>(type: TCastType) {
         return new SQLOperator<TDbType, TValues, TValueType, TFieldName, TAs, TCastType, TParams>(this.dbType, this.strs, this.values, this.asName, type);
     }
     specs<TValueType extends DbValueTypes | null, TFieldName extends string = ''>() {

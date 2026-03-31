@@ -1,8 +1,8 @@
-import type { DbType } from "../../db.js";
-import type { DbValueTypes } from "../../table/column.js";
+import type { DbType, MySQLDbType } from "../../db.js";
+import type { DbValueTypes, GetColumnTypes } from "../../table/column.js";
 import type QueryParam from "../param.js";
 import type { IDbType } from "./IDbType.js";
-import type { PgColumnType, PgTypeToJsType } from "../../table/columnTypes.js";
+import type { GetValueTypeOfDbType } from "../../table/columnTypes.js";
 import type { IsAny } from "../../utility/common.js";
 import type { eq, gt, gte, lt, lte, notEq } from "../comparisons/_basicColumnComparisonOperation.js";
 import type { between, notBetween } from "../comparisons/_betweenColumnComparisonOperation.js";
@@ -10,15 +10,19 @@ import type { sqlIn, sqlNotIn } from "../comparisons/_inColumnComparisonOperatio
 import type { isNotNull, isNull } from "../comparisons/_isNullColumnComparisonOperation.js";
 import type { iLike, like, notILike, notLike } from "../comparisons/_likeColumnComparisonOperation.js";
 
-type DetermineValueType<TCastType extends PgColumnType | undefined, TValueType extends DbValueTypes | null> =
-    TCastType extends undefined ?
+type DetermineValueType<
+    TDbType extends DbType,
+    TCastType extends GetColumnTypes<TDbType> | undefined,
+    TValueType extends DbValueTypes | null
+> =
+    [TCastType] extends [undefined] ?
     TValueType :
-    TCastType extends PgColumnType ?
-    IsAny<TValueType> extends true ? PgTypeToJsType<TCastType> :
-    TValueType extends null ? TValueType :
-    object extends PgTypeToJsType<TCastType> ?
+    [TCastType] extends [GetColumnTypes<TDbType>] ?
+    IsAny<TValueType> extends true ? GetValueTypeOfDbType<TDbType, TCastType> :
+    [TValueType] extends [null] ? TValueType :
+    [object] extends [GetValueTypeOfDbType<TDbType, TCastType>] ?
     TValueType :
-    PgTypeToJsType<TCastType> :
+    GetValueTypeOfDbType<TDbType, TCastType> :
     never;
 
 type DetermineFinalValueType<TCurrFinalType extends DbValueTypes | null, TValueType extends DbValueTypes | null> =
@@ -39,7 +43,7 @@ interface IQueryExpression<
     TFinalValueType extends DbValueTypes | null,
     TFieldName extends string | undefined,
     TAs extends string | undefined,
-    TCastType extends PgColumnType | undefined
+    TCastType extends GetColumnTypes<TDbType> | undefined
 > extends IDbType<TDbType> {
     dbType: TDbType;
 
@@ -69,7 +73,7 @@ interface IQueryExpression<
     notILike: typeof notILike;
 
     as<TAs extends string>(asName: TAs): IQueryExpression<TDbType, TParams, TValueType, TFinalValueType, TFieldName, TAs, TCastType>
-    cast<TCastType extends PgColumnType>(type: TCastType): IQueryExpression<TDbType, TParams, any, any, TFieldName, TAs, TCastType>
+    cast<TCastType extends GetColumnTypes<TDbType>>(type: TCastType): IQueryExpression<TDbType, TParams, any, any, TFieldName, TAs, TCastType>
 
     buildSQL(context?: QueryBuilderContext): { query: string, params: string[] };
 }

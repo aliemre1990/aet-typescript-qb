@@ -1,6 +1,5 @@
 import type { DbType } from "../../db.js";
-import type { DbValueTypes } from "../../table/column.js";
-import type { PgColumnType } from "../../table/columnTypes.js";
+import type { DbValueTypes, GetColumnTypes } from "../../table/column.js";
 import type { LiteralToBase, UndefinedIfLengthZero } from "../../utility/common.js";
 import type { BasicComparisonOperationType, ConvertComparisonParamToTyped, InferComparisonParams, InferValueTypeFromExpression } from "../_baseClasses/BaseColumnComparisonOperation.js";
 import BaseColumnComparisonOperation, { basicComparisonOperations } from "../_baseClasses/BaseColumnComparisonOperation.js";
@@ -17,13 +16,13 @@ class BasicColumnComparisonOperation<
     TValueType extends DbValueTypes = InferValueTypeFromExpression<TDbType, TComparing>,
     TParams extends readonly QueryParam<TDbType, string, any, any, any>[] | undefined = UndefinedIfLengthZero<InferComparisonParams<TComparing, [TApplied]>>,
     TAs extends string | undefined = undefined,
-    TCastType extends PgColumnType | undefined = undefined,
+    TCastType extends GetColumnTypes<TDbType> | undefined = undefined,
 > extends BaseColumnComparisonOperation<
     TDbType,
     BasicComparisonOperationType,
     TParams,
-    DetermineValueType<TCastType, boolean>,
-    DetermineValueType<TCastType, boolean>,
+    DetermineValueType<TDbType, TCastType, boolean>,
+    DetermineValueType<TDbType, TCastType, boolean>,
     TAs,
     TCastType
 > {
@@ -33,7 +32,7 @@ class BasicColumnComparisonOperation<
     as<TAs extends string>(asName: TAs) {
         return new BasicColumnComparisonOperation<TDbType, TComparing, TApplied, TValueType, TParams, TAs, TCastType>(this.dbType, this.operation, this.comparing, this.value, asName, this.castType);
     }
-    cast<TCastType extends PgColumnType>(type: TCastType) {
+    cast<TCastType extends GetColumnTypes<TDbType>>(type: TCastType) {
         return new BasicColumnComparisonOperation<TDbType, TComparing, TApplied, TValueType, TParams, TAs, TCastType>(this.dbType, this.operation, this.comparing, this.value, this.asName, type);
     }
 

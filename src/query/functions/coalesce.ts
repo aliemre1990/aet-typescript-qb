@@ -1,18 +1,18 @@
 import type { DbType } from "../../db.js";
-import type { DbValueTypes } from "../../table/column.js";
+import type { DbValueTypes, GetColumnTypes } from "../../table/column.js";
 import type { IsAny } from "../../utility/common.js";
 import type { IQueryExpression } from "../_interfaces/IQueryExpression.js";
 import QueryParam from "../param.js";
 import ColumnSQLFunction, { sqlFunctions } from "./_functions.js";
 import type { InferFirstTypeFromArgs, IsContainsNonNull } from "../_types/args.js";
 
-type ConvertMedianToParam<T, TDbType extends DbType, TConvert extends DbValueTypes | null> =
-    T extends QueryParam<any, infer U, infer TValueType, infer TAs, infer TCastType>
-    ? QueryParam<TDbType, U, IsAny<TValueType> extends true ? TConvert : TValueType, TAs, TCastType>
+type ConvertMedianToParam<T, TConvert extends DbValueTypes | null> =
+    T extends QueryParam<infer TDbTypeInner, infer TName, infer TValueType, infer TAs, infer TCastType>
+    ? QueryParam<TDbTypeInner, TName, IsAny<TValueType> extends true ? TConvert : TValueType, TAs, TCastType>
     : T;
 
-type ConvertMediansInArray<T extends any[], TDbType extends DbType, TValueType extends DbValueTypes | null> = {
-    [K in keyof T]: ConvertMedianToParam<T[K], TDbType, TValueType>
+type ConvertMediansInArray<T extends any[], TValueType extends DbValueTypes | null> = {
+    [K in keyof T]: ConvertMedianToParam<T[K], TValueType>
 };
 
 type CoalesceArg<TDbType extends DbType, TValueType extends DbValueTypes> =
@@ -41,9 +41,9 @@ function generateCoalesceFn<
         return new ColumnSQLFunction<
             TDbType,
             typeof sqlFunctions.coalesce,
-            ConvertMediansInArray<TArgs, TDbType, FirstType | null>,
+            ConvertMediansInArray<TArgs, FirstType | null>,
             DetermineReturnType<TDbType, TArgs, FirstType>
-        >(dbType, args as ConvertMediansInArray<TArgs, TDbType, FirstType | null>, sqlFunctions.coalesce, undefined, undefined);
+        >(dbType, args as ConvertMediansInArray<TArgs, FirstType | null>, sqlFunctions.coalesce, undefined, undefined);
     }
 }
 

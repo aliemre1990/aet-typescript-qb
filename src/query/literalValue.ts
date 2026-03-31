@@ -1,6 +1,5 @@
 import type { DbType } from "../db.js";
-import type { DbValueTypes } from "../table/column.js";
-import type { PgColumnType } from "../table/columnTypes.js";
+import type { DbValueTypes, GetColumnTypes } from "../table/column.js";
 import BaseQueryExpression from "./_baseClasses/BaseQueryExpression.js";
 import {
     IQueryExpressionFinalValueDummySymbol,
@@ -16,12 +15,12 @@ class LiteralValue<
     TDbType extends DbType,
     TValue extends DbValueTypes | null,
     TAs extends string | undefined = undefined,
-    TCastType extends PgColumnType | undefined = undefined
+    TCastType extends GetColumnTypes<TDbType> | undefined = undefined
 > extends BaseQueryExpression<
     TDbType,
     undefined,
-    DetermineValueType<TCastType, TValue>,
-    DetermineFinalValueType<TValue, DetermineValueType<TCastType, TValue>>,
+    DetermineValueType<TDbType, TCastType, TValue>,
+    DetermineFinalValueType<TValue, DetermineValueType<TDbType, TCastType, TValue>>,
     undefined,
     TAs,
     TCastType
@@ -31,7 +30,7 @@ class LiteralValue<
     as<TAs extends string>(asName: TAs) {
         return new LiteralValue<TDbType, TValue, TAs, TCastType>(this.dbType, this.value, asName, this.castType);
     }
-    cast<TCastType extends PgColumnType>(type: TCastType) {
+    cast<TCastType extends GetColumnTypes<TDbType>>(type: TCastType) {
         return new LiteralValue<TDbType, TValue, TAs, TCastType>(this.dbType, this.value, this.asName, type);
     }
 

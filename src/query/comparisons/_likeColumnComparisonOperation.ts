@@ -1,5 +1,5 @@
 import { dbTypes, type DbType } from "../../db.js";
-import type { PgColumnType } from "../../table/columnTypes.js";
+import type { GetColumnTypes } from "../../table/column.js";
 import type { UndefinedIfLengthZero } from "../../utility/common.js";
 import type { ConvertComparisonParamToNonNullTyped, InferComparisonParams, InferFinalValueTypeFromApplied, InferFinalValueTypeFromExpression, InferValueTypeFromExpression, LikeComparisonOperationType } from "../_baseClasses/BaseColumnComparisonOperation.js";
 import BaseColumnComparisonOperation, { likeComparisonOperations } from "../_baseClasses/BaseColumnComparisonOperation.js";
@@ -23,13 +23,13 @@ class LikeColumnComparisonOperation<
     TApplied extends string | null | IQueryExpression<TDbType, any, any, string | null, any, any, any>,
     TParams extends readonly QueryParam<TDbType, string, any, any, any>[] | undefined = UndefinedIfLengthZero<InferComparisonParams<TComparing, [TApplied]>>,
     TAs extends string | undefined = undefined,
-    TCastType extends PgColumnType | undefined = undefined,
+    TCastType extends GetColumnTypes<TDbType> | undefined = undefined,
 > extends BaseColumnComparisonOperation<
     TDbType,
     LikeComparisonOperationType,
     TParams,
-    DetermineValueType<TCastType, boolean>,
-    DetermineValueType<TCastType, InferLikeComparisonReturnType<InferFinalValueTypeFromExpression<TComparing>, InferFinalValueTypeFromApplied<TApplied>>>,
+    DetermineValueType<TDbType, TCastType, boolean>,
+    DetermineValueType<TDbType, TCastType, InferLikeComparisonReturnType<InferFinalValueTypeFromExpression<TComparing>, InferFinalValueTypeFromApplied<TApplied>>>,
     TAs,
     TCastType
 > {
@@ -39,7 +39,7 @@ class LikeColumnComparisonOperation<
     as<TAs extends string>(asName: TAs) {
         return new LikeColumnComparisonOperation<TDbType, TComparing, TApplied, TParams, TAs, TCastType>(this.dbType, this.operation, this.comparing, this.value, asName, this.castType);
     }
-    cast<TCastType extends PgColumnType>(type: TCastType) {
+    cast<TCastType extends GetColumnTypes<TDbType>>(type: TCastType) {
         return new LikeColumnComparisonOperation<TDbType, TComparing, TApplied, TParams, TAs, TCastType>(this.dbType, this.operation, this.comparing, this.value, this.asName, type);
     }
 

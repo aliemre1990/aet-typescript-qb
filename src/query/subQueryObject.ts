@@ -1,6 +1,5 @@
 import type { DbType } from "../db.js";
-import type { DbValueTypes } from "../table/column.js";
-import type { PgColumnType } from "../table/columnTypes.js";
+import type { DbValueTypes, GetColumnTypes } from "../table/column.js";
 import BaseQueryExpression from "./_baseClasses/BaseQueryExpression.js";
 import { queryBuilderContextFactory, type DetermineFinalValueType, type DetermineValueType, type IQueryExpression, type QueryBuilderContext } from "./_interfaces/IQueryExpression.js";
 import type { IName } from "./_interfaces/IName.js";
@@ -24,12 +23,12 @@ class SubQueryEntry<
     TFinalValueType extends TValueType | null = TExpression extends IQueryExpression<TDbType, any, any, infer TFinalType, any, any, any> ? TFinalType : never,
     TFieldName extends string = TExpression extends IQueryExpression<TDbType, any, any, any, infer TFieldName, infer TAs, any> ? TAs extends undefined ? TFieldName : TAs : never,
     TAsName extends string | undefined = undefined,
-    TCastType extends PgColumnType | undefined = undefined
+    TCastType extends GetColumnTypes<TDbType> | undefined = undefined
 > extends BaseQueryExpression<
     TDbType,
     undefined,
-    DetermineValueType<TCastType, TValueType>,
-    DetermineFinalValueType<TFinalValueType, DetermineValueType<TCastType, TValueType>>,
+    DetermineValueType<TDbType, TCastType, TValueType>,
+    DetermineFinalValueType<TFinalValueType, DetermineValueType<TDbType, TCastType, TValueType>>,
     TFieldName,
     TAsName,
     TCastType
@@ -39,7 +38,7 @@ class SubQueryEntry<
     as<TAsName extends string>(val: TAsName) {
         return new SubQueryEntry<TDbType, TExpression, TValueType, TFinalValueType, TFieldName, TAsName, TCastType>(this.dbType, this.expression, val, this.castType, this.ownerName);
     }
-    cast<TCastType extends PgColumnType>(type: TCastType) {
+    cast<TCastType extends GetColumnTypes<TDbType>>(type: TCastType) {
         return new SubQueryEntry<TDbType, TExpression, TValueType, TFinalValueType, TFieldName, TAsName, TCastType>(this.dbType, this.expression, this.asName, type, this.ownerName);
 
     }

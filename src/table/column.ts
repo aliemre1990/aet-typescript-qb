@@ -1,13 +1,15 @@
-import type { DbType, PgDbType } from "../db.js";
+import type { DbType, MySQLDbType, PgDbType } from "../db.js";
 import type { IDbType } from "../query/_interfaces/IDbType.js";
-import type { PgColumnType, PgTypeToJsType } from "./columnTypes.js";
+import type { GetValueTypeOfDbType, MySQLColumnType, PgColumnType, PgTypeToJsType } from "./columnTypes.js";
 import type { TableSpecsType } from "./table.js";
 
 type DbValueTypes = string | string[] | number | number[] | bigint | bigint[] | boolean | boolean[] | Date | Date[] | Buffer | object | object[];
 
-type GetColumnTypes<TDbType extends DbType> = TDbType extends PgDbType ? PgColumnType : never;
-type GetValueTypeFromColumnType<TDbType extends DbType, TColType extends TDbType extends PgDbType ? PgColumnType : never> =
-    TDbType extends PgDbType ? PgTypeToJsType<TColType> : never;
+type GetColumnTypes<TDbType extends DbType> =
+    [TDbType] extends [PgDbType] ? PgColumnType :
+    [TDbType] extends [MySQLDbType] ? MySQLColumnType :
+    never;
+
 
 type ColumnType<TDbType extends DbType> = Column<TDbType, GetColumnTypes<TDbType>, string, TableSpecsType, boolean, any, any>;
 type ColumnsObjectType<TDbType extends DbType> = { [key: string]: ColumnType<TDbType> };
@@ -18,7 +20,7 @@ class Column<
     TColumnName extends string,
     TTableSpecs extends TableSpecsType,
     TIsNull extends boolean = false,
-    TValueType extends DbValueTypes = GetValueTypeFromColumnType<TDbType, TColumnType>,
+    TValueType extends DbValueTypes = GetValueTypeOfDbType<TDbType, TColumnType>,
     TFinalValueType extends DbValueTypes | null = TIsNull extends true ? TValueType | null : TValueType
 > implements IDbType<TDbType> {
 
@@ -51,6 +53,5 @@ export type {
     DbValueTypes,
     GetColumnTypes,
     ColumnType,
-    ColumnsObjectType,
-    GetValueTypeFromColumnType
+    ColumnsObjectType
 }

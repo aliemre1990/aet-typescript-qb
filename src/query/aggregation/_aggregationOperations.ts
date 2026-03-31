@@ -1,10 +1,9 @@
 import type { DbType } from "../../db.js";
-import type { DbValueTypes } from "../../table/column.js";
+import type { DbValueTypes, GetColumnTypes } from "../../table/column.js";
 import { IQueryExpressionFinalValueDummySymbol, IQueryExpressionValueDummySymbol, queryBuilderContextFactory, type DetermineFinalValueType, type DetermineValueType, type IQueryExpression, type QueryBuilderContext } from "../_interfaces/IQueryExpression.js";
 import type { InferParamsFromFnArgs } from "../_types/inferParamsFromArgs.js";
 import QueryParam from "../param.js";
 import { convertArgsToQueryString } from "../uitlity/common.js";
-import type { PgColumnType } from "../../table/columnTypes.js";
 import BaseQueryExpression from "../_baseClasses/BaseQueryExpression.js";
 import { extractParams } from "../utility.js";
 
@@ -53,12 +52,12 @@ class BasicColumnAggregationOperation<
     TReturnType extends DbValueTypes | null,
     TParams extends QueryParam<TDbType, string, any, any, any>[] | undefined = InferParamsFromFnArgs<TArgs>,
     TAs extends string | undefined = undefined,
-    TCastType extends PgColumnType | undefined = undefined
+    TCastType extends GetColumnTypes<TDbType> | undefined = undefined
 > extends BaseQueryExpression<
     TDbType,
     TParams,
-    DetermineValueType<TCastType, NonNullable<TReturnType>>,
-    DetermineFinalValueType<TReturnType, DetermineValueType<TCastType, NonNullable<TReturnType>>>,
+    DetermineValueType<TDbType, TCastType, NonNullable<TReturnType>>,
+    DetermineFinalValueType<TReturnType, DetermineValueType<TDbType, TCastType, NonNullable<TReturnType>>>,
     undefined,
     TAs,
     TCastType
@@ -69,7 +68,7 @@ class BasicColumnAggregationOperation<
     as<TAs extends string>(asName: TAs) {
         return new BasicColumnAggregationOperation<TDbType, TAggregationOperation, TArgs, TReturnType, TParams, TAs, TCastType>(this.dbType, this.args, this.operation, asName, this.castType);
     }
-    cast<TCastType extends PgColumnType>(type: TCastType) {
+    cast<TCastType extends GetColumnTypes<TDbType>>(type: TCastType) {
         return new BasicColumnAggregationOperation<TDbType, TAggregationOperation, TArgs, TReturnType, TParams, TAs, TCastType>(this.dbType, this.args, this.operation, this.asName, type);
     }
 

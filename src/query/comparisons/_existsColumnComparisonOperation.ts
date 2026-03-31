@@ -1,5 +1,5 @@
 import { PgDbType, type DbType, type MySQLDbType } from "../../db.js";
-import type { PgColumnType } from "../../table/columnTypes.js";
+import type { GetColumnTypes } from "../../table/column.js";
 import type { UndefinedIfLengthZero } from "../../utility/common.js";
 import BaseColumnComparisonOperation, { existsComparisonOperations, type ExistsComparisonOperationType } from "../_baseClasses/BaseColumnComparisonOperation.js";
 import { queryBuilderContextFactory, type DetermineValueType, type IQueryExpression, type QueryBuilderContext } from "../_interfaces/IQueryExpression.js";
@@ -13,13 +13,13 @@ class ExistsColumnComparionOperation<
     TCompared extends QueryBuilder<TDbType, any, any, any, any, any, any>,
     TParams extends readonly QueryParam<TDbType, string, any, any, any>[] | undefined = UndefinedIfLengthZero<ExtractParams<TCompared>>,
     TAs extends string | undefined = undefined,
-    TCastType extends PgColumnType | undefined = undefined,
+    TCastType extends GetColumnTypes<TDbType> | undefined = undefined,
 > extends BaseColumnComparisonOperation<
     TDbType,
     ExistsComparisonOperationType,
     TParams,
-    DetermineValueType<TCastType, boolean>,
-    DetermineValueType<TCastType, boolean>,
+    DetermineValueType<TDbType, TCastType, boolean>,
+    DetermineValueType<TDbType, TCastType, boolean>,
     TAs,
     TCastType
 > {
@@ -28,7 +28,7 @@ class ExistsColumnComparionOperation<
     as<TAs extends string>(asName: TAs) {
         return new ExistsColumnComparionOperation<TDbType, TCompared, TParams, TAs, TCastType>(this.dbType, this.operation, this.compared, asName, this.castType);
     }
-    cast<TCastType extends PgColumnType>(type: TCastType) {
+    cast<TCastType extends GetColumnTypes<TDbType>>(type: TCastType) {
         return new ExistsColumnComparionOperation<TDbType, TCompared, TParams, TAs, TCastType>(this.dbType, this.operation, this.compared, this.asName, type);
     }
 

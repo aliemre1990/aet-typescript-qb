@@ -1,6 +1,5 @@
 import type { DbType } from "../../db.js";
-import type { DbValueTypes } from "../../table/column.js";
-import type { PgColumnType } from "../../table/columnTypes.js";
+import type { DbValueTypes, GetColumnTypes } from "../../table/column.js";
 import type { IsAny, LiteralToBase } from "../../utility/common.js";
 import type { IQueryExpression } from "../_interfaces/IQueryExpression.js";
 import type { ExtractParams } from "../param.js";
@@ -109,7 +108,7 @@ class BaseColumnComparisonOperation<
     TValueType extends DbValueTypes | null,
     TFinalValueType extends DbValueTypes | null,
     TAs extends string | undefined,
-    TCastType extends PgColumnType | undefined
+    TCastType extends GetColumnTypes<TDbType> | undefined
 > extends BaseQueryExpression<
     TDbType,
     TParams,
