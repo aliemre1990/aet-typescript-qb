@@ -20,7 +20,7 @@ type TableToColumnsMap<
         [K in keyof T]: ColumnsSelection<
             TDbType,
             T[K],
-            T[K] extends QueryTable<TDbType, any, any, any, any, any> ? T[K]["columnsList"] :
+            T[K] extends QueryTable<TDbType, any, any, any> ? T[K]["columnsList"] :
             T[K] extends SubQueryObject<TDbType, any, infer TSubQueryEntries, string> ?
             TSubQueryEntries extends undefined ? never :
             TSubQueryEntries :
@@ -43,7 +43,7 @@ type TablesToObject<
         {
             [
             T in TFrom[number]as
-            T extends QueryTable<TDbType, any, any, any, any, any> ?
+            T extends QueryTable<TDbType, any, any, any> ?
             T["name"] :
             T extends SubQueryObject<TDbType, any, any, any> ?
             T["name"] :
@@ -59,7 +59,7 @@ type TablesToObject<
         {
             [
             T in TInnerJoinSpecs[number]as T["table"] extends
-            QueryTable<TDbType, any, any, any, any, any> ?
+            QueryTable<TDbType, any, any, any> ?
             T["table"]["name"] :
             T["table"] extends SubQueryObject<TDbType, any, any, any> ?
             T["table"]["name"] :

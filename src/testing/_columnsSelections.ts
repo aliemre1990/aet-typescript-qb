@@ -16,11 +16,9 @@ const customersQueryColumns = customersTable
     )) as MapToQueryColumns<PgDbType, typeof customersTable.name, typeof customersTable.columnsList>;
 const customersQueryTable = new QueryTable<
     PgDbType,
-    typeof customersTable.columnsList,
     typeof customersTable.name,
-    typeof customersTable,
     typeof customersQueryColumns
->(dbTypes.postgresql, customersTable, customersQueryColumns)
+>(dbTypes.postgresql, customersTable.name, customersQueryColumns)
 
 const customersColumnsSelection = columnsSelectionFactory<PgDbType>(customersQueryTable, customersQueryTable.columnsList) as ColumnsSelection<PgDbType, typeof customersQueryTable, typeof customersQueryTable.columnsList>;
 

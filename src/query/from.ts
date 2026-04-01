@@ -13,7 +13,7 @@ import SubQueryObject from "./subQueryObject.js";
 function from<
     TFrom extends readonly (
         Table<TDbType, any, any> |
-        QueryTable<TDbType, any, any, any, any, any> |
+        QueryTable<TDbType, any, any, any> |
         QueryBuilder<TDbType, any, any, any, any, any, string, any> |
         CTEObject<TDbType, any, any, any, any>
     )[],
@@ -32,7 +32,7 @@ function from<
                 return new QueryColumn(item.dbType, col.name, { tableName: item.name, asTableName: undefined }, undefined, undefined);
             }) as QueryColumn<TDbType, any, any, any, any, any, any>[];
 
-            return new QueryTable(item.dbType, item, queryColumns);
+            return new QueryTable(item.dbType, item.name, queryColumns);
         } if (item instanceof QueryBuilder) {
             params = [...(params || []), ...(item.params || [])];
 

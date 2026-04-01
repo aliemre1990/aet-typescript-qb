@@ -100,7 +100,7 @@ type ResultShape<TDbType extends DbType> = readonly ResultShapeItem<TDbType>[];
 
 type SelectSpecsType<TDbType extends DbType> = "*" | readonly (ColumnsSelection<TDbType, any, any> | IQueryExpression<TDbType, any, any, any, any, any, any>)[]
 
-type FromItemType<TDbType extends DbType> = QueryTable<TDbType, any, any, any, any, any> | SubQueryObject<TDbType, any, any, string> | CTEObject<TDbType, any, any, any, any>;
+type FromItemType<TDbType extends DbType> = QueryTable<TDbType, any, any, any> | SubQueryObject<TDbType, any, any, string> | CTEObject<TDbType, any, any, any, any>;
 type FromType<TDbType extends DbType> = readonly FromItemType<TDbType>[];
 
 const orderTypes = {
@@ -380,7 +380,7 @@ class QueryBuilder<
                 selectList = this.selectSpecs
                     .map(sl => {
                         if (ColumnsSelectionQueryObjectSymbol in sl) {
-                            return `"${sl[ColumnsSelectionQueryObjectSymbol].asName || sl[ColumnsSelectionQueryObjectSymbol].table.name}".*`;
+                            return `"${sl[ColumnsSelectionQueryObjectSymbol].asName || sl[ColumnsSelectionQueryObjectSymbol].tableName}".*`;
                         }
 
                         return sl.buildSQL(context).query;
@@ -393,7 +393,7 @@ class QueryBuilder<
             }
             let fromClause = this.fromSpecs.map(frm => {
                 if (frm instanceof QueryTable) {
-                    return `"${frm.table.name}"${frm.asName === undefined ? '' : ` AS "${frm.asName}"`}`;
+                    return `"${frm.tableName}"${frm.asName === undefined ? '' : ` AS "${frm.asName}"`}`;
                 }
                 else if (frm instanceof CTEObject) {
                     return `"${frm.cteName}"${frm.asName === undefined ? '' : ` AS "${frm.asName}"`}`;
@@ -408,7 +408,7 @@ class QueryBuilder<
                     let result = `${spec.joinType} JOIN `;
 
                     if (spec.table instanceof QueryTable) {
-                        result = `${result}"${spec.table.table.name}"${spec.table.asName === undefined ? '' : ` AS "${spec.table.asName}"`}`;
+                        result = `${result}"${spec.table.tableName}"${spec.table.asName === undefined ? '' : ` AS "${spec.table.asName}"`}`;
                     } else if (spec.table instanceof CTEObject) {
                         result = `${result}"${spec.table.cteName}"${spec.table.asName === undefined ? '' : ` AS "${spec.table.asName}"`}`;
                     } else {
@@ -652,15 +652,13 @@ class QueryBuilder<
 
     join<
         TJoinType extends JoinType,
-        TJoinTable extends Table<TDbType, any, any> | QueryTable<TDbType, any, any, any, any, any> | QueryBuilder<TDbType, any, any, any, any, any, string, any> | CTEObject<TDbType, any, any, any, any>,
+        TJoinTable extends Table<TDbType, any, any> | QueryTable<TDbType, any, any, any> | QueryBuilder<TDbType, any, any, any, any, any, string, any> | CTEObject<TDbType, any, any, any, any>,
         TCbResult extends ComparisonType<TDbType>,
         TJoinResult extends JoinSpecsTableType<TDbType> =
         TJoinTable extends Table<TDbType, infer TJoinCols, infer TJoinTableName> ?
         QueryTable<
             TDbType,
-            TJoinCols,
             TJoinTableName,
-            Table<TDbType, TJoinCols, TJoinTableName>,
             MapToQueryColumns<TDbType, TJoinTableName, TJoinCols>
         > :
         TJoinTable extends QueryBuilder<TDbType, any, any, any, any, any, string, any> ? MapToSubQueryObject<TDbType, TJoinTable> :
@@ -697,7 +695,7 @@ class QueryBuilder<
                 return new QueryColumn(table.dbType, col.name, { tableName: table.name, asTableName: undefined }, undefined, undefined);
             }) as QueryColumn<TDbType, any, any, any, any, any, any>[];
 
-            let res = new QueryTable(table.dbType, table, queryColumns);
+            let res = new QueryTable(table.dbType, table.name, queryColumns);
             let ownerName = res.name;
             let selection = columnsSelectionFactory<TDbType>(res, res.columnsList);
 
@@ -707,7 +705,7 @@ class QueryBuilder<
                 [ownerName]: selection
             }
         } else if (table instanceof QueryTable) {
-            joinTable = table as QueryTable<TDbType, any, any, any, any, any> as TJoinResult;
+            joinTable = table as QueryTable<TDbType, any, any, any> as TJoinResult;
             let ownerName = joinTable.name;
             let selection = columnsSelectionFactory<TDbType>(table, table.columnsList)
 
@@ -1000,7 +998,7 @@ class QueryBuilder<
     from<
         const TSelected extends readonly (
             Table<TDbType, any, any> |
-            QueryTable<TDbType, any, any, any, any, any> |
+            QueryTable<TDbType, any, any, any> |
             QueryBuilder<TDbType, any, any, any, any, any, string, any> |
             CTEObject<TDbType, any, any, any, any>
         )[],
@@ -1024,7 +1022,7 @@ class QueryBuilder<
     from<
         const TSelected extends readonly (
             Table<TDbType, any, any> |
-            QueryTable<TDbType, any, any, any, any, any> |
+            QueryTable<TDbType, any, any, any> |
             QueryBuilder<TDbType, any, any, any, any, any, string, any> |
             CTEObject<TDbType, any, any, any, any>
         )[],
@@ -1049,7 +1047,7 @@ class QueryBuilder<
 
         let res: (
             Table<TDbType, any, any> |
-            QueryTable<TDbType, any, any, any, any, any> |
+            QueryTable<TDbType, any, any, any> |
             QueryBuilder<TDbType, any, any, any, any, any, string, any> |
             CTEObject<TDbType, any, any, any, any>
         )[];
@@ -1072,7 +1070,7 @@ class QueryBuilder<
                     return new QueryColumn(item.dbType, col.name, { tableName: item.name, asTableName: undefined }, undefined, undefined);
                 }) as QueryColumn<TDbType, any, any, any, any, any, any>[];
 
-                return new QueryTable(item.dbType, item, queryColumns);
+                return new QueryTable(item.dbType, item.name, queryColumns);
             } if (item instanceof QueryBuilder) {
                 return new SubQueryObject(item.dbType, item);
             }

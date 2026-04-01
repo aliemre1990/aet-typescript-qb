@@ -80,7 +80,7 @@ type JoinToAllColumnsMapRecursively<
     TJoin extends readonly [infer FFirst, ...infer FRest] ?
     FFirst extends { joinType: JoinType, table: infer TTable, comparison: ComparisonType<TDbType> } ?
 
-    TTable extends QueryTable<TDbType, any, any, any, infer TQCols, any> ?
+    TTable extends QueryTable<TDbType, any, infer TQCols, any> ?
     FRest extends readonly [any, ...any[]] ?
     [...TQCols, ...JoinToAllColumnsMapRecursively<TDbType, FRest>] :
     [...TQCols] :
@@ -100,7 +100,7 @@ type FromToAllColumnsMapRecursively<
     TFrom extends FromType<TDbType>
 > =
     TFrom extends readonly [infer FFirst, ...infer FRest] ?
-    FFirst extends QueryTable<TDbType, any, any, any, infer TQCols, any> ?
+    FFirst extends QueryTable<TDbType, any, infer TQCols, any> ?
     FRest extends readonly [any, ...any[]] ?
     [...TQCols, ...FromToAllColumnsMapRecursively<TDbType, FRest>] :
     [...TQCols] :
