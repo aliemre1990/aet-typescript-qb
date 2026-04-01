@@ -14,7 +14,6 @@ function generateArithmeticDivision<
 
         return new SQLArithmeticOperation<
             TDbType,
-            typeof arithmeticOperations.divison,
             TArgs,
             IsContainsNull<TDbType, TArgs> extends true ? number | null : number
         >(dbType, args, arithmeticOperations.divison, undefined, undefined);

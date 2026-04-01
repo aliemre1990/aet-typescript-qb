@@ -14,7 +14,6 @@ function generateArithmeticAddition<
 
         return new SQLArithmeticOperation<
             TDbType,
-            typeof arithmeticOperations.addition,
             TArgs,
             IsContainsNull<TDbType, TArgs> extends true ? number | null : number
         >(dbType, args, arithmeticOperations.addition, undefined, undefined);

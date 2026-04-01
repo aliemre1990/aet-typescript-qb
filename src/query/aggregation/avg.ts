@@ -8,7 +8,6 @@ function generateAvgFn<TDbType extends DbType>(dbType: TDbType) {
     >(arg: TAggColumn) => {
         return new BasicColumnAggregationOperation<
             TDbType,
-            typeof aggregationOperations.avg,
             [TAggColumn],
             TAggColumn extends IQueryExpression<TDbType, any, any, infer TFinalType, any, any, any> ? TFinalType : never
         >(dbType, [arg], aggregationOperations.avg, undefined, undefined);

@@ -34,7 +34,6 @@ function jsonAggFn<
 ) {
     return new BasicColumnAggregationOperation<
         PgDbType,
-        typeof aggregationOperations.jsonAgg,
         [TArg],
         InferReturnTypeFromArg<TArg>
     >(dbTypes.postgresql, [arg], aggregationOperations.jsonAgg, undefined, undefined);
@@ -48,7 +47,6 @@ function jsonbAggFn<
 ) {
     return new BasicColumnAggregationOperation<
         PgDbType,
-        typeof aggregationOperations.jsonbAgg,
         [TArg],
         InferReturnTypeFromArg<TArg>
     >(dbTypes.postgresql, [arg], aggregationOperations.jsonbAgg, undefined, undefined);

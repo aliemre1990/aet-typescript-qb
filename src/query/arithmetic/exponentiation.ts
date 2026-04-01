@@ -13,7 +13,6 @@ function generateArithmeticExponentiation<
 
         return new SQLArithmeticOperation<
             TDbType,
-            typeof arithmeticOperations.exponentiation,
             TArgs,
             IsContainsNull<TDbType, TArgs> extends true ? number | null : number
         >(dbType, args, arithmeticOperations.exponentiation, undefined, undefined);

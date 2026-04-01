@@ -43,7 +43,6 @@ type AggregationOperation = (typeof aggregationOperations)[keyof typeof aggregat
 
 class BasicColumnAggregationOperation<
     TDbType extends DbType,
-    TAggregationOperation extends AggregationOperation,
     TArgs extends (
 
         DbValueTypes | null |
@@ -63,13 +62,13 @@ class BasicColumnAggregationOperation<
     TCastType
 > {
     args: TArgs;
-    operation: TAggregationOperation;
+    operation: AggregationOperation;
 
     as<TAs extends string>(asName: TAs) {
-        return new BasicColumnAggregationOperation<TDbType, TAggregationOperation, TArgs, TReturnType, TParams, TAs, TCastType>(this.dbType, this.args, this.operation, asName, this.castType);
+        return new BasicColumnAggregationOperation<TDbType, TArgs, TReturnType, TParams, TAs, TCastType>(this.dbType, this.args, this.operation, asName, this.castType);
     }
     cast<TCastType extends GetColumnTypes<TDbType>>(type: TCastType) {
-        return new BasicColumnAggregationOperation<TDbType, TAggregationOperation, TArgs, TReturnType, TParams, TAs, TCastType>(this.dbType, this.args, this.operation, this.asName, type);
+        return new BasicColumnAggregationOperation<TDbType, TArgs, TReturnType, TParams, TAs, TCastType>(this.dbType, this.args, this.operation, this.asName, type);
     }
 
     buildSQL(context?: QueryBuilderContext) {
@@ -87,7 +86,7 @@ class BasicColumnAggregationOperation<
     constructor(
         dbType: TDbType,
         args: TArgs,
-        operation: TAggregationOperation,
+        operation: AggregationOperation,
         asName: TAs,
         castType: TCastType
     ) {

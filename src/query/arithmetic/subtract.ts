@@ -14,7 +14,6 @@ function generateArithmeticSubtraction<
 
         return new SQLArithmeticOperation<
             TDbType,
-            typeof arithmeticOperations.subtraction,
             TArgs,
             IsContainsNull<TDbType, TArgs> extends true ? number | null : number
         >(dbType, args, arithmeticOperations.subtraction, undefined, undefined);

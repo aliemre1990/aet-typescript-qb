@@ -40,7 +40,6 @@ type ArithmeticOperation = typeof arithmeticOperations[keyof typeof arithmeticOp
 
 class SQLArithmeticOperation<
     TDbType extends DbType,
-    TArithmeticOperation extends ArithmeticOperation,
     TArgs extends (
         DbValueTypes | null |
         IQueryExpression<TDbType, any, any, any, any, any, any>
@@ -59,13 +58,13 @@ class SQLArithmeticOperation<
     TCastType
 > {
     args: TArgs;
-    operation: TArithmeticOperation;
+    operation: ArithmeticOperation;
 
     as<TAs extends string>(asName: TAs) {
-        return new SQLArithmeticOperation<TDbType, TArithmeticOperation, TArgs, TReturnType, TAs, TParams, TCastType>(this.dbType, this.args, this.operation, asName, this.castType);
+        return new SQLArithmeticOperation<TDbType, TArgs, TReturnType, TAs, TParams, TCastType>(this.dbType, this.args, this.operation, asName, this.castType);
     }
     cast<TCastType extends GetColumnTypes<TDbType>>(type: TCastType) {
-        return new SQLArithmeticOperation<TDbType, TArithmeticOperation, TArgs, TReturnType, TAs, TParams, TCastType>(this.dbType, this.args, this.operation, this.asName, type);
+        return new SQLArithmeticOperation<TDbType, TArgs, TReturnType, TAs, TParams, TCastType>(this.dbType, this.args, this.operation, this.asName, type);
     }
 
     buildSQL(context?: QueryBuilderContext) {
@@ -89,7 +88,7 @@ class SQLArithmeticOperation<
     constructor(
         dbType: TDbType,
         args: TArgs,
-        operation: TArithmeticOperation,
+        operation: ArithmeticOperation,
         asName: TAs,
         castType: TCastType
     ) {

@@ -14,7 +14,6 @@ function generateArithmeticModulo<
 
         return new SQLArithmeticOperation<
             TDbType,
-            typeof arithmeticOperations.modulo,
             TArgs,
             IsContainsNull<TDbType, TArgs> extends true ? number | null : number
         >(dbType, args, arithmeticOperations.modulo, undefined, undefined);
