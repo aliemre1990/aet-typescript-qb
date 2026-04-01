@@ -1,10 +1,6 @@
-import type { DbType } from "../../db.js";
 import type { IQueryExpression } from "../../query/_interfaces/IQueryExpression.js";
-import type SQLArithmeticOperation from "../../query/arithmetic/_arithmeticOperations.js";
-import type QueryColumn from "../../query/queryColumn.js";
 import { customerIdQC, empSalaryQC } from "../_columns.js";
 import { arithmeticAdditionTester, jsonBuildObjectTester, literalTester, paramTester, roundTester, sumTester } from "../_functions.js";
-import { customersTable } from "../_tables.js";
 import type { AssertEqual, AssertTrue } from "../_typeTestingUtilities.js";
 
 //

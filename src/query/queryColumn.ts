@@ -6,18 +6,18 @@ import BaseQueryExpression from "./_baseClasses/BaseQueryExpression.js";
 
 class QueryColumn<
     TDbType extends DbType,
-    TColumn extends ColumnType<TDbType>,
-    TQTableSpecs extends { tableName: string, asTableName?: string },
+    TName extends string,
+    TQTableSpecs extends { tableName: string, asTableName: string | undefined },
+    TValueType extends DbValueTypes,
+    TFinalValueType extends DbValueTypes | null,
     TAsName extends string | undefined = undefined,
     TCastType extends GetColumnTypes<TDbType> | undefined = undefined,
-    TValueType extends DbValueTypes = TColumn extends Column<TDbType, any, any, any, any, infer TValType> ? TValType : never,
-    TFinalValueType extends TValueType | null = TColumn extends Column<TDbType, any, any, any, any, any, infer TFinalValType> ? TFinalValType : never
 > extends BaseQueryExpression<
     TDbType,
     undefined,
     DetermineValueType<TDbType, TCastType, TValueType>,
     DetermineFinalValueType<TFinalValueType, DetermineValueType<TDbType, TCastType, TValueType>>,
-    TColumn["name"],
+    TName,
     TAsName,
     TCastType
 > {
@@ -25,20 +25,20 @@ class QueryColumn<
 
     constructor(
         dbType: TDbType,
-        public column: TColumn,
+        name: TName,
         qTableSpecs: TQTableSpecs,
         asName: TAsName,
         castType: TCastType
     ) {
-        super(dbType, undefined, column.name, asName, castType);
+        super(dbType, undefined, name, asName, castType);
         this.qTableSpecs = qTableSpecs;
     }
 
     as<TAsName extends string>(val: TAsName) {
-        return new QueryColumn<TDbType, TColumn, TQTableSpecs, TAsName, TCastType, TValueType, TFinalValueType>(this.dbType, this.column, this.qTableSpecs, val, this.castType);
+        return new QueryColumn<TDbType, TName, TQTableSpecs, TValueType, TFinalValueType, TAsName, TCastType>(this.dbType, this.fieldName, this.qTableSpecs, val, this.castType);
     }
     cast<TCastType extends GetColumnTypes<TDbType>>(type: TCastType) {
-        return new QueryColumn<TDbType, TColumn, TQTableSpecs, TAsName, TCastType, TValueType, TFinalValueType>(this.dbType, this.column, this.qTableSpecs, this.asName, type);
+        return new QueryColumn<TDbType, TName, TQTableSpecs, TValueType, TFinalValueType, TAsName, TCastType>(this.dbType, this.fieldName, this.qTableSpecs, this.asName, type);
     }
 
     buildSQL(context?: QueryBuilderContext) {
@@ -46,7 +46,7 @@ class QueryColumn<
             context = queryBuilderContextFactory();
         }
 
-        return { query: `"${this.qTableSpecs.asTableName || this.qTableSpecs.tableName}"."${this.column.name}"${this.asName ? ` AS "${this.asName}"` : ''}`, params: context.params };
+        return { query: `"${this.qTableSpecs.asTableName || this.qTableSpecs.tableName}"."${this.fieldName}"${this.asName ? ` AS "${this.asName}"` : ''}`, params: context.params };
     }
 }
 

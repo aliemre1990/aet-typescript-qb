@@ -25,7 +25,7 @@ type InferDbTypeFromFromFirstIDbType<TFrom> =
 type ConvertElementsToSubQueryCompliant<TDbType extends DbType, TFrom> =
     TFrom extends readonly [infer First, ...infer Rest] ?
     First extends Table<infer TDbType, infer TColumns, infer TTableName> ?
-    [QueryTable<TDbType, TColumns, TTableName, Table<TDbType, TColumns, TTableName>, MapToQueryColumns<TDbType, TDbType, TColumns>>, ...ConvertElementsToSubQueryCompliant<TDbType, Rest>] :
+    [QueryTable<TDbType, TColumns, TTableName, Table<TDbType, TColumns, TTableName>, MapToQueryColumns<TDbType, TTableName, TColumns>>, ...ConvertElementsToSubQueryCompliant<TDbType, Rest>] :
     First extends QueryTable<TDbType, any, any, any, any, any> ?
     [First, ...ConvertElementsToSubQueryCompliant<TDbType, Rest>] :
     First extends QueryBuilder<TDbType, any, any, any, any, any, any, any> ?

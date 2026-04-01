@@ -27,9 +27,10 @@ QueryBuilder,
     type OrderBySpecsType,
     type ResultShape
 } from "./queryBuilder.js";
+import type { MapToQueryColumns } from "../table/table.js";
 
 type MapQueryColumnsToRecord<TColumns extends readonly QueryColumn<any, any, any, any, any, any, any>[]> = {
-    [C in TColumns[number]as C["column"]["name"]]: C
+    [C in TColumns[number]as C["fieldName"]]: C
 }
 
 class QueryTable<
@@ -62,7 +63,7 @@ class QueryTable<
         this.table = table;
 
         this.columns = columnsList.reduce((prev, curr) => {
-            prev[curr.column.name] = curr;
+            prev[curr.fieldName] = curr;
 
             return prev;
         }, {} as { [key: string]: QueryColumn<TDbType, any, any, any, any, any, any> }) as typeof this.columns;
@@ -149,7 +150,7 @@ class QueryTable<
             TJoinCols,
             TJoinTableName,
             Table<TDbType, TJoinCols, TJoinTableName>,
-            { [K in keyof TJoinCols]: QueryColumn<TDbType, TJoinCols[K], { tableName: TJoinTableName, asTableName: undefined }> }
+            MapToQueryColumns<TDbType, TJoinTableName, TJoinCols>
         > :
         TJoinTable extends QueryBuilder<TDbType, any, any, any, any, any, string, any> ? MapToSubQueryObject<TDbType, TJoinTable> :
         TJoinTable extends CTEObject<TDbType, any, any, any, any> ? TJoinTable :

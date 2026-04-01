@@ -5,75 +5,71 @@ import { customersTable, employeesTable } from "./_tables.js";
 
 const customerIdQC = new QueryColumn<
     PgDbType,
-    typeof customersTable.columns.id,
-    NonNullable<typeof customersTable.columns.id.tableSpecs>,
-    undefined
+    typeof customersTable.columns.id.name,
+    typeof customersTable.columns.id.tableSpecs & { asTableName: undefined },
+    typeof customersTable.columns.id.value,
+    typeof customersTable.columns.id.finalValue
 >(
     dbTypes.postgresql,
-    customersTable.columns.id,
-    { tableName: customersTable.name },
-    undefined,
-    undefined
-);
-const createdByQC = new QueryColumn<
-    PgDbType,
-    typeof customersTable.columns.createdBy,
-    NonNullable<typeof customersTable.columns.createdBy.tableSpecs>,
-    undefined
->(
-    dbTypes.postgresql,
-    customersTable.columns.createdBy,
-    { tableName: customersTable.name },
+    customersTable.columns.id.name,
+    { tableName: customersTable.name, asTableName: undefined },
     undefined,
     undefined
 );
 const customerCreatedByQC = new QueryColumn<
     PgDbType,
-    typeof customersTable.columns.createdBy,
-    NonNullable<typeof customersTable.columns.createdBy.tableSpecs>,
-    undefined
+    typeof customersTable.columns.createdBy.name,
+    typeof customersTable.columns.createdBy.tableSpecs & { asTableName: undefined },
+    typeof customersTable.columns.createdBy.value,
+    typeof customersTable.columns.createdBy.finalValue
 >(
     dbTypes.postgresql,
-    customersTable.columns.createdBy,
-    { tableName: customersTable.name },
+    customersTable.columns.createdBy.name,
+    { tableName: customersTable.name, asTableName: undefined },
     undefined,
     undefined
 );
 const customerNameQC = new QueryColumn<
     PgDbType,
-    typeof customersTable.columns.name,
-    NonNullable<typeof customersTable.columns.name.tableSpecs>,
+    typeof customersTable.columns.name.name,
+    typeof customersTable.columns.name.tableSpecs & { asTableName: undefined },
+    typeof customersTable.columns.name.value,
+    typeof customersTable.columns.name.finalValue,
     undefined
 >(
     dbTypes.postgresql,
-    customersTable.columns.name,
-    { tableName: customersTable.name },
+    customersTable.columns.name.name,
+    { tableName: customersTable.name, asTableName: undefined },
     undefined,
     undefined
 );
 
 const empPositionQC = new QueryColumn<
     PgDbType,
-    typeof employeesTable.columns.position,
-    NonNullable<typeof employeesTable.columns.position.tableSpecs>,
+    typeof employeesTable.columns.position.name,
+    typeof employeesTable.columns.position.tableSpecs & { asTableName: undefined },
+    typeof employeesTable.columns.position.value,
+    typeof employeesTable.columns.position.finalValue,
     undefined
 >(
     dbTypes.postgresql,
-    employeesTable.columns.position,
-    { tableName: employeesTable.name },
+    employeesTable.columns.position.name,
+    { tableName: employeesTable.name, asTableName: undefined },
     undefined,
     undefined
 );
 
 const empSalaryQC = new QueryColumn<
     PgDbType,
-    typeof employeesTable.columns.salary,
-    NonNullable<typeof employeesTable.columns.salary.tableSpecs>,
+    typeof employeesTable.columns.salary.name,
+    typeof employeesTable.columns.salary.tableSpecs & { asTableName: undefined },
+    typeof employeesTable.columns.salary.value,
+    typeof employeesTable.columns.salary.finalValue,
     undefined
 >(
     dbTypes.postgresql,
-    employeesTable.columns.salary,
-    { tableName: employeesTable.name },
+    employeesTable.columns.salary.name,
+    { tableName: employeesTable.name, asTableName: undefined },
     undefined,
     undefined
 );

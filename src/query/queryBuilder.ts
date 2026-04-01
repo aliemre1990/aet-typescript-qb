@@ -661,7 +661,7 @@ class QueryBuilder<
             TJoinCols,
             TJoinTableName,
             Table<TDbType, TJoinCols, TJoinTableName>,
-            MapToQueryColumns<TDbType, TDbType, TJoinCols>
+            MapToQueryColumns<TDbType, TJoinTableName, TJoinCols>
         > :
         TJoinTable extends QueryBuilder<TDbType, any, any, any, any, any, string, any> ? MapToSubQueryObject<TDbType, TJoinTable> :
         TJoinTable extends CTEObject<TDbType, any, any, any, any> ? TJoinTable :
@@ -694,7 +694,7 @@ class QueryBuilder<
         let joinTable: TJoinResult;
         if (table instanceof Table) {
             const queryColumns = table.columnsList.map((col: Column<TDbType, any, any, any, any, any, any>) => {
-                return new QueryColumn(table.dbType, col, { tableName: table.name }, undefined, undefined);
+                return new QueryColumn(table.dbType, col.name, { tableName: table.name, asTableName: undefined }, undefined, undefined);
             }) as QueryColumn<TDbType, any, any, any, any, any, any>[];
 
             let res = new QueryTable(table.dbType, table, queryColumns);
@@ -1069,7 +1069,7 @@ class QueryBuilder<
         const fromResult = res.map(item => {
             if (item instanceof Table) {
                 const queryColumns = item.columnsList.map((col: Column<TDbType, any, any, any, any, any, any>) => {
-                    return new QueryColumn(item.dbType, col, { tableName: item.name }, undefined, undefined);
+                    return new QueryColumn(item.dbType, col.name, { tableName: item.name, asTableName: undefined }, undefined, undefined);
                 }) as QueryColumn<TDbType, any, any, any, any, any, any>[];
 
                 return new QueryTable(item.dbType, item, queryColumns);

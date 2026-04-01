@@ -26,10 +26,10 @@ class Column<
 
     dbType: TDbType;
 
-    tableSpecs?: TTableSpecs;
+    tableSpecs: TTableSpecs;
 
-    value?: TValueType;
-    finalValue?: TFinalValueType;
+    value: TValueType;
+    finalValue: TFinalValueType;
 
     constructor(
         dbType: TDbType,
@@ -39,6 +39,11 @@ class Column<
         public defaultValue?: string
     ) {
         this.dbType = dbType;
+
+        this.value = undefined as unknown as TValueType;
+        this.finalValue = undefined as unknown as TFinalValueType;
+
+        this.tableSpecs = undefined as unknown as TTableSpecs;
     }
 
     setTableSpecs(val: TTableSpecs) {

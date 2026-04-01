@@ -29,7 +29,7 @@ function from<
         if (item instanceof Table) {
 
             const queryColumns = item.columnsList.map((col: Column<TDbType, any, any, any, any, any, any>) => {
-                return new QueryColumn(item.dbType, col, { tableName: item.name }, undefined, undefined);
+                return new QueryColumn(item.dbType, col.name, { tableName: item.name, asTableName: undefined }, undefined, undefined);
             }) as QueryColumn<TDbType, any, any, any, any, any, any>[];
 
             return new QueryTable(item.dbType, item, queryColumns);
