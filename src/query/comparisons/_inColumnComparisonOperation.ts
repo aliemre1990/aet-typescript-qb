@@ -5,7 +5,7 @@ import BaseColumnComparisonOperation, { inComparisonOperations, type InCompariso
 import { queryBuilderContextFactory, type DetermineValueType, type IQueryExpression, type QueryBuilderContext } from "../_interfaces/IQueryExpression.js";
 import QueryParam from "../param.js";
 import QueryBuilder from "../queryBuilder.js";
-import { convertArgsToQueryString } from "../uitlity/common.js";
+import { convertArgsToQueryString } from "../utility/common.js";
 import { extractParams } from "../utility.js";
 
 

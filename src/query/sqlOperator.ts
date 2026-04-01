@@ -13,7 +13,7 @@ import {
 import type ColumnLogicalOperation from "./logicalOperations.js";
 import type { ExtractParams } from "./param.js";
 import QueryParam from "./param.js";
-import { convertValueToQueryString } from "./uitlity/common.js";
+import { convertValueToQueryString } from "./utility/common.js";
 import { extractParams } from "./utility.js";
 
 type CalculateSQLParams<

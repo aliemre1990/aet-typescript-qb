@@ -9,7 +9,7 @@ import {
     type DetermineValueType,
     type QueryBuilderContext
 } from "./_interfaces/IQueryExpression.js";
-import { convertValueToQueryString } from "./uitlity/common.js";
+import { convertValueToQueryString } from "./utility/common.js";
 
 class LiteralValue<
     TDbType extends DbType,

@@ -3,7 +3,7 @@ import type { DbValueTypes, GetColumnTypes } from "../../table/column.js";
 import { IQueryExpressionFinalValueDummySymbol, IQueryExpressionValueDummySymbol, queryBuilderContextFactory, type DetermineFinalValueType, type DetermineValueType, type IQueryExpression, type QueryBuilderContext } from "../_interfaces/IQueryExpression.js";
 import type { InferParamsFromFnArgs } from "../_types/inferParamsFromArgs.js";
 import QueryParam from "../param.js";
-import { convertArgsToQueryString } from "../uitlity/common.js";
+import { convertArgsToQueryString } from "../utility/common.js";
 import BaseQueryExpression from "../_baseClasses/BaseQueryExpression.js";
 import { extractParams } from "../utility.js";
 

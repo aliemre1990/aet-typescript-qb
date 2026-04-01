@@ -6,7 +6,7 @@ import BaseColumnComparisonOperation, { basicComparisonOperations } from "../_ba
 import { IQueryExpressionFinalValueDummySymbol, IQueryExpressionValueDummySymbol, queryBuilderContextFactory, type DetermineValueType, type IQueryExpression, type QueryBuilderContext } from "../_interfaces/IQueryExpression.js";
 import QueryParam from "../param.js";
 import QueryBuilder from "../queryBuilder.js";
-import { convertArgsToQueryString } from "../uitlity/common.js";
+import { convertArgsToQueryString } from "../utility/common.js";
 import { extractParams } from "../utility.js";
 
 class BasicColumnComparisonOperation<

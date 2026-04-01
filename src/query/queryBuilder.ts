@@ -19,7 +19,7 @@ import { queryBuilderContextFactory, type DetermineFinalValueType, type Determin
 import SubQueryObject from "./subQueryObject.js";
 import CTEObject, { CTEObjectEntry } from "./cteObject.js";
 import { extractParams, mapCTESpecsToSelection } from "./utility.js";
-import { getDbFunctions } from "./uitlity/dbOperations.js";
+import { getDbFunctions } from "./utility/dbOperations.js";
 import type { MapToCTEObject, MapToCTEObjectForRecursive } from "./_types/cteUtility.js";
 import type { UndefinedIfLengthZero } from "../utility/common.js";
 import type { ExtractParams } from "./param.js";
