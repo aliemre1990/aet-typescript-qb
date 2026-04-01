@@ -35,6 +35,9 @@ class ForeignKey {
     constructor(public column: string, public references: { table: string; column: string | 'self-parent' | 'self-child' }) { }
 }
 
+/**
+ * Use TTableName variable instead of infering it from 'First' column object. When infered it causes errors in intellisense.
+ */
 type MapToQueryColumns<TDbType extends DbType, TTableName extends string, TColumns extends readonly any[], TAsTableName extends string | undefined = undefined> =
     TColumns extends readonly [infer First, ...infer Rest] ?
     First extends Column<TDbType, any, infer TColumnName, any, any, infer TValueType, infer TFinalValueType> ?

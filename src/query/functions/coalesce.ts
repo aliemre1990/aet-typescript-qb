@@ -40,7 +40,6 @@ function generateCoalesceFn<
 
         return new ColumnSQLFunction<
             TDbType,
-            typeof sqlFunctions.coalesce,
             ConvertMediansInArray<TArgs, FirstType | null>,
             DetermineReturnType<TDbType, TArgs, FirstType>
         >(dbType, args as ConvertMediansInArray<TArgs, FirstType | null>, sqlFunctions.coalesce, undefined, undefined);

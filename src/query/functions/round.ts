@@ -42,7 +42,6 @@ function generateRoundFn<TDbType extends DbType>(dbType: TDbType) {
 
         return new ColumnSQLFunction<
             TDbType,
-            typeof sqlFunctions.round,
             [TFirstArgFormatted, TSecondArgFormatted],
             DetermineReturnType<TFirstArgFormatted, TSecondArgFormatted>
         >(dbType, [firstArgValue as TFirstArgFormatted, secondArgValue as TSecondArgFormatted], sqlFunctions.round, undefined, undefined);

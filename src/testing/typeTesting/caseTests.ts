@@ -52,7 +52,7 @@ const caseWithMainExpression_OneWhenWithExpressions = caseTester(customersTable.
 type typeof_CaseWithMainExpression_OneWhenWithExpressions_ResultType = typeof caseWithMainExpression_OneWhenWithExpressions extends SQLCaseExpression<any, any, any, any, infer TResultType, any, any, any> ? TResultType : never;
 type typeof_CaseWithMainExpression_OneWhenWithExpressions_ExpressionType = typeof caseWithMainExpression_OneWhenWithExpressions extends SQLCaseExpression<any, any, any, infer TWhenExps, any, any, any, any> ? TWhenExps : never;
 type caseWithMainExpression_OneWhenWithExpressions_ResultTypeTest = AssertTrue<AssertEqual<typeof_CaseWithMainExpression_OneWhenWithExpressions_ResultType, number | null>>;
-type caseWithMainExpression_OneWhenWithExpressions_ExpressionTypeTest = AssertTrue<AssertExtends<typeof_CaseWithMainExpression_OneWhenWithExpressions_ExpressionType, [[LiteralValue<any, any, any, any>, ColumnSQLFunction<any, any, any, any, any, any, any>]]>>;
+type caseWithMainExpression_OneWhenWithExpressions_ExpressionTypeTest = AssertTrue<AssertExtends<typeof_CaseWithMainExpression_OneWhenWithExpressions_ExpressionType, [[LiteralValue<any, any, any, any>, ColumnSQLFunction<any, any, any, any, any, any>]]>>;
 
 const caseWithMainExpression_OneWhenWithExpressions_ThenParamed = caseTester(customersTable.select((tables) => [tables.customers.id]).where((tables, { param }) => tables.customers.id.eq(param("idParam"))))
     .when(paramTester("when"), roundTester(paramTester("then"), 1));

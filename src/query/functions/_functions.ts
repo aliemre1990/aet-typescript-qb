@@ -18,7 +18,6 @@ type SQLFunction = (typeof sqlFunctions)[keyof typeof sqlFunctions];
 
 class ColumnSQLFunction<
     TDbType extends DbType,
-    TSQLFunction extends SQLFunction,
     TArgs extends (
         DbValueTypes | null |
         IQueryExpression<TDbType, any, any, any, any, any, any>
@@ -37,13 +36,13 @@ class ColumnSQLFunction<
     TCastType
 > {
     args: TArgs;
-    sqlFunction: TSQLFunction;
+    sqlFunction: SQLFunction;
 
     as<TAs extends string>(asName: TAs) {
-        return new ColumnSQLFunction<TDbType, TSQLFunction, TArgs, TReturnType, TParams, TAs, TCastType>(this.dbType, this.args, this.sqlFunction, asName, this.castType);
+        return new ColumnSQLFunction<TDbType, TArgs, TReturnType, TParams, TAs, TCastType>(this.dbType, this.args, this.sqlFunction, asName, this.castType);
     }
     cast<TCastType extends GetColumnTypes<TDbType>>(type: TCastType) {
-        return new ColumnSQLFunction<TDbType, TSQLFunction, TArgs, TReturnType, TParams, TAs, TCastType>(this.dbType, this.args, this.sqlFunction, this.asName, type);
+        return new ColumnSQLFunction<TDbType, TArgs, TReturnType, TParams, TAs, TCastType>(this.dbType, this.args, this.sqlFunction, this.asName, type);
     }
 
     buildSQL(context?: QueryBuilderContext) {
@@ -61,7 +60,7 @@ class ColumnSQLFunction<
     constructor(
         dbType: TDbType,
         args: TArgs,
-        sqlFunction: TSQLFunction,
+        sqlFunction: SQLFunction,
         asName: TAs,
         castType: TCastType
     ) {
