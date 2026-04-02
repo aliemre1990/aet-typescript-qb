@@ -1,3 +1,4 @@
+import type { IQueryExpression } from "../../query/_interfaces/IQueryExpression.js";
 import type ColumnLogicalOperation from "../../query/logicalOperations.js";
 import type QueryParam from "../../query/param.js";
 import { customerIdQC, empSalaryQC } from "../_columns.js";
@@ -34,3 +35,13 @@ type typeof_LogicalAndWithParams_Complex_InnerOp_Params = typeof_LogicalAndWithP
 type logicalAndWithParams_Complex_ParamsLength_Test = AssertTrue<AssertEqual<typeof_LogicalAndWithParams_Complex_Params["length"], 6>>;
 type logicalAndWithParams_Complex_Ops_Length_Test = AssertTrue<AssertEqual<typeof_LogicalAndWithParams_Complex_Ops["length"], 3>>;
 type logicalAndWithParams_Comples_InnerOp_ParamsLength_Test = AssertTrue<AssertEqual<typeof_LogicalAndWithParams_Complex_InnerOp_Params["length"], 3>>;
+
+const logicalAnd_WithNull = andTester(customerIdQC.eq(null), empSalaryQC.eq(1));
+type typeof_LogicalAndWithNull = typeof logicalAnd_WithNull;
+type typeof_LogicalAndWithNull_ResultType = typeof_LogicalAndWithNull extends IQueryExpression<any, any, any, infer TFinalValueType, any, any, any> ? TFinalValueType : never;
+type logicalAndWithNull_ResultType_Test = AssertTrue<AssertEqual<typeof_LogicalAndWithNull_ResultType, null>>;
+
+const logicalAnd_WithNullable = andTester(customerIdQC.eq(1), empSalaryQC.eq(1));
+type typeof_LogicalAndWithNullable = typeof logicalAnd_WithNullable;
+type typeof_LogicalAndWithNullable_ResultType = typeof_LogicalAndWithNullable extends IQueryExpression<any, any, any, infer TFinalValueType, any, any, any> ? TFinalValueType : never;
+type logicalAndWithNullable_ResultType_Test = AssertTrue<AssertEqual<typeof_LogicalAndWithNullable_ResultType, boolean | null>>;

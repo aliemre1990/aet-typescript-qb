@@ -3,9 +3,31 @@ import type { GetColumnTypes } from "../table/column.js";
 import type { UndefinedIfLengthZero } from "../utility/common.js";
 import type BaseColumnComparisonOperation from "./_baseClasses/BaseColumnComparisonOperation.js";
 import BaseQueryExpression from "./_baseClasses/BaseQueryExpression.js";
-import { queryBuilderContextFactory, type DetermineValueType, type QueryBuilderContext } from "./_interfaces/IQueryExpression.js";
+import { queryBuilderContextFactory, type DetermineValueType, type IQueryExpression, type QueryBuilderContext } from "./_interfaces/IQueryExpression.js";
 import QueryParam from "./param.js";
 import { extractParams } from "./utility.js";
+
+type IsContainsNullable<TComparisons> =
+    TComparisons extends readonly [infer First, ...infer Rest] ?
+    First extends IQueryExpression<any, any, any, infer TFinalValueType, any, any, any> ?
+    [null] extends [TFinalValueType] ? true :
+    IsContainsNullable<Rest> :
+    IsContainsNullable<Rest> :
+    false;
+
+
+type IsContainsNull<TComparisons> =
+    TComparisons extends readonly [infer First, ...infer Rest] ?
+    First extends IQueryExpression<any, any, any, infer TFinalValueType, any, any, any> ?
+    [TFinalValueType] extends [null] ? true :
+    IsContainsNull<Rest> :
+    IsContainsNull<Rest> :
+    false;
+
+type DetermineResultType<TComparisons> =
+    IsContainsNull<TComparisons> extends true ? null :
+    IsContainsNullable<TComparisons> extends true ? boolean | null :
+    boolean;
 
 type InferLogicalOperationParams<
     TComparisons extends readonly (BaseColumnComparisonOperation<any, any, any, any, any, any, any> | ColumnLogicalOperation<any, any, any, any, any>)[],
@@ -35,8 +57,8 @@ class ColumnLogicalOperation<
 > extends BaseQueryExpression<
     TDbType,
     TParams,
-    DetermineValueType<TDbType, TCastType, boolean>,
-    DetermineValueType<TDbType, TCastType, boolean>,
+    DetermineValueType<TDbType, TCastType, DetermineResultType<TComparisons>>,
+    DetermineValueType<TDbType, TCastType, DetermineResultType<TComparisons>>,
     undefined,
     TAs,
     TCastType

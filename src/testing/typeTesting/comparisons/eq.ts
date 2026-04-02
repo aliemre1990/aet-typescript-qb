@@ -79,3 +79,8 @@ const maybeNullEqToNull = empPositionQC.eq(null);
 type typeof_MaybeNullEqToNull = typeof maybeNullEqToNull;
 type typeof_MaybeNullEqToNull_ValueType = typeof maybeNullEqToNull extends IQueryExpression<any, any, infer TValueType, any, any, any, any> ? TValueType : never;
 type maybeNullEqToNull_ValueType_Test = AssertTrue<AssertEqual<typeof_MaybeNullEqToNull_ValueType, null>>;
+
+const maybeNullEqToVal = empSalaryQC.eq(100);
+type typeof_MaybeNullEqToVal = typeof maybeNullEqToVal;
+type typeof_MaybeNullEqToVal_ValueType = typeof maybeNullEqToVal extends IQueryExpression<any, any, infer TValueType, any, any, any, any> ? TValueType : never;
+type maybeNullEqToVal_ValueType_Test = AssertTrue<AssertEqual<typeof_MaybeNullEqToVal_ValueType, boolean | null>>;
