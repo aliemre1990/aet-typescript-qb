@@ -1,6 +1,7 @@
+import type { IQueryExpression } from "../../../query/_interfaces/IQueryExpression.js";
 import type BasicColumnComparisonOperation from "../../../query/comparisons/_basicColumnComparisonOperation.js";
 import type QueryParam from "../../../query/param.js";
-import { customerIdQC, empSalaryQC } from "../../_columns.js";
+import { customerIdQC, empPositionQC, empSalaryQC } from "../../_columns.js";
 import { literalTester, paramTester, roundTester } from "../../_functions.js";
 import type { AssertEqual, AssertTrue } from "../../_typeTestingUtilities.js";
 
@@ -63,3 +64,18 @@ type typeof_ColEqToParam_WithCast_ParamType = typeof_ColEqToParam_WithCast_Value
 type typeof_ColEqToParam_WithCast_ParamCastType = typeof_ColEqToParam_WithCast_Value extends QueryParam<any, any, any, any, infer TCastType> ? TCastType : never;
 type colEqToParam_WithCast_ParamType_Test = AssertTrue<AssertEqual<typeof_ColEqToParam_WithCast_ParamType, number>>;
 type colEqToParam_WithCast_ParamCastType_Test = AssertTrue<AssertEqual<typeof_ColEqToParam_WithCast_ParamCastType, "VARCHAR">>;
+
+const eqToNull = customerIdQC.eq(null);
+type typeof_EqToNull = typeof eqToNull;
+type typeof_EqToNull_ValueType = typeof eqToNull extends IQueryExpression<any, any, infer TValueType, any, any, any, any> ? TValueType : never;
+type eqToNull_ValueType_Test = AssertTrue<AssertEqual<typeof_EqToNull_ValueType, null>>;
+
+const eqToMaybeNull = customerIdQC.eq(paramTester("num").type<number | null>());
+type typeof_EqToMaybeNull = typeof eqToMaybeNull;
+type typeof_EqToMaybeNull_ValueType = typeof eqToMaybeNull extends IQueryExpression<any, any, infer TValueType, any, any, any, any> ? TValueType : never;
+type eqToMaybeNull_ValueType_Test = AssertTrue<AssertEqual<typeof_EqToMaybeNull_ValueType, boolean | null>>;
+
+const maybeNullEqToNull = empPositionQC.eq(null);
+type typeof_MaybeNullEqToNull = typeof maybeNullEqToNull;
+type typeof_MaybeNullEqToNull_ValueType = typeof maybeNullEqToNull extends IQueryExpression<any, any, infer TValueType, any, any, any, any> ? TValueType : never;
+type maybeNullEqToNull_ValueType_Test = AssertTrue<AssertEqual<typeof_MaybeNullEqToNull_ValueType, null>>;

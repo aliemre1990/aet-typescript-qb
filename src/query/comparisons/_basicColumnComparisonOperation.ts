@@ -1,6 +1,6 @@
 import type { DbType } from "../../db.js";
 import type { DbValueTypes, GetColumnTypes } from "../../table/column.js";
-import type { LiteralToBase, UndefinedIfLengthZero } from "../../utility/common.js";
+import type { IsExact, LiteralToBase, UndefinedIfLengthZero } from "../../utility/common.js";
 import type { BasicComparisonOperationType, ConvertComparisonParamToTyped, InferComparisonParams, InferValueTypeFromExpression } from "../_baseClasses/BaseColumnComparisonOperation.js";
 import BaseColumnComparisonOperation, { basicComparisonOperations } from "../_baseClasses/BaseColumnComparisonOperation.js";
 import { IQueryExpressionFinalValueDummySymbol, IQueryExpressionValueDummySymbol, queryBuilderContextFactory, type DetermineValueType, type IQueryExpression, type QueryBuilderContext } from "../_interfaces/IQueryExpression.js";
@@ -8,6 +8,18 @@ import QueryParam from "../param.js";
 import QueryBuilder from "../queryBuilder.js";
 import { convertArgsToQueryString } from "../utility/common.js";
 import { extractParams } from "../utility.js";
+
+type ExtractComparingType<TComparing> = TComparing extends IQueryExpression<any, any, any, infer TFinalValueType, any, any, any> ? TFinalValueType : never;
+type ExtractAppliedType<TApplied> = TApplied extends IQueryExpression<any, any, any, infer TFinalValueType, any, any, any> ? TFinalValueType : TApplied;
+
+type GetComparisonType<TComparingType, TAppliedType> =
+    [TComparingType] extends [null] ? null :
+    [TAppliedType] extends [null] ? null :
+    null extends TComparingType ? boolean | null :
+    null extends TAppliedType ? boolean | null : boolean;
+
+type DetermineResultType<TComparing, TApplied> = GetComparisonType<ExtractComparingType<TComparing>, ExtractAppliedType<TApplied>>;
+
 
 class BasicColumnComparisonOperation<
     TDbType extends DbType,
@@ -21,8 +33,8 @@ class BasicColumnComparisonOperation<
     TDbType,
     BasicComparisonOperationType,
     TParams,
-    DetermineValueType<TDbType, TCastType, boolean>,
-    DetermineValueType<TDbType, TCastType, boolean>,
+    DetermineValueType<TDbType, TCastType, DetermineResultType<TComparing, TApplied>>,
+    DetermineValueType<TDbType, TCastType, DetermineResultType<TComparing, TApplied>>,
     TAs,
     TCastType
 > {
@@ -75,14 +87,14 @@ function generateBasicComparison(operation: BasicComparisonOperationType) {
     function basicComparison<
         TComparing extends IQueryExpression<TDbType, any, any, any, any, any, any>,
         TValueType extends InferValueTypeFromExpression<TDbType, TComparing>,
-        TParamMedian extends QueryParam<TDbType, string, any, any, any>,
-        TParamValue extends TParamMedian extends QueryParam<any, any, infer TVal, any, any> ? TVal : never,
+        TParamIntermediate extends QueryParam<TDbType, string, any, any, any>,
+        TParamValue extends TParamIntermediate extends QueryParam<any, any, infer TVal, any, any> ? TVal : never,
         TDbType extends DbType = TComparing extends IQueryExpression<infer DbType, any, any, any, any, any, any> ? DbType : never,
-    >(this: TComparing, value: TParamValue extends (LiteralToBase<TValueType> | null) ? TParamMedian : never):
+    >(this: TComparing, value: TParamValue extends (LiteralToBase<TValueType> | null) ? TParamIntermediate : never):
         BasicColumnComparisonOperation<
             TDbType,
             TComparing,
-            ConvertComparisonParamToTyped<TParamMedian, TValueType>
+            ConvertComparisonParamToTyped<TParamIntermediate, TValueType>
 
         >
     function basicComparison<
@@ -99,12 +111,13 @@ function generateBasicComparison(operation: BasicComparisonOperationType) {
     function basicComparison<
         TComparing extends IQueryExpression<TDbType, any, any, any, any, any, any>,
         TValueType extends InferValueTypeFromExpression<TDbType, TComparing>,
+        TApplied extends LiteralToBase<TValueType> | null,
         TDbType extends DbType = TComparing extends IQueryExpression<infer DbType, any, any, any, any, any, any> ? DbType : never,
-    >(this: TComparing, value: LiteralToBase<TValueType> | null):
+    >(this: TComparing, value: TApplied):
         BasicColumnComparisonOperation<
             TDbType,
             TComparing,
-            TValueType | null
+            TApplied
         >
     function basicComparison<TComparing extends IQueryExpression<any, any, any, any, any, any, any>,>(
         this: TComparing,

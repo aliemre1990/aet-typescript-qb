@@ -14,7 +14,8 @@
     }
   },
   "scripts": {
-    "test": "tsc && node --test ./dist/**/*.test.js"
+    "test": "tsc && node --test ./dist/**/*.test.js",
+    "trace": "tsc --generateTrace traceDir"
   },
   "dependencies": {
     "@types/pg": "^8.15.5",
