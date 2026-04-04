@@ -15,8 +15,8 @@ type ExtractAppliedType<TApplied> = TApplied extends IQueryExpression<any, any, 
 type GetComparisonType<TComparingType, TAppliedType> =
     [TComparingType] extends [null] ? null :
     [TAppliedType] extends [null] ? null :
-    [null] extends [TComparingType] ? boolean | null :
-    [null] extends [TAppliedType] ? boolean | null : boolean;
+    null extends TComparingType ? boolean | null :
+    null extends TAppliedType ? boolean | null : boolean;
 
 type DetermineResultType<TComparing, TApplied> = GetComparisonType<ExtractComparingType<TComparing>, ExtractAppliedType<TApplied>>;
 

@@ -12,7 +12,7 @@ const multipleFromQuery_WithSubQuery = from(employeesTable.as("employeesAs"), su
 type typeof_MultipleFromQuery_WithSubQuery_ResultType = ReturnType<typeof multipleFromQuery_WithSubQuery>
 type typeof_MultipleFromQuery_WithSubQuery_ParamsResult = typeof multipleFromQuery_WithSubQuery extends (param: infer TParams) => any ? TParams : never;
 type typeof_MultipleFromQuery_WithSubQuery_ResultType_Expected = { id: number }[]
-type typeof_MultipleFromQuery_WithSubQuery_ParamsResult_Expected = { [key: string]: any; } & { whereParam: number | null, roundParam1: number | null }
+type typeof_MultipleFromQuery_WithSubQuery_ParamsResult_Expected = { [key: string]: any; } & { whereParam: number | null, roundParam1: number }
 type multipleFromQuery_WithSubQuery_ResultType_Test = AssertTrue<AssertEqual<typeof_MultipleFromQuery_WithSubQuery_ResultType, typeof_MultipleFromQuery_WithSubQuery_ResultType_Expected>>;
 type multipleFromQuery_WithSubQuery_Params_Test = AssertTrue<AssertEqual<typeof_MultipleFromQuery_WithSubQuery_ParamsResult, typeof_MultipleFromQuery_WithSubQuery_ParamsResult_Expected>>
 

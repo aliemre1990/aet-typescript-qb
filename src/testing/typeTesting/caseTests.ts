@@ -68,7 +68,7 @@ type caseWithMainExpression_OneWhenWithExpressions_ThenParamed_MainParamNameTest
 type caseWithMainExpression_OneWhenWithExpressions_ThenParamed_MainParamTypeTest = AssertTrue<AssertEqual<typeof_CaseWithMainExpression_OneWhenWithExpressions_ThenParamed_MainParamType, number | null>>;
 type caseWithMainExpression_OneWhenWithExpressions_ThenParamed_WhenParamTypeTest = AssertTrue<AssertEqual<typeof_CaseWithMainExpression_OneWhenWithExpressions_ThenParamed_WhenParamType, number | null>>;
 type caseWithMainExpression_OneWhenWithExpressions_ThenParamed_WhenParamNameTest = AssertTrue<AssertEqual<typeof_CaseWithMainExpression_OneWhenWithExpressions_ThenParamed_WhenParamName, "when">>;
-type caseWithMainExpression_OneWhenWithExpressions_ThenParamed_ThenParamTypeTest = AssertTrue<AssertEqual<typeof_CaseWithMainExpression_OneWhenWithExpressions_ThenParamed_ThenParamType, number | null>>;
+type caseWithMainExpression_OneWhenWithExpressions_ThenParamed_ThenParamTypeTest = AssertTrue<AssertEqual<typeof_CaseWithMainExpression_OneWhenWithExpressions_ThenParamed_ThenParamType, number>>;
 type caseWithMainExpression_OneWhenWithExpressions_ThenParamed_ThenParamNameTest = AssertTrue<AssertEqual<typeof_CaseWithMainExpression_OneWhenWithExpressions_ThenParamed_ThenParamName, "then">>;
 
 const caseWithNoBranch_WithElse = caseTester().else("ali");
@@ -105,7 +105,7 @@ type caseWithParams_ParamsLengthTest = AssertTrue<AssertEqual<typeof_CaseWithPar
 type caseWithParams_WhenParamNameTest = AssertTrue<AssertEqual<typeof_CaseWithParams_WhenParamName, "when">>;
 type caseWithParams_WhenParamTypeTest = AssertTrue<AssertEqual<typeof_CaseWithParams_WhenParamType, number | null>>;
 type caseWithParams_ThenParamNameTest = AssertTrue<AssertEqual<typeof_CaseWithParams_ThenParamName, "then">>;
-type caseWithParams_ThenParamTypeTest = AssertTrue<AssertEqual<typeof_CaseWithParams_ThenParamType, number | null>>;
+type caseWithParams_ThenParamTypeTest = AssertTrue<AssertEqual<typeof_CaseWithParams_ThenParamType, number>>;
 type caseWithParams_ElseParamFromParamsParamNameTest = AssertTrue<AssertEqual<typeof_CaseWithParams_ElseParamFromParamsParamName, "else">>;
 type caseWithParams_ElseParamFromParamsParamTypeTest = AssertTrue<AssertEqual<typeof_CaseWithParams_ElseParamFromParamsParamType, number | null>>;
 

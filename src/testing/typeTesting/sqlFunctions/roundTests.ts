@@ -1,7 +1,8 @@
+import type { IQueryExpression } from "../../../query/_interfaces/IQueryExpression.js";
 import type ColumnSQLFunction from "../../../query/functions/_functions.js";
 import type QueryParam from "../../../query/param.js";
 import { empSalaryQC } from "../../_columns.js";
-import { paramTester, roundTester } from "../../_functions.js";
+import { literalTester, paramTester, roundTester } from "../../_functions.js";
 import type { AssertEqual, AssertTrue } from "../../_typeTestingUtilities.js";
 
 const roundValues = roundTester(1.55, 1);
@@ -29,15 +30,25 @@ type typeof_RoundParamsNotTyped = typeof roundParamsNotTyped;
 type typeof_RoundParamsNotTyped_ReturnType = typeof_RoundParamsNotTyped extends ColumnSQLFunction<any, any, infer TReturnType, any, any, any> ? TReturnType : never;
 type typeof_RoundParamsNotTyped_Params = typeof_RoundParamsNotTyped extends ColumnSQLFunction<any, any, any, infer TParams, any, any> ? TParams : never;
 type typeof_RoundParamsNotTyped_ValueParamType = typeof_RoundParamsNotTyped_Params[0] extends QueryParam<any, any, infer TValueType, any, any> ? TValueType : never;
-type roundParamsNotTyped_ReturnType_Test = AssertTrue<AssertEqual<typeof_RoundParamsNotTyped_ReturnType, number | null>>;
-type roundParamsNotTyped_ValueParamType_Test = AssertTrue<AssertEqual<typeof_RoundParamsNotTyped_ValueParamType, number | null>>;
+type roundParamsNotTyped_ReturnType_Test = AssertTrue<AssertEqual<typeof_RoundParamsNotTyped_ReturnType, number>>;
+type roundParamsNotTyped_ValueParamType_Test = AssertTrue<AssertEqual<typeof_RoundParamsNotTyped_ValueParamType, number>>;
 
 const roundParamsValNull = roundTester(paramTester("value"), 2);
 type typeof_RoundParamsValNull = typeof roundParamsValNull;
 type typeof_RoundParamsValNull_ReturnType = typeof_RoundParamsValNull extends ColumnSQLFunction<any, any, infer TReturnType, any, any, any> ? TReturnType : never;
-type roundParamsValNull_ReturnType_Test = AssertTrue<AssertEqual<typeof_RoundParamsValNull_ReturnType, number | null>>;
+type roundParamsValNull_ReturnType_Test = AssertTrue<AssertEqual<typeof_RoundParamsValNull_ReturnType, number>>;
 
 const roundParamsValNullableCol = roundTester(empSalaryQC, 2);
 type typeof_RoundParamsValNullableCol = typeof roundParamsValNullableCol;
 type typeof_RoundParamsValNullableCol_ReturnType = typeof_RoundParamsValNullableCol extends ColumnSQLFunction<any, any, infer TReturnType, any, any, any> ? TReturnType : never;
 type roundParamsValNullableCol_ReturnType_Test = AssertTrue<AssertEqual<typeof_RoundParamsValNullableCol_ReturnType, number | null>>;
+
+const roundWithNull = roundTester(1, null);
+type typeof_RoundWithNull = typeof roundWithNull;
+type typeof_RoundWithNull_ReturnType = typeof_RoundWithNull extends IQueryExpression<any, any, any, infer TFinalValueType, any, any, any> ? TFinalValueType : never;
+type roundWithNull_ReturnType_Test = AssertTrue<AssertEqual<typeof_RoundWithNull_ReturnType, null>>;
+
+const roundWithLiteralNull = roundTester(1, literalTester(null));
+type typeof_RoundWithLiteralNull = typeof roundWithLiteralNull;
+type typeof_RoundWithLiteralNull_ReturnType = typeof_RoundWithLiteralNull extends IQueryExpression<any, any, any, infer TFinalValueType, any, any, any> ? TFinalValueType : never;
+type roundWithLiteralNull_ReturnType_Test = AssertTrue<AssertEqual<typeof_RoundWithLiteralNull_ReturnType, null>>;
