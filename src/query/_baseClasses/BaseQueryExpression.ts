@@ -1,12 +1,13 @@
 import type { DbType } from "../../db.js";
 import type { DbValueTypes, GetColumnTypes } from "../../table/column.js";
-import { IQueryExpressionFinalValueDummySymbol, IQueryExpressionValueDummySymbol, type IQueryExpression, type QueryBuilderContext } from "../_interfaces/IQueryExpression.js";
+import { type IQueryExpression, type QueryBuilderContext } from "../_interfaces/IQueryExpression.js";
 import type QueryParam from "../param.js";
 import type { eq, gt, gte, lt, lte, notEq } from "../comparisons/_basicColumnComparisonOperation.js";
 import type { between, notBetween } from "../comparisons/_betweenColumnComparisonOperation.js";
 import type { sqlIn, sqlNotIn } from "../comparisons/_inColumnComparisonOperation.js";
 import type { isNotNull, isNull } from "../comparisons/_isNullColumnComparisonOperation.js";
 import type { iLike, like, notILike, notLike } from "../comparisons/_likeColumnComparisonOperation.js";
+import { FinalValueTypeDummySymbol, ValueTypeDummySymbol } from "../_interfaces/IQueryValue.js";
 
 class BaseQueryExpression<
     TDbType extends DbType,
@@ -19,8 +20,8 @@ class BaseQueryExpression<
 > implements IQueryExpression<TDbType, TParams, TValueType, TFinalValueType, TFieldName, TAs, TCastType> {
     dbType: TDbType;
 
-    [IQueryExpressionValueDummySymbol]: TValueType;
-    [IQueryExpressionFinalValueDummySymbol]: TFinalValueType;
+    [ValueTypeDummySymbol]: TValueType;
+    [FinalValueTypeDummySymbol]: TFinalValueType;
 
     params?: TParams;
     fieldName: TFieldName;
@@ -45,8 +46,8 @@ class BaseQueryExpression<
         this.asName = asName;
         this.castType = castType;
 
-        this[IQueryExpressionValueDummySymbol] = null as any;
-        this[IQueryExpressionFinalValueDummySymbol] = null as any;
+        this[ValueTypeDummySymbol] = null as any;
+        this[FinalValueTypeDummySymbol] = null as any;
     }
 }
 

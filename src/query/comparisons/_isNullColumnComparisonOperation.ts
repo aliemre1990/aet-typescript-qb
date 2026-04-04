@@ -2,7 +2,7 @@ import type { DbType } from "../../db.js";
 import type { GetColumnTypes } from "../../table/column.js";
 import type { UndefinedIfLengthZero } from "../../utility/common.js";
 import BaseColumnComparisonOperation, { isNullComparisonOperations, type InferComparisonParams, type IsNullComparisonOperationType } from "../_baseClasses/BaseColumnComparisonOperation.js";
-import { IQueryExpressionFinalValueDummySymbol, IQueryExpressionValueDummySymbol, queryBuilderContextFactory, type DetermineValueType, type IQueryExpression, type QueryBuilderContext } from "../_interfaces/IQueryExpression.js";
+import { queryBuilderContextFactory, type DetermineValueType, type IQueryExpression, type QueryBuilderContext } from "../_interfaces/IQueryExpression.js";
 import type QueryParam from "../param.js";
 import QueryBuilder from "../queryBuilder.js";
 import { extractParams } from "../utility.js";

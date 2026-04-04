@@ -1,9 +1,9 @@
 import type { DbType } from "../../db.js";
 import type { DbValueTypes, GetColumnTypes } from "../../table/column.js";
-import type { IsExact, LiteralToBase, UndefinedIfLengthZero } from "../../utility/common.js";
+import type { LiteralToBase, UndefinedIfLengthZero } from "../../utility/common.js";
 import type { BasicComparisonOperationType, ConvertComparisonParamToTyped, InferComparisonParams, InferValueTypeFromExpression } from "../_baseClasses/BaseColumnComparisonOperation.js";
 import BaseColumnComparisonOperation, { basicComparisonOperations } from "../_baseClasses/BaseColumnComparisonOperation.js";
-import { IQueryExpressionFinalValueDummySymbol, IQueryExpressionValueDummySymbol, queryBuilderContextFactory, type DetermineValueType, type IQueryExpression, type QueryBuilderContext } from "../_interfaces/IQueryExpression.js";
+import { queryBuilderContextFactory, type DetermineValueType, type IQueryExpression, type QueryBuilderContext } from "../_interfaces/IQueryExpression.js";
 import QueryParam from "../param.js";
 import QueryBuilder from "../queryBuilder.js";
 import { convertArgsToQueryString } from "../utility/common.js";

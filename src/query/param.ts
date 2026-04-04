@@ -2,7 +2,7 @@ import { dbTypes, type DbType } from "../db.js";
 import type { DbValueTypes, GetColumnTypes } from "../table/column.js";
 import type { IsAny } from "../utility/common.js";
 import BaseQueryExpression from "./_baseClasses/BaseQueryExpression.js";
-import { IQueryExpressionFinalValueDummySymbol, IQueryExpressionValueDummySymbol, queryBuilderContextFactory, type DetermineFinalValueType, type DetermineValueType, type IQueryExpression, type QueryBuilderContext } from "./_interfaces/IQueryExpression.js";
+import { queryBuilderContextFactory, type DetermineFinalValueType, type DetermineValueType, type IQueryExpression, type QueryBuilderContext } from "./_interfaces/IQueryExpression.js";
 
 
 type ExtractParams<T> =

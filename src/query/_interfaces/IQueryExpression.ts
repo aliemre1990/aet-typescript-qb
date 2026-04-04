@@ -9,6 +9,7 @@ import type { between, notBetween } from "../comparisons/_betweenColumnCompariso
 import type { sqlIn, sqlNotIn } from "../comparisons/_inColumnComparisonOperation.js";
 import type { isNotNull, isNull } from "../comparisons/_isNullColumnComparisonOperation.js";
 import type { iLike, like, notILike, notLike } from "../comparisons/_likeColumnComparisonOperation.js";
+import { type IQueryValue, type FinalValueTypeDummySymbol, ValueTypeDummySymbol } from "./IQueryValue.js";
 
 type DetermineValueType<
     TDbType extends DbType,
@@ -33,9 +34,6 @@ function queryBuilderContextFactory(): QueryBuilderContext {
     return { params: [], isTopLevel: true }
 }
 
-const IQueryExpressionValueDummySymbol = Symbol();
-const IQueryExpressionFinalValueDummySymbol = Symbol();
-
 interface IQueryExpression<
     TDbType extends DbType,
     TParams extends readonly QueryParam<TDbType, string, any, any, any>[] | undefined,
@@ -44,11 +42,11 @@ interface IQueryExpression<
     TFieldName extends string | undefined,
     TAs extends string | undefined,
     TCastType extends GetColumnTypes<TDbType> | undefined
-> extends IDbType<TDbType> {
+> extends IDbType<TDbType>, IQueryValue<TFieldName, TValueType, TFinalValueType> {
     dbType: TDbType;
 
-    [IQueryExpressionValueDummySymbol]: TValueType;
-    [IQueryExpressionFinalValueDummySymbol]: TFinalValueType;
+    [ValueTypeDummySymbol]: TValueType;
+    [FinalValueTypeDummySymbol]: TFinalValueType;
 
     params?: TParams;
     fieldName: TFieldName;
@@ -86,7 +84,5 @@ export type {
 }
 
 export {
-    IQueryExpressionValueDummySymbol,
-    IQueryExpressionFinalValueDummySymbol,
     queryBuilderContextFactory
 }

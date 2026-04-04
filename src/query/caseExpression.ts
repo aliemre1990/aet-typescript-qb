@@ -3,7 +3,7 @@ import type { DbValueTypes, GetColumnTypes } from "../table/column.js";
 import type { IsAny, IsExact, IsExactAlt, LiteralToBase, UndefinedIfLengthZero } from "../utility/common.js";
 import type BaseColumnComparisonOperation from "./_baseClasses/BaseColumnComparisonOperation.js";
 import BaseQueryExpression from "./_baseClasses/BaseQueryExpression.js";
-import { IQueryExpressionFinalValueDummySymbol, IQueryExpressionValueDummySymbol, type DetermineFinalValueType, type DetermineValueType, type IQueryExpression, type QueryBuilderContext } from "./_interfaces/IQueryExpression.js";
+import { type DetermineFinalValueType, type DetermineValueType, type IQueryExpression, type QueryBuilderContext } from "./_interfaces/IQueryExpression.js";
 import type { AccumulateComparisonParams } from "./_types/paramAccumulationComparison.js";
 import type ColumnLogicalOperation from "./logicalOperations.js";
 import type { ExtractParams } from "./param.js";

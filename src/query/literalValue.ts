@@ -2,8 +2,6 @@ import type { DbType } from "../db.js";
 import type { DbValueTypes, GetColumnTypes } from "../table/column.js";
 import BaseQueryExpression from "./_baseClasses/BaseQueryExpression.js";
 import {
-    IQueryExpressionFinalValueDummySymbol,
-    IQueryExpressionValueDummySymbol,
     queryBuilderContextFactory,
     type DetermineFinalValueType,
     type DetermineValueType,
