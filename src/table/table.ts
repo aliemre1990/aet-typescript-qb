@@ -95,6 +95,7 @@ class Table<
         [QueryTable<TDbType, TTableName, MapToQueryColumns<TDbType, TTableName, TColumns>, undefined>],
         undefined,
         undefined,
+        undefined,
         SelectToAllColumnsMapRecursively<TDbType, [QueryTable<TDbType, TTableName, MapToQueryColumns<TDbType, TTableName, TColumns>, undefined>], undefined>,
         undefined,
         undefined
@@ -110,6 +111,7 @@ class Table<
     ): QueryBuilder<
         TDbType,
         [QueryTable<TDbType, TTableName, MapToQueryColumns<TDbType, TTableName, TColumns>, undefined>],
+        undefined,
         undefined,
         undefined,
         TCbResult["length"] extends 0 ? SelectToAllColumnsMapRecursively<TDbType, [QueryTable<TDbType, TTableName, MapToQueryColumns<TDbType, TTableName, TColumns>, undefined>], undefined> : TFinalResult,
@@ -128,6 +130,7 @@ class Table<
         [QueryTable<TDbType, TTableName, MapToQueryColumns<TDbType, TTableName, TColumns>, undefined>],
         undefined,
         undefined,
+        undefined,
         TCbResult["length"] extends 0 ? SelectToAllColumnsMapRecursively<TDbType, [QueryTable<TDbType, TTableName, MapToQueryColumns<TDbType, TTableName, TColumns>, undefined>], undefined> : TFinalResult,
         TCbResult["length"] extends 0 ? undefined : UndefinedIfLengthZero<AccumulateColumnParams<undefined, TFinalResult>>
     > {
@@ -144,6 +147,7 @@ class Table<
                 [QueryTable<TDbType, TTableName, MapToQueryColumns<TDbType, TTableName, TColumns>, undefined>],
                 undefined,
                 undefined,
+                undefined,
                 TCbResult["length"] extends 0 ? SelectToAllColumnsMapRecursively<TDbType, [QueryTable<TDbType, TTableName, MapToQueryColumns<TDbType, TTableName, TColumns>, undefined>], undefined> : TFinalResult,
                 TCbResult["length"] extends 0 ? undefined : UndefinedIfLengthZero<AccumulateColumnParams<undefined, TFinalResult>>
             >;
@@ -151,6 +155,7 @@ class Table<
             return queryTable.select(cb) as QueryBuilder<
                 TDbType,
                 [QueryTable<TDbType, TTableName, MapToQueryColumns<TDbType, TTableName, TColumns>, undefined>],
+                undefined,
                 undefined,
                 undefined,
                 TCbResult["length"] extends 0 ? SelectToAllColumnsMapRecursively<TDbType, [QueryTable<TDbType, TTableName, MapToQueryColumns<TDbType, TTableName, TColumns>, undefined>], undefined> : TFinalResult,
@@ -161,7 +166,7 @@ class Table<
 
     join<
         TJoinType extends JoinType,
-        TJoinTable extends Table<TDbType, any, any> | QueryTable<TDbType, any, any, any> | QueryBuilder<TDbType, any, any, any, any, any, string, any> | CTEObject<TDbType, any, any, any, any>,
+        TJoinTable extends Table<TDbType, any, any> | QueryTable<TDbType, any, any, any> | QueryBuilder<TDbType, any, any, any, any, any, any, string, any> | CTEObject<TDbType, any, any, any, any>,
         TCbResult extends ComparisonType<TDbType>,
         TJoinResult extends JoinSpecsTableType<TDbType> =
         TJoinTable extends Table<TDbType, infer TJoinCols, infer TJoinTableName> ?
@@ -170,7 +175,7 @@ class Table<
             TJoinTableName,
             MapToQueryColumns<TDbType, TJoinTableName, TJoinCols>
         > :
-        TJoinTable extends QueryBuilder<TDbType, any, any, any, any, any, string, any> ? MapToSubQueryObject<TDbType, TJoinTable> :
+        TJoinTable extends QueryBuilder<TDbType, any, any, any, any, any, any, string, any> ? MapToSubQueryObject<TDbType, TJoinTable> :
         TJoinTable extends CTEObject<TDbType, any, any, any, any> ? TJoinTable :
         TJoinTable,
         TJoinParams extends QueryParam<TDbType, any, any, any, any>[] = AccumulateSubQueryParams<TDbType, [TJoinResult], AccumulateComparisonParams<TCbResult>>,
@@ -189,6 +194,7 @@ class Table<
             TDbType,
             [QueryTable<TDbType, TTableName, MapToQueryColumns<TDbType, TTableName, TColumns>, undefined>],
             TJoinAccumulated,
+            undefined,
             undefined,
             undefined,
             TJoinParamsResult
@@ -229,6 +235,7 @@ class Table<
         undefined,
         undefined,
         undefined,
+        undefined,
         AccumulateColumnParams<undefined, TCbResult>
     > {
         const queryColumns = this.columnsList.map((col) => {
@@ -246,6 +253,7 @@ class Table<
         QueryBuilder<
             TDbType,
             [QueryTable<TDbType, TTableName, MapToQueryColumns<TDbType, TTableName, TColumns>, undefined>],
+            undefined,
             undefined,
             undefined,
             undefined,

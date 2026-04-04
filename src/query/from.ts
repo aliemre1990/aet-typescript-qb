@@ -14,7 +14,7 @@ function from<
     TFrom extends readonly (
         Table<TDbType, any, any> |
         QueryTable<TDbType, any, any, any> |
-        QueryBuilder<TDbType, any, any, any, any, any, string, any> |
+        QueryBuilder<TDbType, any, any, any, any, any, any, string, any> |
         CTEObject<TDbType, any, any, any, any>
     )[],
     TDbType extends DbType = InferDbTypeFromFromFirstIDbType<TFrom>
@@ -51,6 +51,7 @@ function from<
     return new QueryBuilder<
         TDbType,
         TFromRes,
+        undefined,
         undefined,
         undefined,
         undefined,

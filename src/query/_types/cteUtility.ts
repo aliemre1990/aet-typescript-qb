@@ -9,14 +9,14 @@ type MapToCTEObjectForRecursive<
     TDbType extends DbType,
     TCTEName extends string,
     TColumnNames extends (readonly string[]) | undefined,
-    T extends QueryBuilder<TDbType, any, any, any, any, any, any, any>
+    T extends QueryBuilder<TDbType, any, any, any, any, any, any, any, any>
 > =
     TColumnNames extends undefined ?
     MapToCTEObject<TDbType, TCTEName, T> :
     TColumnNames extends readonly string[] ?
     TColumnNames["length"] extends 0 ?
     MapToCTEObject<TDbType, TCTEName, T> :
-    T extends QueryBuilder<TDbType, any, any, any, infer TRes, any, any, any> ?
+    T extends QueryBuilder<TDbType, any, any, any, any, infer TRes, any, any, any> ?
     TRes extends readonly IQueryExpression<TDbType, any, any, any, any, any, any>[] ?
     CTEObject<TDbType, TCTEName, T, MapToColumnMatch<TDbType, TRes, TColumnNames>, undefined> :
     never :
@@ -46,7 +46,7 @@ type MapToColumnMatch<
 
 
 type MapToCTEObject<TDbType extends DbType, TCTEName extends string, T> =
-    T extends QueryBuilder<TDbType, any, any, any, infer TRes extends ResultShape<TDbType>, any, any, any> ?
+    T extends QueryBuilder<TDbType, any, any, any, any, infer TRes extends ResultShape<TDbType>, any, any, any> ?
     CTEObject<TDbType, TCTEName, T, MapResultToCTEObjectEntry<TDbType, TRes>, undefined> : never
     ;
 

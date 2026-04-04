@@ -5,7 +5,7 @@ import type { MapCtesToSelectionType } from "./_types/miscellaneous.js";
 import CTEObject from "./cteObject.js";
 import type { ExtractParams } from "./param.js";
 import type QueryParam from "./param.js";
-import type { CTESpecsType, CTEType, FromType, JoinSpecsType, ResultShape } from "./queryBuilder.js";
+import type { CTESpecsType, CTEType, DMLSpecType, FromType, JoinSpecsType, ResultShape } from "./queryBuilder.js";
 import QueryBuilder, { cteTypes } from "./queryBuilder.js";
 import { extractParams, mapCTESpecsToSelection } from "./utility.js";
 
@@ -13,18 +13,19 @@ import { extractParams, mapCTESpecsToSelection } from "./utility.js";
 function generateCTEFunctionForQb(cteType: CTEType) {
 
     function cteFn<
-        TThis extends QueryBuilder<any, any, any, any, any, any, any, any>,
+        TThis extends QueryBuilder<any, any, any, any, any, any, any, any, any>,
         TCTEName extends string,
-        TQb extends QueryBuilder<TThisDbType, any, any, any, any, any, any, any>,
+        TQb extends QueryBuilder<TThisDbType, any, any, any, any, any, any, any, any>,
 
-        TThisDbType extends DbType = TThis extends QueryBuilder<infer TDbType, any, any, any, any, any, any, any> ? TDbType : never,
-        TThisFrom extends FromType<TThisDbType> | undefined = TThis extends QueryBuilder<any, infer TFrom, any, any, any, any, any, any> ? TFrom : never,
-        TThisJoinSpecs extends JoinSpecsType<TThisDbType> | undefined = TThis extends QueryBuilder<any, any, infer TJoinSpecs, any, any, any, any, any> ? TJoinSpecs : never,
-        TThisCTESpecs extends CTESpecsType<TThisDbType> | undefined = TThis extends QueryBuilder<any, any, any, infer TCTESpecs, any, any, any, any> ? TCTESpecs : never,
-        TThisResult extends ResultShape<TThisDbType> | undefined = TThis extends QueryBuilder<any, any, any, any, infer TResultShape, any, any, any> ? TResultShape : never,
-        TThisParams extends readonly QueryParam<TThisDbType, any, any, any, any>[] | undefined = TThis extends QueryBuilder<any, any, any, any, any, infer TParams, any, any> ? TParams : never,
-        TThisAs extends string | undefined = TThis extends QueryBuilder<any, any, any, any, any, any, infer TAs, any> ? TAs : never,
-        TThisCastType extends GetColumnTypes<TThisDbType> | undefined = TThis extends QueryBuilder<any, any, any, any, any, any, any, infer TCastType> ? TCastType : never,
+        TThisDbType extends DbType = TThis extends QueryBuilder<infer TDbType, any, any, any, any, any, any, any, any> ? TDbType : never,
+        TThisFrom extends FromType<TThisDbType> | undefined = TThis extends QueryBuilder<any, infer TFrom, any, any, any, any, any, any, any> ? TFrom : never,
+        TThisJoinSpecs extends JoinSpecsType<TThisDbType> | undefined = TThis extends QueryBuilder<any, any, infer TJoinSpecs, any, any, any, any, any, any> ? TJoinSpecs : never,
+        TThisCTESpecs extends CTESpecsType<TThisDbType> | undefined = TThis extends QueryBuilder<any, any, any, infer TCTESpecs, any, any, any, any, any> ? TCTESpecs : never,
+        TThisDMLSpec extends DMLSpecType<TThisDbType> | undefined = TThis extends QueryBuilder<any, any, any, any, infer TDMLSpec, any, any, any, any> ? TDMLSpec : never,
+        TThisResult extends ResultShape<TThisDbType> | undefined = TThis extends QueryBuilder<any, any, any, any, any, infer TResultShape, any, any, any> ? TResultShape : never,
+        TThisParams extends readonly QueryParam<TThisDbType, any, any, any, any>[] | undefined = TThis extends QueryBuilder<any, any, any, any, any, any, infer TParams, any, any> ? TParams : never,
+        TThisAs extends string | undefined = TThis extends QueryBuilder<any, any, any, any, any, any, any, infer TAs, any> ? TAs : never,
+        TThisCastType extends GetColumnTypes<TThisDbType> | undefined = TThis extends QueryBuilder<any, any, any, any, any, any, any, any, infer TCastType> ? TCastType : never,
 
         TCTEObject extends CTEObject<TThisDbType, any, any, any, any> = CTEObject<TThisDbType, TCTEName, TQb>,
         TFinalCTESpec extends readonly CTEObject<TThisDbType, any, any, any, any>[] = readonly [...(TThisCTESpecs extends CTESpecsType<TThisDbType> ? TThisCTESpecs : []), TCTEObject],
@@ -44,24 +45,26 @@ function generateCTEFunctionForQb(cteType: CTEType) {
             TThisFrom,
             TThisJoinSpecs,
             TFinalCTESpec,
+            TThisDMLSpec,
             TThisResult,
             TParamsAccumulated,
             TThisAs,
             TThisCastType
         >
     function cteFn<
-        TThis extends QueryBuilder<any, any, any, any, any, any, any, any>,
+        TThis extends QueryBuilder<any, any, any, any, any, any, any, any, any>,
         TCTEName extends string,
-        TQb extends QueryBuilder<TThisDbType, any, any, any, any, any, any, any>,
+        TQb extends QueryBuilder<TThisDbType, any, any, any, any, any, any, any, any>,
 
-        TThisDbType extends DbType = TThis extends QueryBuilder<infer TDbType, any, any, any, any, any, any, any> ? TDbType : never,
-        TThisFrom extends FromType<TThisDbType> | undefined = TThis extends QueryBuilder<any, infer TFrom, any, any, any, any, any, any> ? TFrom : never,
-        TThisJoinSpecs extends JoinSpecsType<TThisDbType> | undefined = TThis extends QueryBuilder<any, any, infer TJoinSpecs, any, any, any, any, any> ? TJoinSpecs : never,
-        TThisCTESpecs extends CTESpecsType<TThisDbType> | undefined = TThis extends QueryBuilder<any, any, any, infer TCTESpecs, any, any, any, any> ? TCTESpecs : never,
-        TThisResult extends ResultShape<TThisDbType> | undefined = TThis extends QueryBuilder<any, any, any, any, infer TResultShape, any, any, any> ? TResultShape : never,
-        TThisParams extends readonly QueryParam<TThisDbType, any, any, any, any>[] | undefined = TThis extends QueryBuilder<any, any, any, any, any, infer TParams, any, any> ? TParams : never,
-        TThisAs extends string | undefined = TThis extends QueryBuilder<any, any, any, any, any, any, infer TAs, any> ? TAs : never,
-        TThisCastType extends GetColumnTypes<TThisDbType> | undefined = TThis extends QueryBuilder<any, any, any, any, any, any, any, infer TCastType> ? TCastType : never,
+        TThisDbType extends DbType = TThis extends QueryBuilder<infer TDbType, any, any, any, any, any, any, any, any> ? TDbType : never,
+        TThisFrom extends FromType<TThisDbType> | undefined = TThis extends QueryBuilder<any, infer TFrom, any, any, any, any, any, any, any> ? TFrom : never,
+        TThisJoinSpecs extends JoinSpecsType<TThisDbType> | undefined = TThis extends QueryBuilder<any, any, infer TJoinSpecs, any, any, any, any, any, any> ? TJoinSpecs : never,
+        TThisCTESpecs extends CTESpecsType<TThisDbType> | undefined = TThis extends QueryBuilder<any, any, any, infer TCTESpecs, any, any, any, any, any> ? TCTESpecs : never,
+        TThisDMLSpec extends DMLSpecType<TThisDbType> | undefined = TThis extends QueryBuilder<any, any, any, any, infer TDMLSpec, any, any, any, any> ? TDMLSpec : never,
+        TThisResult extends ResultShape<TThisDbType> | undefined = TThis extends QueryBuilder<any, any, any, any, any, infer TResultShape, any, any, any> ? TResultShape : never,
+        TThisParams extends readonly QueryParam<TThisDbType, any, any, any, any>[] | undefined = TThis extends QueryBuilder<any, any, any, any, any, any, infer TParams, any, any> ? TParams : never,
+        TThisAs extends string | undefined = TThis extends QueryBuilder<any, any, any, any, any, any, any, infer TAs, any> ? TAs : never,
+        TThisCastType extends GetColumnTypes<TThisDbType> | undefined = TThis extends QueryBuilder<any, any, any, any, any, any, any, any, infer TCastType> ? TCastType : never,
 
         TCTEObject extends CTEObject<TThisDbType, any, any, any, any> = CTEObject<TThisDbType, TCTEName, TQb>,
         TFinalCTESpec extends readonly CTEObject<TThisDbType, any, any, any, any>[] = readonly [...(TThisCTESpecs extends CTESpecsType<TThisDbType> ? TThisCTESpecs : []), TCTEObject],
@@ -81,24 +84,26 @@ function generateCTEFunctionForQb(cteType: CTEType) {
             TThisFrom,
             TThisJoinSpecs,
             TFinalCTESpec,
+            TThisDMLSpec,
             TThisResult,
             TParamsAccumulated,
             TThisAs,
             TThisCastType
         >
     function cteFn<
-        TThis extends QueryBuilder<any, any, any, any, any, any, any, any>,
+        TThis extends QueryBuilder<any, any, any, any, any, any, any, any, any>,
         TCTEName extends string,
-        TQb extends QueryBuilder<TThisDbType, any, any, any, any, any, any, any>,
+        TQb extends QueryBuilder<TThisDbType, any, any, any, any, any, any, any, any>,
 
-        TThisDbType extends DbType = TThis extends QueryBuilder<infer TDbType, any, any, any, any, any, any, any> ? TDbType : never,
-        TThisFrom extends FromType<TThisDbType> | undefined = TThis extends QueryBuilder<any, infer TFrom, any, any, any, any, any, any> ? TFrom : never,
-        TThisJoinSpecs extends JoinSpecsType<TThisDbType> | undefined = TThis extends QueryBuilder<any, any, infer TJoinSpecs, any, any, any, any, any> ? TJoinSpecs : never,
-        TThisCTESpecs extends CTESpecsType<TThisDbType> | undefined = TThis extends QueryBuilder<any, any, any, infer TCTESpecs, any, any, any, any> ? TCTESpecs : never,
-        TThisResult extends ResultShape<TThisDbType> | undefined = TThis extends QueryBuilder<any, any, any, any, infer TResultShape, any, any, any> ? TResultShape : never,
-        TThisParams extends readonly QueryParam<TThisDbType, any, any, any, any>[] | undefined = TThis extends QueryBuilder<any, any, any, any, any, infer TParams, any, any> ? TParams : never,
-        TThisAs extends string | undefined = TThis extends QueryBuilder<any, any, any, any, any, any, infer TAs, any> ? TAs : never,
-        TThisCastType extends GetColumnTypes<TThisDbType> | undefined = TThis extends QueryBuilder<any, any, any, any, any, any, any, infer TCastType> ? TCastType : never,
+        TThisDbType extends DbType = TThis extends QueryBuilder<infer TDbType, any, any, any, any, any, any, any, any> ? TDbType : never,
+        TThisFrom extends FromType<TThisDbType> | undefined = TThis extends QueryBuilder<any, infer TFrom, any, any, any, any, any, any, any> ? TFrom : never,
+        TThisJoinSpecs extends JoinSpecsType<TThisDbType> | undefined = TThis extends QueryBuilder<any, any, infer TJoinSpecs, any, any, any, any, any, any> ? TJoinSpecs : never,
+        TThisCTESpecs extends CTESpecsType<TThisDbType> | undefined = TThis extends QueryBuilder<any, any, any, infer TCTESpecs, any, any, any, any, any> ? TCTESpecs : never,
+        TThisDMLSpec extends DMLSpecType<TThisDbType> | undefined = TThis extends QueryBuilder<any, any, any, any, infer TDMLSpec, any, any, any, any> ? TDMLSpec : never,
+        TThisResult extends ResultShape<TThisDbType> | undefined = TThis extends QueryBuilder<any, any, any, any, any, infer TResultShape, any, any, any> ? TResultShape : never,
+        TThisParams extends readonly QueryParam<TThisDbType, any, any, any, any>[] | undefined = TThis extends QueryBuilder<any, any, any, any, any, any, infer TParams, any, any> ? TParams : never,
+        TThisAs extends string | undefined = TThis extends QueryBuilder<any, any, any, any, any, any, any, infer TAs, any> ? TAs : never,
+        TThisCastType extends GetColumnTypes<TThisDbType> | undefined = TThis extends QueryBuilder<any, any, any, any, any, any, any, any, infer TCastType> ? TCastType : never,
 
         TCTEObject extends CTEObject<TThisDbType, any, any, any, any> = CTEObject<TThisDbType, TCTEName, TQb>,
         TFinalCTESpec extends readonly CTEObject<TThisDbType, any, any, any, any>[] = readonly [...(TThisCTESpecs extends CTESpecsType<TThisDbType> ? TThisCTESpecs : []), TCTEObject],
@@ -118,6 +123,7 @@ function generateCTEFunctionForQb(cteType: CTEType) {
             TThisFrom,
             TThisJoinSpecs,
             TFinalCTESpec,
+            TThisDMLSpec,
             TThisResult,
             TParamsAccumulated,
             TThisAs,
@@ -155,6 +161,7 @@ function generateCTEFunctionForQb(cteType: CTEType) {
             TThisFrom,
             TThisJoinSpecs,
             TFinalCTESpec,
+            TThisDMLSpec,
             TThisResult,
             TParamsAccumulated,
             TThisAs,
