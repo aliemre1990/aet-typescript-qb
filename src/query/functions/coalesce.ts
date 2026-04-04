@@ -6,13 +6,13 @@ import QueryParam from "../param.js";
 import ColumnSQLFunction, { sqlFunctions } from "./_functions.js";
 import type { InferFirstTypeFromArgs, IsContainsNonNull } from "../_types/args.js";
 
-type ConvertMedianToParam<T, TConvert extends DbValueTypes | null> =
+type ConvertInterParamToParam<T, TConvert extends DbValueTypes | null> =
     T extends QueryParam<infer TDbTypeInner, infer TName, infer TValueType, infer TAs, infer TCastType>
     ? QueryParam<TDbTypeInner, TName, IsAny<TValueType> extends true ? TConvert : TValueType, TAs, TCastType>
     : T;
 
-type ConvertMediansInArray<T extends any[], TValueType extends DbValueTypes | null> = {
-    [K in keyof T]: ConvertMedianToParam<T[K], TValueType>
+type ConvertInterParamsInArray<T extends any[], TValueType extends DbValueTypes | null> = {
+    [K in keyof T]: ConvertInterParamToParam<T[K], TValueType>
 };
 
 type CoalesceArg<TDbType extends DbType, TValueType extends DbValueTypes> =
@@ -40,9 +40,9 @@ function generateCoalesceFn<
 
         return new ColumnSQLFunction<
             TDbType,
-            ConvertMediansInArray<TArgs, FirstType | null>,
+            ConvertInterParamsInArray<TArgs, FirstType | null>,
             DetermineReturnType<TDbType, TArgs, FirstType>
-        >(dbType, args as ConvertMediansInArray<TArgs, FirstType | null>, sqlFunctions.coalesce, undefined, undefined);
+        >(dbType, args as ConvertInterParamsInArray<TArgs, FirstType | null>, sqlFunctions.coalesce, undefined, undefined);
     }
 }
 
