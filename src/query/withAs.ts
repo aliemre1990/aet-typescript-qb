@@ -62,7 +62,7 @@ function withRecursiveAs<
         any,
         any,
         any,
-        MapQueryResultForCombine<TAnchorQb extends QueryBuilder<any, any, any, any, any, infer TResult, any, any, any> ? TResult : never>,
+        MapQueryResultForCombine<any, TAnchorQb extends QueryBuilder<any, any, any, any, any, infer TResult, any, any, any> ? TResult : never>,
         any,
         any,
         any

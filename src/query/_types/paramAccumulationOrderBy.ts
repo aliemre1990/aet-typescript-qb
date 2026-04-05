@@ -19,10 +19,10 @@ type InferParamsFromOrderByParams<TDbType extends DbType, TOrderByParams extends
     TOrderByParams extends readonly [infer First, ...infer Rest] ?
     First extends IQueryExpression<TDbType, any, any, any, any, any, any> ?
     Rest extends OrderBySpecsType<TDbType> ?
-    [...(ExtractParams<First>), InferParamsFromOrderByParams<TDbType, Rest>] :
+    [...(ExtractParams<First>), ...InferParamsFromOrderByParams<TDbType, Rest>] :
     [...(ExtractParams<First>)] :
     First extends [infer TComp extends IQueryExpression<TDbType, any, any, any, any, any, any>, OrderType] ? Rest extends OrderBySpecsType<TDbType> ?
-    [...(ExtractParams<TComp>), InferParamsFromOrderByParams<TDbType, Rest>] :
+    [...(ExtractParams<TComp>), ...InferParamsFromOrderByParams<TDbType, Rest>] :
     [...(ExtractParams<TComp>)] :
     [] :
     [];

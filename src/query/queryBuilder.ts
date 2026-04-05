@@ -50,26 +50,12 @@ type CombineExpressions<
 type CalculateCombineResultRecursively<
     TUnionSelectResult extends ResultShape<any>,
     TSelectResult extends ResultShape<any>
-> =
-    TSelectResult extends readonly [infer SHead, ...infer STail] ?
-    TUnionSelectResult extends readonly [infer UHead, ...infer UTail] ?
-    SHead extends ResultShapeItem<any> ?
-    UHead extends ResultShapeItem<any> ?
-    STail extends readonly [any, ...any[]] ?
-    UTail extends readonly [any, ...any[]] ?
-    readonly [
-        CombineExpressions<SHead, UHead>,
-        ...CalculateCombineResultRecursively<STail, UTail>
-    ] :
-    [CombineExpressions<SHead, UHead>] :
-    [CombineExpressions<SHead, UHead>] :
-    never :
-    never :
-    never :
-    never;
+> = {
+        readonly [K in keyof TSelectResult]: K extends keyof TUnionSelectResult ? CombineExpressions<TSelectResult[K], TUnionSelectResult[K]> : never
+    }
 
 type CalculateCombineResult<
-    TUnionQb extends QueryBuilder<any, any, any, any, any, MapQueryResultForCombine<any>, any, any, any>,
+    TUnionQb extends QueryBuilder<any, any, any, any, any, any, any, any, any>,
     TResult extends ResultShape<any> | undefined
 > = TResult extends ResultShape<any> ?
     TUnionQb extends QueryBuilder<any, any, any, any, any, infer TUnionResult, any, any, any> ?
@@ -79,22 +65,30 @@ type CalculateCombineResult<
     never :
     never;
 
-type MapQueryResultForCombineRecursively<
-    TResult extends ResultShape<any>
+type MapNullableForCombine<
+    TDbType extends DbType,
+    T extends ResultShapeItem<TDbType>
 > =
-    TResult extends readonly [infer First, ...infer Rest] ?
-    First extends IQueryExpression<infer TDbType, any, infer TValueType, any, any, any, any> ?
-    Rest extends readonly [any, ...any[]] ?
-    [IQueryExpression<TDbType, any, any, TValueType extends null ? any : TValueType | null, any, any, any>, ...MapQueryResultForCombineRecursively<Rest>] :
-    [IQueryExpression<TDbType, any, any, TValueType extends null ? any : TValueType | null, any, any, any>] :
-    Rest extends readonly [any, ...any[]] ?
-    [never, ...MapQueryResultForCombineRecursively<Rest>] :
-    [never] :
-    []
-    ;
+    T extends IQueryExpression<TDbType, any, infer TValueType, any, any, any, any>
+    ? IQueryExpression<
+        TDbType,
+        any,
+        any,
+        TValueType extends null ? any : TValueType | null,
+        any,
+        any,
+        any
+    >
+    : never;
+
+type MapQueryResultForCombineRecursively<TDbType extends DbType, TResult extends ResultShape<any>> = {
+    readonly [K in keyof TResult]: MapNullableForCombine<TDbType, TResult[K]>;
+};
+
 type MapQueryResultForCombine<
-    TResult extends ResultShape<any> | undefined,
-> = TResult extends undefined ? never : TResult extends ResultShape<any> ? MapQueryResultForCombineRecursively<TResult> : never;
+    TDbType extends DbType,
+    TResult extends ResultShape<TDbType> | undefined,
+> = TResult extends ResultShape<TDbType> ? MapQueryResultForCombineRecursively<TDbType, TResult> : never;
 
 type ResultShapeItem<TDbType extends DbType> = IQueryExpression<TDbType, any, any, any, any, any, any>;
 type ResultShape<TDbType extends DbType> = readonly ResultShapeItem<TDbType>[];
@@ -1129,7 +1123,7 @@ class QueryBuilder<
             any,
             any,
             any,
-            MapQueryResultForCombine<TAnchorQb extends QueryBuilder<any, any, any, any, any, infer TResult, any, any, any> ? TResult : never>,
+            MapQueryResultForCombine<TDbType, TAnchorQb extends QueryBuilder<any, any, any, any, any, infer TResult, any, any, any> ? TResult : never>,
             any,
             any,
             any
