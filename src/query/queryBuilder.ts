@@ -179,6 +179,20 @@ const unionTypes = {
 } as const;
 type UNION_TYPE = typeof unionTypes[keyof typeof unionTypes]["name"];
 
+type CalculateSelectResult<
+    TDbType extends DbType,
+    TFrom extends FromType<TDbType> | undefined,
+    TJoinSpecs extends JoinSpecsType<TDbType> | undefined,
+    TCbResult extends readonly (ColumnsSelection<TDbType, any, any> | IQueryExpression<TDbType, any, any, any, string, any, any> | IQueryExpression<TDbType, any, any, any, any, string, any>)[],
+    TFinalResult extends ResultShape<TDbType>
+> = TCbResult["length"] extends 0 ? SelectToAllColumnsMapRecursively<TDbType, TFrom, TJoinSpecs> : TFinalResult;
+
+type CalculateSelectParams<
+    TParams extends readonly QueryParam<any, any, any, any, any>[] | undefined,
+    TCbResult extends readonly (ColumnsSelection<any, any, any> | IQueryExpression<any, any, any, any, string, any, any> | IQueryExpression<any, any, any, any, any, string, any>)[],
+    TFinalResult extends ResultShape<any>
+> = TCbResult["length"] extends 0 ? TParams : UndefinedIfLengthZero<AccumulateColumnParams<TParams, TFinalResult>>;
+
 const combineTypes = {
     ...unionTypes,
     INTERSECT: { name: 'INTERSECT', query: 'INTERSECT' },
@@ -506,8 +520,8 @@ class QueryBuilder<
         TJoinSpecs,
         TCTESpecs,
         TDMLSPec,
-        TCbResult["length"] extends 0 ? SelectToAllColumnsMapRecursively<TDbType, TFrom, TJoinSpecs> : TFinalResult,
-        TCbResult["length"] extends 0 ? TParams : UndefinedIfLengthZero<AccumulateColumnParams<TParams, TFinalResult>>,
+        CalculateSelectResult<TDbType, TFrom, TJoinSpecs, TCbResult, TFinalResult>,
+        CalculateSelectParams<TParams, TCbResult, TFinalResult>,
         TAs,
         TCastType
     >
@@ -519,17 +533,7 @@ class QueryBuilder<
             tables: TableToColumnsMap<TDbType, TablesToObject<TDbType, TFrom, TJoinSpecs>>,
             ops: DbOperations<TDbType>
         ) => TCbResult
-    ): QueryBuilder<
-        TDbType,
-        TFrom,
-        TJoinSpecs,
-        TCTESpecs,
-        TDMLSPec,
-        TCbResult["length"] extends 0 ? SelectToAllColumnsMapRecursively<TDbType, TFrom, TJoinSpecs> : TFinalResult,
-        TCbResult["length"] extends 0 ? TParams : UndefinedIfLengthZero<AccumulateColumnParams<TParams, TFinalResult>>,
-        TAs,
-        TCastType
-    > {
+    ): any {
 
         let selectRes: readonly (ColumnsSelection<TDbType, any, any> | IQueryExpression<TDbType, any, any, any, any, any, any>)[] = [];
         if (!isNullOrUndefined(cb)) {
@@ -577,17 +581,7 @@ class QueryBuilder<
                 }
             }
 
-            return new QueryBuilder<
-                TDbType,
-                TFrom,
-                TJoinSpecs,
-                TCTESpecs,
-                TDMLSPec,
-                TCbResult["length"] extends 0 ? SelectToAllColumnsMapRecursively<TDbType, TFrom, TJoinSpecs> : TFinalResult,
-                TCbResult["length"] extends 0 ? TParams : UndefinedIfLengthZero<AccumulateColumnParams<TParams, TFinalResult>>,
-                TAs,
-                TCastType
-            >(
+            return new QueryBuilder(
                 this.dbType,
                 this.fromSpecs,
                 this.asName,
@@ -619,17 +613,7 @@ class QueryBuilder<
                 }
             }
 
-            return new QueryBuilder<
-                TDbType,
-                TFrom,
-                TJoinSpecs,
-                TCTESpecs,
-                TDMLSPec,
-                TCbResult["length"] extends 0 ? SelectToAllColumnsMapRecursively<TDbType, TFrom, TJoinSpecs> : TFinalResult,
-                TCbResult["length"] extends 0 ? TParams : UndefinedIfLengthZero<AccumulateColumnParams<TParams, TFinalResult>>,
-                TAs,
-                TCastType
-            >(
+            return new QueryBuilder(
                 this.dbType,
                 this.fromSpecs,
                 this.asName,
@@ -1324,5 +1308,7 @@ export type {
     MapQueryResultForCombine,
     CalculateCombineResult,
     CombineSpecsType,
-    DMLSpecType
+    DMLSpecType,
+    CalculateSelectResult,
+    CalculateSelectParams
 }
