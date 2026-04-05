@@ -20,14 +20,7 @@ type TableToColumnsMap<
         [K in keyof T]: ColumnsSelection<
             TDbType,
             T[K],
-            T[K] extends QueryTable<TDbType, any, any, any> ? T[K]["columnsList"] :
-            T[K] extends SubQueryObject<TDbType, any, infer TSubQueryEntries, string> ?
-            TSubQueryEntries extends undefined ? never :
-            TSubQueryEntries :
-            T[K] extends CTEObject<TDbType, any, any, any, any> ?
-            T[K]["cteObjectEntries"] extends undefined ? never :
-            T[K]["cteObjectEntries"] :
-            never
+            T[K]["columnsList"] extends undefined ? never : T[K]["columnsList"]
         >
     };
 
@@ -39,34 +32,13 @@ type TablesToObject<
 > =
     (
         TFrom extends undefined ? {} :
-        TFrom extends FromType<TDbType> ?
-        {
-            [
-            T in TFrom[number]as
-            T extends QueryTable<TDbType, any, any, any> ?
-            T["name"] :
-            T extends SubQueryObject<TDbType, any, any, any> ?
-            T["name"] :
-            T extends CTEObject<TDbType, any, any, any, any> ?
-            T["name"] :
-            never
-            ]: T
-        } : {}
+        TFrom extends FromType<TDbType> ? { [T in TFrom[number]as T["name"]]: T } : {}
     ) &
     (
         TInnerJoinSpecs extends undefined ? {} :
         TInnerJoinSpecs extends JoinSpecsType<TDbType> ?
         {
-            [
-            T in TInnerJoinSpecs[number]as T["table"] extends
-            QueryTable<TDbType, any, any, any> ?
-            T["table"]["name"] :
-            T["table"] extends SubQueryObject<TDbType, any, any, any> ?
-            T["table"]["name"] :
-            T["table"] extends CTEObject<TDbType, any, any, any, any> ?
-            T["table"]["name"] :
-            never
-            ]: T["table"]
+            [T in TInnerJoinSpecs[number]as T["table"]["name"]]: T["table"]
         }
         : never
     ) &

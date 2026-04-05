@@ -30,6 +30,7 @@ import type { IName } from "../query/_interfaces/IName.js";
 import type ColumnsSelection from "../query/ColumnsSelection.js";
 import type { IQueryExpression } from "../query/_interfaces/IQueryExpression.js";
 import type { UndefinedIfLengthZero } from "../utility/common.js";
+import type { IQueryTable } from "../query/_interfaces/IQueryTable.js";
 
 type TableSpecsType<TTableName extends string = string> = { tableName: TTableName }
 
@@ -137,7 +138,7 @@ class Table<
 
     join<
         TJoinType extends JoinType,
-        TJoinTable extends Table<TDbType, any, any> | QueryTable<TDbType, any, any, any> | QueryBuilder<TDbType, any, any, any, any, any, any, string, any> | CTEObject<TDbType, any, any, any, any>,
+        TJoinTable extends IQueryTable<TDbType, any, any> | Table<TDbType, any, any> | QueryBuilder<TDbType, any, any, any, any, any, any, string, any>,
         TCbResult extends ComparisonType<TDbType>,
         TJoinResult extends JoinSpecsTableType<TDbType> =
         TJoinTable extends Table<TDbType, infer TJoinCols, infer TJoinTableName> ?

@@ -29,6 +29,7 @@ import type { withAsFnForQb, withAsMaterializedFnForQb, withAsNotMaterializedFnF
 import type { exceptAllFn, exceptFn, intersectAllFn, intersectFn, unionAllFn, unionFn } from "./combining.js";
 import type { GetColumnTypes } from "../table/column.js";
 import type { IQueryValue } from "./_interfaces/IQueryValue.js";
+import type { IQueryTable } from "./_interfaces/IQueryTable.js";
 
 type CombineExpressions<
     TLeft extends ResultShapeItem<any>,
@@ -95,7 +96,7 @@ type ResultShape<TDbType extends DbType> = readonly ResultShapeItem<TDbType>[];
 
 type SelectSpecsType<TDbType extends DbType> = "*" | readonly (ColumnsSelection<TDbType, any, any> | IQueryExpression<TDbType, any, any, any, any, any, any>)[]
 
-type FromItemType<TDbType extends DbType> = QueryTable<TDbType, any, any, any> | SubQueryObject<TDbType, any, any, string> | CTEObject<TDbType, any, any, any, any>;
+type FromItemType<TDbType extends DbType> = IQueryTable<TDbType, any, any>;
 type FromType<TDbType extends DbType> = readonly FromItemType<TDbType>[];
 
 const orderTypes = {
@@ -334,11 +335,11 @@ class QueryBuilder<
                     columnsSelection[ownerName] = selection;
                 } else if (spec instanceof SubQueryObject) {
                     let ownerName = spec.name;
-                    let selection = columnsSelectionFactory<TDbType>(spec, spec.subQueryEntries);
+                    let selection = columnsSelectionFactory<TDbType>(spec, spec.columnsList);
                     columnsSelection[ownerName] = selection;
                 } else if (spec instanceof CTEObject) {
                     let ownerName = spec.name;
-                    let selection = columnsSelectionFactory(spec, spec.cteObjectEntries);
+                    let selection = columnsSelectionFactory(spec, spec.columnsList);
                     columnsSelection[ownerName] = selection;
                 } else {
                     throw Error('Invalid from element type.')
@@ -356,11 +357,11 @@ class QueryBuilder<
                     columnsSelection[ownerName] = selection;
                 } else if (table instanceof SubQueryObject) {
                     let ownerName = table.name;
-                    let selection = columnsSelectionFactory<TDbType>(table, table.subQueryEntries);
+                    let selection = columnsSelectionFactory<TDbType>(table, table.columnsList);
                     columnsSelection[ownerName] = selection;
                 } else if (table instanceof CTEObject) {
                     let ownerName = table.name;
-                    let selection = columnsSelectionFactory(table, table.cteObjectEntries);
+                    let selection = columnsSelectionFactory(table, table.columnsList);
                     columnsSelection[ownerName] = selection;
                 } else {
                     throw Error('Invalid from element type.')
@@ -460,7 +461,7 @@ class QueryBuilder<
 
                     result = `${result}"${cte.cteName}"`;
                     if (cte.isColumnListPresent === true) {
-                        const columnList = `(${cte.cteObjectEntries.map(ent => `"${ent.fieldName}"`).join(', ')})`;
+                        const columnList = `(${cte.columnsList.map(ent => `"${ent.fieldName}"`).join(', ')})`;
                         result = `${result}${columnList}`
                     }
 
@@ -557,9 +558,9 @@ class QueryBuilder<
                     if (frm instanceof QueryTable) {
                         finalSelectRes.push(...frm.columnsList);
                     } else if (frm instanceof SubQueryObject) {
-                        finalSelectRes.push(...frm.subQueryEntries);
+                        finalSelectRes.push(...frm.columnsList);
                     } else if (frm instanceof CTEObject) {
-                        finalSelectRes.push(...frm.cteObjectEntries);
+                        finalSelectRes.push(...frm.columnsList);
                     } else {
                         throw Error('Invalid from element type.')
                     }
@@ -572,9 +573,9 @@ class QueryBuilder<
                     if (table instanceof QueryTable) {
                         finalSelectRes.push(...table.columnsList);
                     } else if (table instanceof SubQueryObject) {
-                        finalSelectRes.push(...table.subQueryEntries);
+                        finalSelectRes.push(...table.columnsList);
                     } else if (table instanceof CTEObject) {
-                        finalSelectRes.push(...table.cteObjectEntries);
+                        finalSelectRes.push(...table.columnsList);
                     } else {
                         throw Error('Invalid from element type.')
                     }
@@ -638,7 +639,7 @@ class QueryBuilder<
 
     join<
         TJoinType extends JoinType,
-        TJoinTable extends Table<TDbType, any, any> | QueryTable<TDbType, any, any, any> | QueryBuilder<TDbType, any, any, any, any, any, any, string, any> | CTEObject<TDbType, any, any, any, any>,
+        TJoinTable extends IQueryTable<TDbType, any, any> | Table<TDbType, any, any> | QueryBuilder<TDbType, any, any, any, any, any, any, string, any>,
         TCbResult extends ComparisonType<TDbType>,
         TJoinResult extends JoinSpecsTableType<TDbType> =
         TJoinTable extends Table<TDbType, infer TJoinCols, infer TJoinTableName> ?
@@ -685,13 +686,13 @@ class QueryBuilder<
             let ownerName = res.name;
             let selection = columnsSelectionFactory<TDbType>(res, res.columnsList);
 
-            joinTable = res as TJoinResult;
+            joinTable = res as IQueryTable<TDbType, any, any> as TJoinResult;
             columnsSelection = {
                 ...columnsSelection,
                 [ownerName]: selection
             }
         } else if (table instanceof QueryTable) {
-            joinTable = table as QueryTable<TDbType, any, any, any> as TJoinResult;
+            joinTable = table as IQueryTable<TDbType, any, any> as TJoinResult;
             let ownerName = joinTable.name;
             let selection = columnsSelectionFactory<TDbType>(table, table.columnsList)
 
@@ -703,19 +704,19 @@ class QueryBuilder<
             let tmpTable: SubQueryObject<TDbType, any, any, any> = new SubQueryObject(this.dbType, table);
 
             let ownerName = tmpTable.name;
-            let selection = columnsSelectionFactory<TDbType>(tmpTable, tmpTable.subQueryEntries);
+            let selection = columnsSelectionFactory<TDbType>(tmpTable, tmpTable.columnsList);
 
             columnsSelection = {
                 ...columnsSelection,
                 [ownerName]: selection
             }
 
-            joinTable = tmpTable as TJoinResult;
+            joinTable = tmpTable as IQueryTable<TDbType, any, any> as TJoinResult;
         } else if (table instanceof CTEObject) {
             let ownerName = table.name;
-            let selection = columnsSelectionFactory<TDbType>(table, table.cteObjectEntries);
+            let selection = columnsSelectionFactory<TDbType>(table, table.columnsList);
 
-            joinTable = table as CTEObject<TDbType, any, any, any, any> as TJoinResult;
+            joinTable = table as IQueryTable<TDbType, any, any> as TJoinResult;
 
             columnsSelection = {
                 ...columnsSelection,
@@ -822,7 +823,7 @@ class QueryBuilder<
     groupBy<
         const TCbResult extends GroupBySpecs<TDbType>
     >(cb: (
-        tables: TableToColumnsMap<TDbType, TablesToObject<TDbType, TFrom, TJoinSpecs>>,
+        tables: TableToColumnsMap<TDbType, TablesToObject<TDbType, TFrom, TJoinSpecs, TCTESpecs>>,
         ops: DbOperations<TDbType>
     ) => TCbResult):
         QueryBuilder<
@@ -877,7 +878,7 @@ class QueryBuilder<
         TCbResult extends ComparisonType<TDbType>
     >(
         cb: (
-            tables: TableToColumnsMap<TDbType, TablesToObject<TDbType, TFrom, TJoinSpecs>>,
+            tables: TableToColumnsMap<TDbType, TablesToObject<TDbType, TFrom, TJoinSpecs, TCTESpecs>>,
             ops: DbOperations<TDbType>
         ) => TCbResult
     ): QueryBuilder<
@@ -931,7 +932,7 @@ class QueryBuilder<
         const TCbResult extends OrderBySpecsType<TDbType>
     >(
         cb: (
-            tables: TableToColumnsMap<TDbType, TablesToObject<TDbType, TFrom, TJoinSpecs>>,
+            tables: TableToColumnsMap<TDbType, TablesToObject<TDbType, TFrom, TJoinSpecs, TCTESpecs>>,
             ops: DbOperations<TDbType>
         ) => TCbResult
     ):

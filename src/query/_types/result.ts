@@ -1,6 +1,7 @@
 import type { DbType } from "../../db.js";
 import type { DeepPrettify } from "../../utility/common.js";
 import type { IQueryExpression } from "../_interfaces/IQueryExpression.js";
+import type { IQueryTable } from "../_interfaces/IQueryTable.js";
 import type ColumnsSelection from "../ColumnsSelection.js";
 import type CTEObject from "../cteObject.js";
 import type QueryParam from "../param.js";
@@ -80,38 +81,24 @@ type JoinToAllColumnsMapRecursively<
     TJoin extends readonly [infer FFirst, ...infer FRest] ?
     FFirst extends { joinType: JoinType, table: infer TTable, comparison: ComparisonType<TDbType> } ?
 
-    TTable extends QueryTable<TDbType, any, infer TQCols, any> ?
+    TTable extends IQueryTable<TDbType, any, infer TQCols> ?
     FRest extends readonly [any, ...any[]] ?
     [...TQCols, ...JoinToAllColumnsMapRecursively<TDbType, FRest>] :
     [...TQCols] :
-    TTable extends SubQueryObject<TDbType, any, infer TEntries, any> ?
     FRest extends readonly [any, ...any[]] ?
-    [...TEntries, ...JoinToAllColumnsMapRecursively<TDbType, FRest>] :
-    [...TEntries] :
-    TTable extends CTEObject<TDbType, any, any, any, any> ?
-    FRest extends readonly [any, ...any[]] ?
-    [...TTable["cteObjectEntries"], ...JoinToAllColumnsMapRecursively<TDbType, FRest>] :
-    [...TTable["cteObjectEntries"]] :
-    never :
-    never :
+    [...JoinToAllColumnsMapRecursively<TDbType, FRest>] :
+    [] :
+    [] :
     [];
 type FromToAllColumnsMapRecursively<
     TDbType extends DbType,
     TFrom extends FromType<TDbType>
 > =
     TFrom extends readonly [infer FFirst, ...infer FRest] ?
-    FFirst extends QueryTable<TDbType, any, infer TQCols, any> ?
+    FFirst extends IQueryTable<TDbType, any, any> ?
     FRest extends readonly [any, ...any[]] ?
-    [...TQCols, ...FromToAllColumnsMapRecursively<TDbType, FRest>] :
-    [...TQCols] :
-    FFirst extends SubQueryObject<TDbType, any, infer TEntries, any> ?
-    FRest extends readonly [any, ...any[]] ?
-    [...TEntries, ...FromToAllColumnsMapRecursively<TDbType, FRest>] :
-    [...TEntries] :
-    FFirst extends CTEObject<TDbType, any, any, any, any> ?
-    FRest extends readonly [any, ...any[]] ?
-    [...FFirst["cteObjectEntries"], ...FromToAllColumnsMapRecursively<TDbType, FRest>] :
-    [...FFirst["cteObjectEntries"]] :
+    [...FFirst["columnsList"], ...FromToAllColumnsMapRecursively<TDbType, FRest>] :
+    [...FFirst["columnsList"]] :
     never :
     []
     ;

@@ -1,11 +1,7 @@
 import type { DbType } from "../db.js";
 import QueryColumn from "../query/queryColumn.js";
-import type Column from "../table/column.js";
 import type Table from "../table/table.js";
-import type { UndefinedIfLengthZero } from "../utility/common.js";
 import { queryBuilderContextFactory, type IQueryExpression, type QueryBuilderContext } from "./_interfaces/IQueryExpression.js";
-import type { IDbType } from "./_interfaces/IDbType.js";
-import type { IName } from "./_interfaces/IName.js";
 import type { TablesToObject, TableToColumnsMap } from "./_types/miscellaneous.js";
 import type { DbOperations } from "./_types/ops.js";
 import type { AccumulateComparisonParams } from "./_types/paramAccumulationComparison.js";
@@ -30,6 +26,7 @@ QueryBuilder,
     type ResultShape
 } from "./queryBuilder.js";
 import type { MapToQueryColumns } from "../table/table.js";
+import type { IQueryTable } from "./_interfaces/IQueryTable.js";
 
 type MapQueryColumnsToRecord<TColumns extends readonly QueryColumn<any, any, any, any, any, any, any>[]> = {
     [C in TColumns[number]as C["fieldName"]]: C
@@ -41,25 +38,26 @@ class QueryTable<
     TQColumns extends readonly QueryColumn<TDbType, any, any, any, any, any, any>[],
     TAsName extends string | undefined = undefined
 > implements
-    IDbType<TDbType>,
-    IName<TAsName extends undefined ? TTableName : TAsName> {
+    IQueryTable<TDbType, TAsName extends undefined ? TTableName : TAsName, TQColumns> {
 
     dbType: TDbType;
-    tableName: TTableName;
     name: TAsName extends undefined ? TTableName : TAsName;
+    columnsList: TQColumns;
 
     columns: MapQueryColumnsToRecord<TQColumns>;
+    tableName: TTableName;
 
     constructor(
         dbType: TDbType,
         tableName: TTableName,
-        public columnsList: TQColumns,
+        columnsList: TQColumns,
         public asName?: TAsName
     ) {
         this.dbType = dbType;
-        this.tableName = tableName;
-
         this.name = (asName === undefined ? tableName : asName) as TAsName extends undefined ? TTableName : TAsName;
+        this.columnsList = columnsList;
+
+        this.tableName = tableName;
 
         this.columns = columnsList.reduce((prev, curr) => {
             prev[curr.fieldName] = curr;
@@ -115,7 +113,7 @@ class QueryTable<
 
     join<
         TJoinType extends JoinType,
-        TJoinTable extends Table<TDbType, any, any> | QueryTable<TDbType, any, any, any> | QueryBuilder<TDbType, any, any, any, any, any, any, string, any> | CTEObject<TDbType, any, any, any, any>,
+        TJoinTable extends IQueryTable<TDbType, any, any> | Table<TDbType, any, any> | QueryBuilder<TDbType, any, any, any, any, any, any, string, any>,
         TCbResult extends ComparisonType<TDbType>,
         TJoinResult extends JoinSpecsTableType<TDbType> =
         TJoinTable extends Table<TDbType, infer TJoinCols, infer TJoinTableName> ?

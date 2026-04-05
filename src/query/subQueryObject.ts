@@ -5,6 +5,7 @@ import { queryBuilderContextFactory, type DetermineFinalValueType, type Determin
 import type { IName } from "./_interfaces/IName.js";
 import type { ResultShape } from "./queryBuilder.js";
 import type QueryBuilder from "./queryBuilder.js";
+import type { IQueryTable } from "./_interfaces/IQueryTable.js";
 
 type MapResultToSubQueryEntry<TDbType extends DbType, TExpressions extends ResultShape<TDbType>> =
     TExpressions extends readonly [infer First, ...infer Rest] ?
@@ -74,11 +75,12 @@ class SubQueryObject<
     TQb extends QueryBuilder<TDbType, any, any, any, any, ResultShape<TDbType>, any, string, any>,
     TEntries extends readonly SubQueryEntry<TDbType, any, any, any, any, any, any>[] = TQb extends QueryBuilder<TDbType, any, any, any, any, infer TRes extends ResultShape<TDbType>, any, string, any> ? MapResultToSubQueryEntry<TDbType, TRes> : never,
     TName extends string = TQb extends QueryBuilder<TDbType, any, any, any, any, any, any, infer TAsName, any> ? TAsName : never,
-> implements IName<TName> {
+> implements IQueryTable<TDbType, TName, TEntries> {
     dbType: TDbType;
-    qb: TQb;
     name: TName;
-    subQueryEntries: TEntries;
+    columnsList: TEntries;
+
+    qb: TQb;
 
     buildSQL(context?: QueryBuilderContext) {
         if (context === undefined) {
@@ -106,7 +108,7 @@ class SubQueryObject<
             })
         }
 
-        this.subQueryEntries = tmpEntries as TEntries;
+        this.columnsList = tmpEntries as TEntries;
     }
 }
 

@@ -5,6 +5,7 @@ import { queryBuilderContextFactory, type DetermineFinalValueType, type Determin
 import type { IName } from "./_interfaces/IName.js";
 import type { CTEType, ResultShape } from "./queryBuilder.js";
 import QueryBuilder from "./queryBuilder.js";
+import type { IQueryTable } from "./_interfaces/IQueryTable.js";
 
 type MapResultToCTEObjectEntry<TDbType extends DbType, TExpressions extends ResultShape<TDbType>> =
     TExpressions extends readonly [infer First, ...infer Rest] ?
@@ -77,18 +78,19 @@ class CTEObject<
     TQb extends QueryBuilder<TDbType, any, any, any, any, ResultShape<TDbType>, any, any, any>,
     TEntries extends readonly CTEObjectEntry<TDbType, any, any, any, any, any, any>[] = TQb extends QueryBuilder<TDbType, any, any, any, any, infer TRes, any, any, any> ? TRes extends ResultShape<TDbType> ? MapResultToCTEObjectEntry<TDbType, TRes> : never : never,
     TAs extends string | undefined = undefined
-> implements IName<TAs extends undefined ? TCTEName : TAs> {
+> implements IQueryTable<TDbType, TAs extends undefined ? TCTEName : TAs, TEntries> {
+
     dbType: TDbType;
+    name: TAs extends undefined ? TCTEName : TAs;
+    columnsList: TEntries;
 
     qb: TQb;
 
     asName?: TAs;
-    name: TAs extends undefined ? TCTEName : TAs;
     cteName: TCTEName;
     isColumnListPresent?: boolean;
 
     cteType: CTEType;
-    cteObjectEntries: TEntries;
 
     buildSQL(context?: QueryBuilderContext) {
         if (context === undefined) {
@@ -117,7 +119,7 @@ class CTEObject<
         this.isColumnListPresent = isColumnListPresent;
 
         if (entries !== undefined) {
-            this.cteObjectEntries = entries;
+            this.columnsList = entries;
         } else {
             let tmpEntries: readonly CTEObjectEntry<TDbType, any, any, any, any, any, any>[] = [];
             if (qb.selectResult !== undefined) {
@@ -126,12 +128,12 @@ class CTEObject<
                 })
             }
 
-            this.cteObjectEntries = tmpEntries as TEntries;
+            this.columnsList = tmpEntries as TEntries;
         }
     }
 
     as<TAs extends string>(val: TAs) {
-        const newEntries = this.cteObjectEntries
+        const newEntries = this.columnsList
             .map(ent => new CTEObjectEntry(ent.dbType, ent.expression, ent.asName, ent.castType, ent.fieldName, val)) as readonly CTEObjectEntry<TDbType, any, any, any, any, any>[] as TEntries;
 
         return new CTEObject<TDbType, TCTEName, TQb, TEntries, TAs>(this.dbType, this.qb, this.cteName, this.cteType, newEntries, val);
