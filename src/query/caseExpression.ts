@@ -162,9 +162,9 @@ class SQLCaseExpression<
         IQueryExpression<TDbType, any, any, any, any, any, any> | DbValueTypes | null
     ][] | undefined = undefined,
     TResult extends DbValueTypes | null = InferResultType<TWhenExpressions, TElseExpression>,
-    TParams extends readonly QueryParam<TDbType, string, any, any, any>[] | undefined = UndefinedIfLengthZero<AccumulateCaseParams<TMainExpression, TElseExpression, TWhenExpressions>>,
     TAs extends string | undefined = undefined,
     TCastType extends GetColumnTypes<TDbType> | undefined = undefined,
+    TParams extends readonly QueryParam<TDbType, string, any, any, any>[] | undefined = UndefinedIfLengthZero<AccumulateCaseParams<TMainExpression, TElseExpression, TWhenExpressions>>
 > extends BaseQueryExpression<
     TDbType,
     TParams,
@@ -179,10 +179,10 @@ class SQLCaseExpression<
     whenExpressions?: TWhenExpressions;
 
     as<TAs extends string>(asName: TAs) {
-        return new SQLCaseExpression<TDbType, TMainExpression, TElseExpression, TWhenExpressions, TResult, TParams, TAs, TCastType>(this.dbType, asName, this.castType, this.mainExpression);
+        return new SQLCaseExpression<TDbType, TMainExpression, TElseExpression, TWhenExpressions, TResult, TAs, TCastType, TParams>(this.dbType, asName, this.castType, this.mainExpression);
     }
     cast<TCastType extends GetColumnTypes<TDbType>>(type: TCastType) {
-        return new SQLCaseExpression<TDbType, TMainExpression, TElseExpression, TWhenExpressions, TResult, TParams, TAs, TCastType>(this.dbType, this.asName, type, this.mainExpression);
+        return new SQLCaseExpression<TDbType, TMainExpression, TElseExpression, TWhenExpressions, TResult, TAs, TCastType, TParams>(this.dbType, this.asName, type, this.mainExpression);
     }
     buildSQL(context?: QueryBuilderContext): { query: string; params: string[]; } {
         throw new Error("Method not implemented.");
@@ -236,7 +236,6 @@ class SQLCaseExpression<
         TElseExpression,
         [...(TFinalWhenExpressions extends undefined ? [] : TFinalWhenExpressions), [TFinalWhenResult, TThen extends QueryParam<any, any, any, any, any> ? MapAnyTypedQueryParamToTyped<TThen, InferExpressionType<TElseExpression, TWhenExpressions>> : TThen]],
         InferResultType<[...(TFinalWhenExpressions extends undefined ? [] : TFinalWhenExpressions), [TFinalWhenResult, TThen extends QueryParam<any, any, any, any, any> ? MapAnyTypedQueryParamToTyped<TThen, InferExpressionType<TElseExpression, TWhenExpressions>> : TThen]], TElseExpression>,
-        UndefinedIfLengthZero<AccumulateCaseParams<TMainExpression, TElseExpression, [...(TFinalWhenExpressions extends undefined ? [] : TFinalWhenExpressions), [TFinalWhenResult, TThen extends QueryParam<any, any, any, any, any> ? MapAnyTypedQueryParamToTyped<TThen, InferExpressionType<TElseExpression, TWhenExpressions>> : TThen]]>>,
         TAs,
         TCastType
     > {
@@ -265,7 +264,6 @@ class SQLCaseExpression<
         TFinalElseExpression,
         TWhenExpressions,
         InferResultType<TWhenExpressions, TFinalElseExpression>,
-        UndefinedIfLengthZero<AccumulateCaseParams<TMainExpression, TFinalElseExpression, TWhenExpressions>>,
         TAs,
         TCastType
     > {
