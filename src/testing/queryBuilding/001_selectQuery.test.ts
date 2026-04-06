@@ -107,8 +107,8 @@ test.suite("SIMPLE SELECT TESTS", () => {
 
     test("Select single column using arithmetic operations using AS", () => {
         const qb = customersTable
-            .select((tables, { arithmeticAddition }) => [
-                arithmeticAddition(tables.customers.id, 2).as("customerId")
+            .select((tables, { operatorAdd }) => [
+                operatorAdd(tables.customers.id, 2).as("customerId")
             ]);
         const buildRes = qb.buildSQL();
         const query = buildRes.query;

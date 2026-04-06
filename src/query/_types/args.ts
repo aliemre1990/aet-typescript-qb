@@ -78,7 +78,7 @@ type IsContainsNull<TDbType extends DbType, TArgs extends
     )[]
 > = TArgs extends readonly [infer First, ...infer Rest] ?
 
-    First extends IQueryExpression<TDbType, any, any, infer TFinalType, any, any, any> ?
+    [First] extends [IQueryExpression<TDbType, any, any, infer TFinalType, any, any, any>] ?
     null extends TFinalType ?
     true :
     Rest extends (IQueryExpression<TDbType, any, any, any, any, any, any> | DbValueTypes | null)[] ?

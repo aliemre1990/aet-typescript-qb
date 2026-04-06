@@ -33,13 +33,13 @@ type MySQLArithmeticModulo = ReturnType<typeof generateArithmeticModulo<MySQLDbT
 type PgArithmeticExponentiation = ReturnType<typeof generateArithmeticExponentiation<PgDbType>>;
 
 type ArithmeticOperations<TDbType extends DbType> = {
-    arithmeticAddition: TDbType extends PgDbType ? PgArithmeticAddition : MySQLArithmeticAddition,
-    arithmeticSubtraction: TDbType extends PgDbType ? PgArithmeticSubtraction : MySQLArithmeticSubtraction,
-    arithmeticMultiplication: TDbType extends PgDbType ? PgArithmeticMultiplication : MySQLArithmeticMultiplication,
-    arithmeticDivision: TDbType extends PgDbType ? PgArithmeticDivision : MySQLArithmeticDivision,
-    arithmeticModulo: TDbType extends PgDbType ? PgArithmeticModulo : MySQLArithmeticModulo
+    operatorAdd: TDbType extends PgDbType ? PgArithmeticAddition : MySQLArithmeticAddition,
+    operatorSubtract: TDbType extends PgDbType ? PgArithmeticSubtraction : MySQLArithmeticSubtraction,
+    operatorMultiplicate: TDbType extends PgDbType ? PgArithmeticMultiplication : MySQLArithmeticMultiplication,
+    operatorDivide: TDbType extends PgDbType ? PgArithmeticDivision : MySQLArithmeticDivision,
+    operatorModulo: TDbType extends PgDbType ? PgArithmeticModulo : MySQLArithmeticModulo
 } &
-    (TDbType extends PgDbType ? { arithmeticExponentiation: PgArithmeticExponentiation } : {});
+    (TDbType extends PgDbType ? { operatorExponentiation: PgArithmeticExponentiation } : {});
 
 
 type PgParamFn = ReturnType<typeof generateParamFn<PgDbType>>;

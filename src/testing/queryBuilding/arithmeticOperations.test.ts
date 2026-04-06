@@ -7,7 +7,7 @@ import { customersTable } from "../_tables.js";
 
 test.suite("ARITHMETIC OPERATIONS TESTS", () => {
     test("Simple arithmetics in select clause.", () => {
-        const qb = customersTable.select((tables, { arithmeticAddition }) => [arithmeticAddition(1, tables.customers.id).as("result")]);
+        const qb = customersTable.select((tables, { operatorAdd }) => [operatorAdd(1, tables.customers.id).as("result")]);
         const buildRes = qb.buildSQL();
         const query = buildRes.query;
 
@@ -15,7 +15,7 @@ test.suite("ARITHMETIC OPERATIONS TESTS", () => {
     });
 
     test("Simple arithmetics in select clause with params.", () => {
-        const qb = customersTable.select((tables, { arithmeticAddition, param }) => [arithmeticAddition(tables.customers.id, param("prm1")).as("result")]);
+        const qb = customersTable.select((tables, { operatorAdd, param }) => [operatorAdd(tables.customers.id, param("prm1")).as("result")]);
         const buildRes = qb.buildSQL();
         const query = buildRes.query;
 
@@ -23,7 +23,7 @@ test.suite("ARITHMETIC OPERATIONS TESTS", () => {
     });
 
     test("Simple arithmetics in select clause adds two columns.", () => {
-        const qb = customersTable.select((tables, { arithmeticAddition, param }) => [arithmeticAddition(tables.customers.id, tables.customers.createdBy).as("result")]);
+        const qb = customersTable.select((tables, { operatorAdd, param }) => [operatorAdd(tables.customers.id, tables.customers.createdBy).as("result")]);
         const buildRes = qb.buildSQL();
         const query = buildRes.query;
 
@@ -31,7 +31,7 @@ test.suite("ARITHMETIC OPERATIONS TESTS", () => {
     });
 
     test("Grouped arithmetic operations in where clause.", () => {
-        const qb = customersTable.select().where((tables, { arithmeticAddition }) => arithmeticAddition(tables.customers.id, 10, 20, arithmeticAddition(1, 2, arithmeticAddition(tables.customers.id, 100))).eq(10));
+        const qb = customersTable.select().where((tables, { operatorAdd }) => operatorAdd(tables.customers.id, 10, 20, operatorAdd(1, 2, operatorAdd(tables.customers.id, 100))).eq(10));
         const buildRes = qb.buildSQL();
         const query = buildRes.query;
 
@@ -39,7 +39,7 @@ test.suite("ARITHMETIC OPERATIONS TESTS", () => {
     });
 
     test("Grouped arithmetic operations in select clause.", () => {
-        const qb = customersTable.select((tables, { arithmeticAddition }) => [arithmeticAddition(tables.customers.id, 10, 20).as("result")]);
+        const qb = customersTable.select((tables, { operatorAdd }) => [operatorAdd(tables.customers.id, 10, 20).as("result")]);
         const buildRes = qb.buildSQL();
         const query = buildRes.query;
 

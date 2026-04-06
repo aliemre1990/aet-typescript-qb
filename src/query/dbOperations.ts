@@ -45,18 +45,18 @@ const mysqlAggregationFunctions: AggregationFunctions<MySQLDbType> = {
  */
 function generateCommonArithmeticOperations<TDbType extends DbType>(dbType: TDbType) {
     return {
-        arithmeticAddition: generateArithmeticAddition(dbType),
-        arithmeticSubtraction: generateArithmeticSubtraction(dbType),
-        arithmeticMultiplication: generateArithmeticMultiplication(dbType),
-        arithmeticDivision: generateArithmeticDivision(dbType),
-        arithmeticModulo: generateArithmeticModulo(dbType)
+        operatorAdd: generateArithmeticAddition(dbType),
+        operatorSubtract: generateArithmeticSubtraction(dbType),
+        operatorMultiplicate: generateArithmeticMultiplication(dbType),
+        operatorDivide: generateArithmeticDivision(dbType),
+        operatorModulo: generateArithmeticModulo(dbType)
     }
 }
 
 
 const pgArithmeticOperations: ArithmeticOperations<PgDbType> = {
     ...generateCommonArithmeticOperations(dbTypes.postgresql),
-    arithmeticExponentiation: generateArithmeticExponentiation(dbTypes.postgresql)
+    operatorExponentiation: generateArithmeticExponentiation(dbTypes.postgresql)
 }
 
 const mysqlArithmeticOperations: ArithmeticOperations<MySQLDbType> = {
