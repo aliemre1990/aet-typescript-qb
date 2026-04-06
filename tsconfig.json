@@ -109,6 +109,8 @@
     "global.d.ts"
   ],
   "exclude": [
+    "src/testing",
+    "src/playground",
     "node_modules",
     "dist",
   ],

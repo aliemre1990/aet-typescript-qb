@@ -14,7 +14,7 @@
     }
   },
   "scripts": {
-    "test": "tsc && node --test ./dist/**/*.test.js",
+    "test": "tsc -p tsconfig.test.json && node --test ./dist/**/*.test.js",
     "trace": "tsc --generateTrace traceDir"
   },
   "dependencies": {

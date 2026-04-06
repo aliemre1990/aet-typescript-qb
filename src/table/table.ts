@@ -10,6 +10,7 @@ QueryBuilder,
     type JoinSpecsTableType,
     type JoinSpecsType,
     type JoinType,
+    type MapToJoinTableType,
     type OrderBySpecsType,
     type ResultShape
 } from "../query/queryBuilder.js";
@@ -140,16 +141,7 @@ class Table<
         TJoinType extends JoinType,
         TJoinTable extends IQueryTable<TDbType, any, any> | Table<TDbType, any, any> | QueryBuilder<TDbType, any, any, any, any, any, any, string, any>,
         TCbResult extends ComparisonType<TDbType>,
-        TJoinResult extends JoinSpecsTableType<TDbType> =
-        TJoinTable extends Table<TDbType, infer TJoinCols, infer TJoinTableName> ?
-        QueryTable<
-            TDbType,
-            TJoinTableName,
-            MapToQueryColumns<TDbType, TJoinTableName, TJoinCols>
-        > :
-        TJoinTable extends QueryBuilder<TDbType, any, any, any, any, any, any, string, any> ? MapToSubQueryObject<TDbType, TJoinTable> :
-        TJoinTable extends CTEObject<TDbType, any, any, any, any> ? TJoinTable :
-        TJoinTable,
+        TJoinResult extends JoinSpecsTableType<TDbType> = MapToJoinTableType<TDbType, TJoinTable>,
         TJoinParams extends QueryParam<TDbType, any, any, any, any>[] = AccumulateSubQueryParams<TDbType, [TJoinResult], AccumulateComparisonParams<TCbResult>>,
         TJoinParamsResult extends QueryParam<TDbType, any, any, any, any>[] | undefined = TJoinParams["length"] extends 0 ? undefined : TJoinParams,
         const TJoinAccumulated extends JoinSpecsType<TDbType> = [{ joinType: TJoinType, table: TJoinResult, comparison: ComparisonType<TDbType> }]
