@@ -79,15 +79,15 @@ type IsContainsNull<TDbType extends DbType, TArgs extends
 > = TArgs extends readonly [infer First, ...infer Rest] ?
 
     [First] extends [IQueryExpression<TDbType, any, any, infer TFinalType, any, any, any>] ?
-    [TFinalType] extends null ?
+    [TFinalType] extends [null] ?
     true :
-    Rest extends (IQueryExpression<TDbType, any, any, any, any, any, any> | DbValueTypes | null)[] ?
+    Rest extends [any, ...any[]] ?
     IsContainsNull<TDbType, Rest> :
     false :
 
-    [First] extends null ?
+    [First] extends [null] ?
     true :
-    Rest extends (IQueryExpression<TDbType, any, any, any, any, any, any> | DbValueTypes)[] ?
+    Rest extends [any, ...any[]] ?
     IsContainsNull<TDbType, Rest> :
     false :
 
@@ -107,13 +107,13 @@ type IsContainsNullable<TDbType extends DbType, TArgs extends
     [First] extends [IQueryExpression<TDbType, any, any, infer TFinalType, any, any, any>] ?
     null extends TFinalType ?
     true :
-    Rest extends (IQueryExpression<TDbType, any, any, any, any, any, any> | DbValueTypes | null)[] ?
+    Rest extends [any, ...any[]] ?
     IsContainsNullable<TDbType, Rest> :
     false :
 
     null extends First ?
     true :
-    Rest extends (IQueryExpression<TDbType, any, any, any, any, any, any> | DbValueTypes)[] ?
+    Rest extends [any, ...any[]] ?
     IsContainsNullable<TDbType, Rest> :
     false :
 
