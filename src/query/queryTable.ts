@@ -15,6 +15,7 @@ import type QueryParam from "./param.js";
 import
 QueryBuilder,
 {
+    queryTypes,
     type CalculateSelectParams,
     type CalculateSelectResult,
     type ComparisonType,
@@ -186,6 +187,22 @@ class QueryTable<
             AccumulateOrderByParams<TDbType, undefined, TCbResult>
         > {
         return new QueryBuilder<TDbType, [QueryTable<TDbType, TTableName, TQColumns, TAsName>], undefined, undefined, undefined>(this.dbType, [this], undefined, undefined).orderBy(cb);
+    }
+
+    delete(): QueryBuilder<
+        TDbType,
+        undefined,
+        undefined,
+        undefined,
+        { table: QueryTable<TDbType, TTableName, TQColumns, TAsName>, values: undefined }
+    > {
+        return new QueryBuilder(
+            this.dbType,
+            undefined,
+            undefined,
+            undefined,
+            { queryType: queryTypes.DELETE, dmlSpec: { table: this, values: undefined } }
+        );
     }
 
 }

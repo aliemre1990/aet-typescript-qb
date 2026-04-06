@@ -1,7 +1,7 @@
 import type { DbType } from "../../db.js";
 import type ColumnsSelection from "../ColumnsSelection.js";
 import type CTEObject from "../cteObject.js";
-import type { CTESpecsType, FromItemType, FromType, JoinSpecsType } from "../queryBuilder.js";
+import type { CTESpecsType, DMLSpecType, FromItemType, FromType, JoinSpecsType } from "../queryBuilder.js";
 import type QueryTable from "../queryTable.js";
 import type SubQueryObject from "../subQueryObject.js";
 
@@ -28,7 +28,8 @@ type TablesToObject<
     TDbType extends DbType,
     TFrom extends FromType<TDbType> | undefined,
     TInnerJoinSpecs extends JoinSpecsType<TDbType> | undefined = undefined,
-    TCTESpecs extends CTESpecsType<TDbType> | undefined = undefined
+    TCTESpecs extends CTESpecsType<TDbType> | undefined = undefined,
+    TDMLSpec extends DMLSpecType<TDbType> | undefined = undefined
 > =
     (
         TFrom extends undefined ? {} :
@@ -51,6 +52,13 @@ type TablesToObject<
             ]: T
         }
         : never
+    ) &
+    (
+        TDMLSpec extends undefined ? {} :
+        TDMLSpec extends DMLSpecType<TDbType> ? {
+            [T in TDMLSpec["table"]["name"]]: TDMLSpec["table"]
+        } :
+        never
     );
 
 export type {

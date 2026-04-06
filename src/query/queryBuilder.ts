@@ -221,11 +221,12 @@ type CombineSpecsType<TDbType extends DbType> = readonly { type: typeof combineT
 const queryTypes = {
     SELECT: 'SELECT',
     UPDATE: 'UPDATE',
-    INSERT: 'INSERT'
+    INSERT: 'INSERT',
+    DELETE: 'DELETE'
 }
 type QUERY_TYPE = typeof queryTypes[keyof typeof queryTypes];
 
-type DMLSpecType<TDbType extends DbType> = { table: QueryTable<TDbType, any, any, any>, values: readonly IQueryValue<any, any, any>[] }
+type DMLSpecType<TDbType extends DbType> = { table: QueryTable<TDbType, any, any, any>, values: readonly IQueryValue<any, any, any>[] | undefined }
 
 class QueryBuilder<
     TDbType extends DbType,
@@ -250,6 +251,7 @@ class QueryBuilder<
     > {
 
     cteSpecs?: TCTESpecs;
+    dmlSpec?: TDMLSPec;
     fromSpecs: TFrom;
     joinSpecs?: TJoinSpecs;
     whereComparison?: ComparisonType<TDbType>;
@@ -270,8 +272,9 @@ class QueryBuilder<
         data?: {
             queryType?: QUERY_TYPE,
             params?: TParams;
-            cteSpecs?: TCTESpecs,
             joinSpecs?: TJoinSpecs,
+            cteSpecs?: TCTESpecs,
+            dmlSpec?: TDMLSPec,
             whereComparison?: ComparisonType<TDbType>,
             selectResult?: TResult,
             selectSpecs?: SelectSpecsType<TDbType>,
@@ -285,9 +288,10 @@ class QueryBuilder<
         super(dbType, data?.params as TParams, fieldName, asName, castType);
 
         this.params = data?.params;
-        this.cteSpecs = data?.cteSpecs;
         this.fromSpecs = fromSpecs;
         this.joinSpecs = data?.joinSpecs;
+        this.cteSpecs = data?.cteSpecs;
+        this.dmlSpec = data?.dmlSpec;
         this.whereComparison = data?.whereComparison;
         this.selectResult = data?.selectResult;
         this.selectSpecs = data?.selectSpecs;
@@ -381,6 +385,13 @@ class QueryBuilder<
                     throw Error('Invalid from element type.')
                 }
             }
+        }
+
+        if (this.dmlSpec) {
+            const { table } = this.dmlSpec;
+            let ownerName = table.name;
+            let selection = columnsSelectionFactory<TDbType>(table, table.columnsList)
+            columnsSelection[ownerName] = selection;
         }
 
         return columnsSelection;
@@ -505,6 +516,19 @@ class QueryBuilder<
                 `${groupByClause ? ` GROUP BY ${groupByClause}` : ''}` +
                 `${havingClause ? ` HAVING ${havingClause}` : ''}` +
                 `${unions ? ` ${unions}` : ''}`
+        } else if (this.queryType === queryTypes.DELETE) {
+            if (this.dmlSpec === undefined) {
+                throw Error('DML spec not specified.');
+            }
+
+            const dmlTable = this.dmlSpec.table;
+
+            result = `DELETE FROM "${dmlTable.tableName}"${dmlTable.asName ? ` AS "${dmlTable.asName}"` : ''}`;
+
+            if (this.whereComparison) {
+                const whereClause = this.whereComparison.buildSQL(context).query;
+                result = `${result} WHERE ${whereClause}`;
+            }
         }
 
         return { query: result, params: [...(context?.params || [])] };
@@ -773,7 +797,7 @@ class QueryBuilder<
         TCbResult extends ComparisonType<TDbType>
     >(
         cb: (
-            tables: TableToColumnsMap<TDbType, TablesToObject<TDbType, TFrom, TJoinSpecs>>,
+            tables: TableToColumnsMap<TDbType, TablesToObject<TDbType, TFrom, TJoinSpecs, TCTESpecs, TDMLSPec>>,
             ops: DbOperations<TDbType>
         ) => TCbResult
     ):
@@ -788,7 +812,7 @@ class QueryBuilder<
             TAs,
             TCastType
         > {
-        const columnsSelection = this.#getColumnsSelection() as TableToColumnsMap<TDbType, TablesToObject<TDbType, TFrom, TJoinSpecs>>;
+        const columnsSelection = this.#getColumnsSelection() as TableToColumnsMap<TDbType, TablesToObject<TDbType, TFrom, TJoinSpecs, TCTESpecs, TDMLSPec>>;
         const ops = getDbFunctions(this.dbType);
 
         const comparison = cb(columnsSelection, ops as DbOperations<TDbType>)
@@ -813,8 +837,9 @@ class QueryBuilder<
             {
                 queryType: this.queryType,
                 params: params as AccumulateComparisonParams<TCbResult, TParams>,
-                cteSpecs: this.cteSpecs,
                 joinSpecs: this.joinSpecs,
+                cteSpecs: this.cteSpecs,
+                dmlSpec: this.dmlSpec,
                 whereComparison: comparison,
                 selectResult: this.selectResult,
                 selectSpecs: this.selectSpecs,
@@ -1291,7 +1316,8 @@ export {
     joinTypes,
     cteTypes,
     unionTypes,
-    combineTypes
+    combineTypes,
+    queryTypes
 }
 
 export type {

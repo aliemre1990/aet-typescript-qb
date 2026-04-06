@@ -231,6 +231,24 @@ class Table<
 
         return queryTable.orderBy(cb);
     }
+
+    delete():
+        QueryBuilder<
+            TDbType,
+            undefined,
+            undefined,
+            undefined,
+            { table: QueryTable<TDbType, TTableName, MapToQueryColumns<TDbType, TTableName, TColumns>, undefined>, values: undefined }
+        > {
+        const queryColumns = this.columnsList.map((col) => {
+            return new QueryColumn(this.dbType, col.name, { tableName: this.name, asTableName: undefined }, undefined, undefined);
+        }) as MapToQueryColumns<TDbType, TTableName, TColumns>;
+
+        const queryTable = new QueryTable<TDbType, TTableName, MapToQueryColumns<TDbType, TTableName, TColumns>, undefined>(this.dbType, this.name, queryColumns);
+
+        return queryTable.delete();
+
+    }
 }
 
 function pgTable<
