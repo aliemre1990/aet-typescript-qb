@@ -79,16 +79,42 @@ type IsContainsNull<TDbType extends DbType, TArgs extends
 > = TArgs extends readonly [infer First, ...infer Rest] ?
 
     [First] extends [IQueryExpression<TDbType, any, any, infer TFinalType, any, any, any>] ?
-    null extends TFinalType ?
+    [TFinalType] extends null ?
     true :
     Rest extends (IQueryExpression<TDbType, any, any, any, any, any, any> | DbValueTypes | null)[] ?
     IsContainsNull<TDbType, Rest> :
     false :
 
-    null extends First ?
+    [First] extends null ?
     true :
     Rest extends (IQueryExpression<TDbType, any, any, any, any, any, any> | DbValueTypes)[] ?
     IsContainsNull<TDbType, Rest> :
+    false :
+
+    false
+    ;
+
+
+type IsContainsNullable<TDbType extends DbType, TArgs extends
+    (
+        DbValueTypes |
+        null |
+        IQueryExpression<TDbType, any, any, any, any, any, any>
+
+    )[]
+> = TArgs extends readonly [infer First, ...infer Rest] ?
+
+    [First] extends [IQueryExpression<TDbType, any, any, infer TFinalType, any, any, any>] ?
+    null extends TFinalType ?
+    true :
+    Rest extends (IQueryExpression<TDbType, any, any, any, any, any, any> | DbValueTypes | null)[] ?
+    IsContainsNullable<TDbType, Rest> :
+    false :
+
+    null extends First ?
+    true :
+    Rest extends (IQueryExpression<TDbType, any, any, any, any, any, any> | DbValueTypes)[] ?
+    IsContainsNullable<TDbType, Rest> :
     false :
 
     false
@@ -109,5 +135,6 @@ export type {
     InferFirstTypeFromArgs,
     IsContainsNonNull,
     IsContainsNull,
+    IsContainsNullable,
     InferReturnTypeFromJSONBuildObjectParam
 }

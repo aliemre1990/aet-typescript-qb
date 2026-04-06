@@ -1,5 +1,4 @@
 import { dbTypes } from "../db.js";
-import { generateArithmeticAddition } from "../query/arithmetic/addition.js";
 import { generateSQLCaseFn } from "../query/caseExpression.js";
 import { jsonBuildObjectFn } from "../query/functions/jsonFunctions/jsonBuildObject.js";
 import generateRoundFn from "../query/functions/round.js";
@@ -9,6 +8,7 @@ import generateSumFn from "../query/aggregation/sum.js";//Keep this below, it ca
 import { generateCoalesceFn } from "../query/functions/coalesce.js";
 import { generateAndFn, generateOrFn } from "../query/logicalOperations.js";
 import { generateSqlOperatorFn } from "../query/sqlOperator.js";
+import { arithmeticOperations, generateArithmeticOperationFn } from "../query/arithmetic/_arithmeticOperations.js";
 
 const paramTester = generateParamFn(dbTypes.postgresql);
 const literalTester = generateLiteralValueFn(dbTypes.postgresql);
@@ -19,7 +19,7 @@ const roundTester = generateRoundFn(dbTypes.postgresql);
 
 const sumTester = generateSumFn(dbTypes.postgresql);
 
-const arithmeticAdditionTester = generateArithmeticAddition(dbTypes.postgresql);
+const arithmeticAdditionTester = generateArithmeticOperationFn(dbTypes.postgresql, arithmeticOperations.addition);
 
 const coalesceTester = generateCoalesceFn(dbTypes.postgresql);
 

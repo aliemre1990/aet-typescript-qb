@@ -4,12 +4,7 @@ import type { AggregationFunctions, ArithmeticOperations, DbOperations, LogicalO
 import generateAvgFn from "./aggregation/avg.js"
 import { jsonAggFn, jsonbAggFn } from "./aggregation/json/jsonAgg.js"
 import generateSumFn from "./aggregation/sum.js"
-import { generateArithmeticAddition } from "./arithmetic/addition.js"
-import { generateArithmeticDivision } from "./arithmetic/division.js"
-import { generateArithmeticExponentiation } from "./arithmetic/exponentiation.js"
-import { generateArithmeticModulo } from "./arithmetic/modulo.js"
-import { generateArithmeticMultiplication } from "./arithmetic/multiplication.js"
-import { generateArithmeticSubtraction } from "./arithmetic/subtract.js"
+import { arithmeticOperations, generateArithmeticOperationFn } from "./arithmetic/_arithmeticOperations.js"
 import { generateSQLCaseFn } from "./caseExpression.js"
 import { generateExistsComparison } from "./comparisons/_existsColumnComparisonOperation.js"
 import { generateCoalesceFn } from "./functions/coalesce.js"
@@ -45,18 +40,18 @@ const mysqlAggregationFunctions: AggregationFunctions<MySQLDbType> = {
  */
 function generateCommonArithmeticOperations<TDbType extends DbType>(dbType: TDbType) {
     return {
-        operatorAdd: generateArithmeticAddition(dbType),
-        operatorSubtract: generateArithmeticSubtraction(dbType),
-        operatorMultiplicate: generateArithmeticMultiplication(dbType),
-        operatorDivide: generateArithmeticDivision(dbType),
-        operatorModulo: generateArithmeticModulo(dbType)
+        operatorAdd: generateArithmeticOperationFn(dbType, arithmeticOperations.addition),
+        operatorSubtract: generateArithmeticOperationFn(dbType, arithmeticOperations.subtraction),
+        operatorMultiplicate: generateArithmeticOperationFn(dbType, arithmeticOperations.multiplication),
+        operatorDivide: generateArithmeticOperationFn(dbType, arithmeticOperations.divison),
+        operatorModulo: generateArithmeticOperationFn(dbType, arithmeticOperations.modulo),
     }
 }
 
 
 const pgArithmeticOperations: ArithmeticOperations<PgDbType> = {
     ...generateCommonArithmeticOperations(dbTypes.postgresql),
-    operatorExponentiation: generateArithmeticExponentiation(dbTypes.postgresql)
+    operatorExponentiation: generateArithmeticOperationFn(dbTypes.postgresql, arithmeticOperations.exponentiation)
 }
 
 const mysqlArithmeticOperations: ArithmeticOperations<MySQLDbType> = {

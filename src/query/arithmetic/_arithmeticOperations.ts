@@ -6,6 +6,7 @@ import QueryParam from "../param.js";
 import { convertArgsToQueryString } from "../utility/common.js";
 import BaseQueryExpression from "../_baseClasses/BaseQueryExpression.js";
 import { extractParams } from "../utility.js";
+import type { IsContainsNull, IsContainsNullable } from "../_types/args.js";
 
 
 const arithmeticOperations = {
@@ -99,10 +100,28 @@ class SQLArithmeticOperation<
     }
 }
 
+function generateArithmeticOperationFn<TDbType extends DbType>(
+    dbType: TDbType,
+    operation: ArithmeticOperation
+) {
+    return <
+        TArgs extends (DbValueTypes | null | IQueryExpression<TDbType, any, number, any, any, any, any>)[]
+    >
+        (...args: TArgs) => {
+
+        return new SQLArithmeticOperation<
+            TDbType,
+            TArgs,
+            IsContainsNull<TDbType, TArgs> extends true ? null : IsContainsNullable<TDbType, TArgs> extends true ? number | null : number
+        >(dbType, args, operation, undefined, undefined);
+    }
+}
+
 export default SQLArithmeticOperation;
 
 export {
-    arithmeticOperations
+    arithmeticOperations,
+    generateArithmeticOperationFn
 }
 
 export type {
