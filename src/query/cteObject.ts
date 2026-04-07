@@ -122,8 +122,8 @@ class CTEObject<
             this.columnsList = entries;
         } else {
             let tmpEntries: readonly CTEObjectEntry<TDbType, any, any, any, any, any, any>[] = [];
-            if (qb.selectResult !== undefined) {
-                qb.selectResult.forEach(res => {
+            if (qb.queryResult !== undefined) {
+                qb.queryResult.forEach(res => {
                     tmpEntries = [...tmpEntries, (new CTEObjectEntry(dbType, res, undefined, undefined, this.cteName))];
                 })
             }

@@ -23,7 +23,7 @@ class BaseQueryExpression<
     [ValueTypeDummySymbol]: TValueType;
     [FinalValueTypeDummySymbol]: TFinalValueType;
 
-    params?: TParams;
+    params: TParams;
     fieldName: TFieldName;
     asName: TAs;
     castType: TCastType;

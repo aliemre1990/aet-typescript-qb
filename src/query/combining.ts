@@ -141,17 +141,16 @@ function generateCombineFunction(combineType: CombineType) {
             TThisCastType
         >(
             this.dbType,
-            this.fromSpecs,
             this.asName,
             this.castType,
+            params as TParamsAccumulated,
             {
-                queryType: this.queryType,
-                params: params as TParamsAccumulated,
+                fromSpecs: this.fromSpecs,
                 cteSpecs: this.cteSpecs,
                 joinSpecs: this.joinSpecs,
                 whereComparison: this.whereComparison,
-                selectResult: this.selectResult as CalculateCombineResult<TQbResult, TThisResult>,
-                selectSpecs: this.selectSpecs,
+                queryResult: this.queryResult as CalculateCombineResult<TQbResult, TThisResult>,
+                queryResultSpecs: this.queryResultSpecs,
                 groupedColumns: this.groupedColumns,
                 havingSpec: this.havingSpec,
                 orderBySpecs: this.orderBySpecs,

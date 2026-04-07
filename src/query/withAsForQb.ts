@@ -105,16 +105,16 @@ function generateCTEFunctionForQb(cteType: CTEType) {
 
         return new QueryBuilder(
             this.dbType,
-            this.fromSpecs,
             this.asName,
             this.castType,
+            params,
             {
-                queryType: this.queryType,
-                params: params,
+                fromSpecs: this.fromSpecs,
                 cteSpecs: newCteSpecs,
                 joinSpecs: this.joinSpecs,
                 whereComparison: this.whereComparison,
-                selectResult: this.selectResult,
+                queryResult: this.queryResult,
+                queryResultSpecs: this.queryResultSpecs,
                 groupedColumns: this.groupedColumns,
                 havingSpec: this.havingSpec,
                 orderBySpecs: this.orderBySpecs,

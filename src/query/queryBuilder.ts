@@ -30,6 +30,8 @@ import type { exceptAllFn, exceptFn, intersectAllFn, intersectFn, unionAllFn, un
 import type { GetColumnTypes } from "../table/column.js";
 import type { IQueryValue } from "./_interfaces/IQueryValue.js";
 import type { IQueryTable } from "./_interfaces/IQueryTable.js";
+import type { GetFirstDefaultKeyFromResult, GetFirstFinalTypeFromResult, GetFirstTypeFromResult, QueryResultSpecsType, ResultShape, ResultShapeItem } from "./_baseClasses/BaseQueryBuilder.js";
+import BaseQueryBuilder from "./_baseClasses/BaseQueryBuilder.js";
 
 type CombineExpressions<
     TLeft extends ResultShapeItem<any>,
@@ -91,10 +93,7 @@ type MapQueryResultForCombine<
     TResult extends ResultShape<TDbType> | undefined,
 > = TResult extends ResultShape<TDbType> ? MapQueryResultForCombineRecursively<TDbType, TResult> : never;
 
-type ResultShapeItem<TDbType extends DbType> = IQueryExpression<TDbType, any, any, any, any, any, any>;
-type ResultShape<TDbType extends DbType> = readonly ResultShapeItem<TDbType>[];
 
-type SelectSpecsType<TDbType extends DbType> = "*" | readonly (ColumnsSelection<TDbType, any, any> | IQueryExpression<TDbType, any, any, any, any, any, any>)[]
 
 type FromItemType<TDbType extends DbType> = IQueryTable<TDbType, any, any>;
 type FromType<TDbType extends DbType> = readonly FromItemType<TDbType>[];
@@ -164,30 +163,6 @@ type CTESpecsType<TDbType extends DbType> = readonly CTEObject<
     any
 >[];
 
-type GetFirstTypeFromResult<TDbType extends DbType, TResult extends ResultShape<TDbType> | undefined> =
-    TResult extends undefined ? never :
-    TResult extends ResultShape<TDbType> ?
-    TResult[0] extends never ? never :
-    TResult[0] extends IQueryExpression<TDbType, any, infer TValueType, any, any, any, any> ? TValueType :
-    never :
-    never;
-
-type GetFirstFinalTypeFromResult<TDbType extends DbType, TResult extends ResultShape<TDbType> | undefined> =
-    TResult extends undefined ? never :
-    TResult extends ResultShape<TDbType> ?
-    TResult[0] extends never ? never :
-    TResult[0] extends IQueryExpression<TDbType, any, any, infer TFinalValueType, any, any, any> ? TFinalValueType :
-    never :
-    never;
-
-type GetFirstDefaultKeyFromResult<TDbType extends DbType, TResult extends ResultShape<TDbType> | undefined> =
-    TResult extends undefined ? never :
-    TResult extends ResultShape<TDbType> ?
-    TResult[0] extends never ? never :
-    TResult[0] extends IQueryExpression<TDbType, any, any, any, any, infer TFieldKey, any> ? TFieldKey :
-    never :
-    never;
-
 const unionTypes = {
     UNION: { name: 'UNION', query: 'UNION' },
     UNION_ALL: { name: 'UNION_ALL', query: 'UNION ALL' },
@@ -238,85 +213,74 @@ class QueryBuilder<
     TParams extends readonly QueryParam<TDbType, any, any, any, any>[] | undefined = undefined,
     TAs extends string | undefined = undefined,
     TCastType extends GetColumnTypes<TDbType> | undefined = undefined
->
-    extends
-    BaseQueryExpression<
+> extends
+    BaseQueryBuilder<
         TDbType,
         TParams,
-        DetermineValueType<TDbType, TCastType, GetFirstTypeFromResult<TDbType, TResult>>,
-        DetermineFinalValueType<GetFirstFinalTypeFromResult<TDbType, TResult>, DetermineValueType<TDbType, TCastType, GetFirstTypeFromResult<TDbType, TResult>>>,
-        GetFirstDefaultKeyFromResult<TDbType, TResult>,
+        TResult,
         TAs,
         TCastType
     > {
 
+    fromSpecs: TFrom;
+
     cteSpecs?: TCTESpecs;
     dmlSpec?: TDMLSPec;
-    fromSpecs: TFrom;
     joinSpecs?: TJoinSpecs;
     whereComparison?: ComparisonType<TDbType>;
-    selectResult?: TResult;
-    selectSpecs?: SelectSpecsType<TDbType>;
     groupedColumns?: GroupBySpecs<TDbType>;
     havingSpec?: ComparisonType<TDbType>;
     orderBySpecs?: OrderBySpecsType<TDbType>;
     combineSpecs?: CombineSpecsType<TDbType>;
 
-    queryType?: QUERY_TYPE;
-
     constructor(
         dbType: TDbType,
-        fromSpecs: TFrom,
         asName: TAs,
         castType: TCastType,
-        data?: {
-            queryType?: QUERY_TYPE,
-            params?: TParams;
+        params: TParams,
+        data: {
+            fromSpecs: TFrom,
+            queryResult: TResult,
+            queryResultSpecs: QueryResultSpecsType<TDbType> | undefined,
             joinSpecs?: TJoinSpecs,
             cteSpecs?: TCTESpecs,
             dmlSpec?: TDMLSPec,
             whereComparison?: ComparisonType<TDbType>,
-            selectResult?: TResult,
-            selectSpecs?: SelectSpecsType<TDbType>,
             groupedColumns?: GroupBySpecs<TDbType>,
             havingSpec?: ComparisonType<TDbType>,
             orderBySpecs?: OrderBySpecsType<TDbType>,
             combineSpecs?: CombineSpecsType<TDbType>
         }
     ) {
-        const fieldName = data?.selectResult !== undefined && data.selectResult.length > 0 ? data.selectResult[0].asName || data.selectResult[0].fieldName : "";
-        super(dbType, data?.params as TParams, fieldName, asName, castType);
+        const fieldName = data?.queryResult !== undefined && data.queryResult.length > 0 ? data.queryResult[0].asName || data.queryResult[0].fieldName : "";
+        super(dbType, params, fieldName, asName, castType, data.queryResult, data.queryResultSpecs);
 
-        this.params = data?.params;
-        this.fromSpecs = fromSpecs;
-        this.joinSpecs = data?.joinSpecs;
-        this.cteSpecs = data?.cteSpecs;
-        this.dmlSpec = data?.dmlSpec;
-        this.whereComparison = data?.whereComparison;
-        this.selectResult = data?.selectResult;
-        this.selectSpecs = data?.selectSpecs;
-        this.groupedColumns = data?.groupedColumns;
-        this.havingSpec = data?.havingSpec;
-        this.orderBySpecs = data?.orderBySpecs;
-        this.combineSpecs = data?.combineSpecs;
-
-        this.queryType = data?.queryType;
+        this.fromSpecs = data.fromSpecs;
+        this.joinSpecs = data.joinSpecs;
+        this.cteSpecs = data.cteSpecs;
+        this.dmlSpec = data.dmlSpec;
+        this.whereComparison = data.whereComparison;
+        this.queryResult = data.queryResult;
+        this.queryResultSpecs = data.queryResultSpecs;
+        this.groupedColumns = data.groupedColumns;
+        this.havingSpec = data.havingSpec;
+        this.orderBySpecs = data.orderBySpecs;
+        this.combineSpecs = data.combineSpecs;
     }
 
     as<TAs extends string>(asName: TAs) {
         return new QueryBuilder<TDbType, TFrom, TJoinSpecs, TCTESpecs, TDMLSPec, TResult, TParams, TAs, TCastType>(
             this.dbType,
-            this.fromSpecs,
             asName,
             this.castType,
+            this.params,
             {
-                queryType: this.queryType,
-                params: this.params,
+                fromSpecs: this.fromSpecs,
                 cteSpecs: this.cteSpecs,
                 joinSpecs: this.joinSpecs,
                 whereComparison: this.whereComparison,
-                selectResult: this.selectResult,
-                selectSpecs: this.selectSpecs,
+                queryResult: this.queryResult,
+                queryResultSpecs: this.queryResultSpecs,
                 groupedColumns: this.groupedColumns,
                 havingSpec: this.havingSpec,
                 orderBySpecs: this.orderBySpecs,
@@ -326,17 +290,16 @@ class QueryBuilder<
     cast<TCastType extends GetColumnTypes<TDbType>>(type: TCastType) {
         return new QueryBuilder<TDbType, TFrom, TJoinSpecs, TCTESpecs, TDMLSPec, TResult, TParams, TAs, TCastType>(
             this.dbType,
-            this.fromSpecs,
             this.asName,
             type,
+            this.params,
             {
-                queryType: this.queryType,
-                params: this.params,
+                fromSpecs: this.fromSpecs,
                 cteSpecs: this.cteSpecs,
                 joinSpecs: this.joinSpecs,
                 whereComparison: this.whereComparison,
-                selectResult: this.selectResult,
-                selectSpecs: this.selectSpecs,
+                queryResult: this.queryResult,
+                queryResultSpecs: this.queryResultSpecs,
                 groupedColumns: this.groupedColumns,
                 havingSpec: this.havingSpec,
                 orderBySpecs: this.orderBySpecs,
@@ -404,132 +367,131 @@ class QueryBuilder<
 
         let result = '';
 
-        if (this.queryType === queryTypes.SELECT) {
 
-            if (this.selectSpecs === undefined || this.selectResult === undefined) {
-                throw Error('Result not specified.');
-            }
-
-            let selectList;
-            if (this.selectSpecs === "*") {
-                selectList = this.selectSpecs;
-            } else {
-                selectList = this.selectSpecs
-                    .map(sl => {
-                        if (ColumnsSelectionQueryObjectSymbol in sl) {
-                            return `"${sl[ColumnsSelectionQueryObjectSymbol].asName || sl[ColumnsSelectionQueryObjectSymbol].tableName}".*`;
-                        }
-
-                        return sl.buildSQL(context).query;
-                    }).join(', ');
-            }
-
-
-            if (this.fromSpecs === undefined) {
-                throw Error('From clause not specified.');
-            }
-            let fromClause = this.fromSpecs.map(frm => {
-                if (frm instanceof QueryTable) {
-                    return `"${frm.tableName}"${frm.asName === undefined ? '' : ` AS "${frm.asName}"`}`;
-                }
-                else if (frm instanceof CTEObject) {
-                    return `"${frm.cteName}"${frm.asName === undefined ? '' : ` AS "${frm.asName}"`}`;
-                } else {
-                    return frm.buildSQL(context).query;
-                }
-            }).join(' ,');
-
-            let joinClauses;
-            if (this.joinSpecs) {
-                joinClauses = this.joinSpecs.map(spec => {
-                    let result = `${spec.joinType} JOIN `;
-
-                    if (spec.table instanceof QueryTable) {
-                        result = `${result}"${spec.table.tableName}"${spec.table.asName === undefined ? '' : ` AS "${spec.table.asName}"`}`;
-                    } else if (spec.table instanceof CTEObject) {
-                        result = `${result}"${spec.table.cteName}"${spec.table.asName === undefined ? '' : ` AS "${spec.table.asName}"`}`;
-                    } else {
-                        result = `${result}${spec.table.buildSQL(context).query}`;
-                    }
-                    result = `${result} ON ${spec.comparison.buildSQL(context).query}`;
-
-                    return result;
-                })
-                    .join(' ');
-            }
-
-
-            let whereClause;
-            if (this.whereComparison) {
-                whereClause = this.whereComparison?.buildSQL(context).query;
-            }
-
-            let groupByClause;
-            if (this.groupedColumns) {
-                groupByClause = this.groupedColumns.map(grp => grp.buildSQL(context).query).join(', ');
-            }
-
-            let havingClause;
-            if (this.havingSpec) {
-                havingClause = this.havingSpec.buildSQL(context).query;
-            }
-
-
-            let cteClause;
-            if (this.cteSpecs !== undefined) {
-                const cteItems = this.cteSpecs.map(cte => {
-                    let qbResult = cte.buildSQL(context);
-                    let result = `${cte.cteType.name === 'RECURSIVE' ? 'RECURSIVE ' : ''}`;
-                    if (cte.cteType.name === 'RECURSIVE') {
-
-                    }
-
-                    result = `${result}"${cte.cteName}"`;
-                    if (cte.isColumnListPresent === true) {
-                        const columnList = `(${cte.columnsList.map(ent => `"${ent.fieldName}"`).join(', ')})`;
-                        result = `${result}${columnList}`
-                    }
-
-                    result = `${result} AS`;
-                    result = `${result} ${cte.cteType.name === "MATERIALIZED" || cte.cteType.name === "NOT_MATERIALIZED" ? cte.cteType.query : ''}`;
-                    result = `${result}(${qbResult.query})`
-
-                    return result;
-                }).join(', ');
-                cteClause = `WITH ${cteItems}`
-            }
-
-
-            let unions;
-            if (this.combineSpecs) {
-                unions = this.combineSpecs
-                    .map(spec => `${spec.type.query} (${spec.qb.buildSQL(context).query})`
-                    )
-                    .join('');
-            }
-
-            result =
-                `${cteClause ? `${cteClause} ` : ''}` +
-                `SELECT ${selectList} FROM ${fromClause}` +
-                `${joinClauses ? ` ${joinClauses}` : ''}` +
-                `${whereClause ? ` WHERE ${whereClause}` : ''}` +
-                `${groupByClause ? ` GROUP BY ${groupByClause}` : ''}` +
-                `${havingClause ? ` HAVING ${havingClause}` : ''}` +
-                `${unions ? ` ${unions}` : ''}`
-        } else if (this.queryType === queryTypes.DELETE) {
-            if (this.dmlSpec === undefined) {
-                throw Error('DML spec not specified.');
-            }
-
-            const dmlTable = this.dmlSpec.table;
-
-            result = `DELETE FROM "${dmlTable.tableName}"${dmlTable.asName ? ` AS "${dmlTable.asName}"` : ''}`;
-
-            if (this.whereComparison) {
-                const whereClause = this.whereComparison.buildSQL(context).query;
-                result = `${result} WHERE ${whereClause}`;
-            }
+        if (this.queryResultSpecs === undefined || this.queryResult === undefined) {
+            throw Error('Result not specified.');
         }
+
+        let selectList;
+        if (this.queryResultSpecs === "*") {
+            selectList = this.queryResultSpecs;
+        } else {
+            selectList = this.queryResultSpecs
+                .map(sl => {
+                    if (ColumnsSelectionQueryObjectSymbol in sl) {
+                        return `"${sl[ColumnsSelectionQueryObjectSymbol].asName || sl[ColumnsSelectionQueryObjectSymbol].tableName}".*`;
+                    }
+
+                    return sl.buildSQL(context).query;
+                }).join(', ');
+        }
+
+
+        if (this.fromSpecs === undefined) {
+            throw Error('From clause not specified.');
+        }
+        let fromClause = this.fromSpecs.map(frm => {
+            if (frm instanceof QueryTable) {
+                return `"${frm.tableName}"${frm.asName === undefined ? '' : ` AS "${frm.asName}"`}`;
+            }
+            else if (frm instanceof CTEObject) {
+                return `"${frm.cteName}"${frm.asName === undefined ? '' : ` AS "${frm.asName}"`}`;
+            } else {
+                return frm.buildSQL(context).query;
+            }
+        }).join(' ,');
+
+        let joinClauses;
+        if (this.joinSpecs) {
+            joinClauses = this.joinSpecs.map(spec => {
+                let result = `${spec.joinType} JOIN `;
+
+                if (spec.table instanceof QueryTable) {
+                    result = `${result}"${spec.table.tableName}"${spec.table.asName === undefined ? '' : ` AS "${spec.table.asName}"`}`;
+                } else if (spec.table instanceof CTEObject) {
+                    result = `${result}"${spec.table.cteName}"${spec.table.asName === undefined ? '' : ` AS "${spec.table.asName}"`}`;
+                } else {
+                    result = `${result}${spec.table.buildSQL(context).query}`;
+                }
+                result = `${result} ON ${spec.comparison.buildSQL(context).query}`;
+
+                return result;
+            })
+                .join(' ');
+        }
+
+
+        let whereClause;
+        if (this.whereComparison) {
+            whereClause = this.whereComparison?.buildSQL(context).query;
+        }
+
+        let groupByClause;
+        if (this.groupedColumns) {
+            groupByClause = this.groupedColumns.map(grp => grp.buildSQL(context).query).join(', ');
+        }
+
+        let havingClause;
+        if (this.havingSpec) {
+            havingClause = this.havingSpec.buildSQL(context).query;
+        }
+
+
+        let cteClause;
+        if (this.cteSpecs !== undefined) {
+            const cteItems = this.cteSpecs.map(cte => {
+                let qbResult = cte.buildSQL(context);
+                let result = `${cte.cteType.name === 'RECURSIVE' ? 'RECURSIVE ' : ''}`;
+                if (cte.cteType.name === 'RECURSIVE') {
+
+                }
+
+                result = `${result}"${cte.cteName}"`;
+                if (cte.isColumnListPresent === true) {
+                    const columnList = `(${cte.columnsList.map(ent => `"${ent.fieldName}"`).join(', ')})`;
+                    result = `${result}${columnList}`
+                }
+
+                result = `${result} AS`;
+                result = `${result} ${cte.cteType.name === "MATERIALIZED" || cte.cteType.name === "NOT_MATERIALIZED" ? cte.cteType.query : ''}`;
+                result = `${result}(${qbResult.query})`
+
+                return result;
+            }).join(', ');
+            cteClause = `WITH ${cteItems}`
+        }
+
+
+        let unions;
+        if (this.combineSpecs) {
+            unions = this.combineSpecs
+                .map(spec => `${spec.type.query} (${spec.qb.buildSQL(context).query})`
+                )
+                .join('');
+        }
+
+        result =
+            `${cteClause ? `${cteClause} ` : ''}` +
+            `SELECT ${selectList} FROM ${fromClause}` +
+            `${joinClauses ? ` ${joinClauses}` : ''}` +
+            `${whereClause ? ` WHERE ${whereClause}` : ''}` +
+            `${groupByClause ? ` GROUP BY ${groupByClause}` : ''}` +
+            `${havingClause ? ` HAVING ${havingClause}` : ''}` +
+            `${unions ? ` ${unions}` : ''}`
+        // } else if (this.queryType === queryTypes.DELETE) {
+        //     if (this.dmlSpec === undefined) {
+        //         throw Error('DML spec not specified.');
+        //     }
+
+        //     const dmlTable = this.dmlSpec.table;
+
+        //     result = `DELETE FROM "${dmlTable.tableName}"${dmlTable.asName ? ` AS "${dmlTable.asName}"` : ''}`;
+
+        //     if (this.whereComparison) {
+        //         const whereClause = this.whereComparison.buildSQL(context).query;
+        //         result = `${result} WHERE ${whereClause}`;
+        //     }
+        // }
 
         return { query: result, params: [...(context?.params || [])] };
     }
@@ -622,17 +584,16 @@ class QueryBuilder<
 
             return new QueryBuilder(
                 this.dbType,
-                this.fromSpecs,
                 this.asName,
                 this.castType,
+                params as TCbResult["length"] extends 0 ? TParams : UndefinedIfLengthZero<AccumulateColumnParams<TParams, TFinalResult>>,
                 {
-                    queryType: queryTypes.SELECT,
-                    params: params as TCbResult["length"] extends 0 ? TParams : UndefinedIfLengthZero<AccumulateColumnParams<TParams, TFinalResult>>,
+                    fromSpecs: this.fromSpecs,
                     cteSpecs: this.cteSpecs,
                     joinSpecs: this.joinSpecs,
                     whereComparison: this.whereComparison,
-                    selectResult: finalSelectRes as ResultShape<TDbType> as TCbResult["length"] extends 0 ? SelectToAllColumnsMapRecursively<TDbType, TFrom, TJoinSpecs> : TFinalResult,
-                    selectSpecs: "*",
+                    queryResult: finalSelectRes as ResultShape<TDbType> as TCbResult["length"] extends 0 ? SelectToAllColumnsMapRecursively<TDbType, TFrom, TJoinSpecs> : TFinalResult,
+                    queryResultSpecs: "*",
                     groupedColumns: this.groupedColumns,
                     havingSpec: this.havingSpec,
                     orderBySpecs: this.orderBySpecs,
@@ -654,17 +615,16 @@ class QueryBuilder<
 
             return new QueryBuilder(
                 this.dbType,
-                this.fromSpecs,
                 this.asName,
                 this.castType,
+                params as TCbResult["length"] extends 0 ? TParams : UndefinedIfLengthZero<AccumulateColumnParams<TParams, TFinalResult>>,
                 {
-                    queryType: queryTypes.SELECT,
-                    params: params as TCbResult["length"] extends 0 ? TParams : UndefinedIfLengthZero<AccumulateColumnParams<TParams, TFinalResult>>,
+                    fromSpecs: this.fromSpecs,
                     cteSpecs: this.cteSpecs,
                     joinSpecs: this.joinSpecs,
                     whereComparison: this.whereComparison,
-                    selectResult: finalSelectRes as ResultShape<TDbType> as TCbResult["length"] extends 0 ? SelectToAllColumnsMapRecursively<TDbType, TFrom, TJoinSpecs> : TFinalResult,
-                    selectSpecs: selectRes,
+                    queryResult: finalSelectRes as ResultShape<TDbType> as TCbResult["length"] extends 0 ? SelectToAllColumnsMapRecursively<TDbType, TFrom, TJoinSpecs> : TFinalResult,
+                    queryResultSpecs: selectRes,
                     groupedColumns: this.groupedColumns,
                     havingSpec: this.havingSpec,
                     orderBySpecs: this.orderBySpecs,
@@ -775,17 +735,16 @@ class QueryBuilder<
 
         return new QueryBuilder<TDbType, TFrom, TJoinAccumulated, TCTESpecs, TDMLSPec, TResult, TJoinParams, TAs, TCastType>(
             this.dbType,
-            this.fromSpecs,
             this.asName,
             this.castType,
+            params as TJoinParams,
             {
-                queryType: this.queryType,
-                params: params as TJoinParams,
+                fromSpecs: this.fromSpecs,
                 cteSpecs: this.cteSpecs,
                 joinSpecs: mergedJoinSpecs as TJoinAccumulated,
                 whereComparison: this.whereComparison,
-                selectResult: this.selectResult,
-                selectSpecs: this.selectSpecs,
+                queryResult: this.queryResult,
+                queryResultSpecs: this.queryResultSpecs,
                 groupedColumns: this.groupedColumns,
                 havingSpec: this.havingSpec,
                 orderBySpecs: this.orderBySpecs,
@@ -831,18 +790,17 @@ class QueryBuilder<
             TCastType
         >(
             this.dbType,
-            this.fromSpecs,
             this.asName,
             this.castType,
+            params as AccumulateComparisonParams<TCbResult, TParams>,
             {
-                queryType: this.queryType,
-                params: params as AccumulateComparisonParams<TCbResult, TParams>,
+                fromSpecs: this.fromSpecs,
                 joinSpecs: this.joinSpecs,
                 cteSpecs: this.cteSpecs,
                 dmlSpec: this.dmlSpec,
                 whereComparison: comparison,
-                selectResult: this.selectResult,
-                selectSpecs: this.selectSpecs,
+                queryResult: this.queryResult,
+                queryResultSpecs: this.queryResultSpecs,
                 groupedColumns: this.groupedColumns,
                 havingSpec: this.havingSpec,
                 orderBySpecs: this.orderBySpecs,
@@ -886,17 +844,16 @@ class QueryBuilder<
             TCastType
         >(
             this.dbType,
-            this.fromSpecs,
             this.asName,
             this.castType,
+            params as AccumulateColumnParams<TParams, TCbResult>,
             {
-                queryType: this.queryType,
-                params: params as AccumulateColumnParams<TParams, TCbResult>,
+                fromSpecs: this.fromSpecs,
                 cteSpecs: this.cteSpecs,
                 joinSpecs: this.joinSpecs,
                 whereComparison: this.whereComparison,
-                selectResult: this.selectResult,
-                selectSpecs: this.selectSpecs,
+                queryResult: this.queryResult,
+                queryResultSpecs: this.queryResultSpecs,
                 groupedColumns: res,
                 havingSpec: this.havingSpec,
                 orderBySpecs: this.orderBySpecs,
@@ -940,17 +897,16 @@ class QueryBuilder<
             TCastType
         >(
             this.dbType,
-            this.fromSpecs,
             this.asName,
             this.castType,
+            params as AccumulateComparisonParams<TCbResult, TParams>,
             {
-                queryType: this.queryType,
-                params: params as AccumulateComparisonParams<TCbResult, TParams>,
+                fromSpecs: this.fromSpecs,
                 cteSpecs: this.cteSpecs,
                 joinSpecs: this.joinSpecs,
                 whereComparison: this.whereComparison,
-                selectResult: this.selectResult,
-                selectSpecs: this.selectSpecs,
+                queryResult: this.queryResult,
+                queryResultSpecs: this.queryResultSpecs,
                 groupedColumns: this.groupedColumns,
                 havingSpec: res,
                 orderBySpecs: this.orderBySpecs,
@@ -1002,17 +958,16 @@ class QueryBuilder<
             TCastType
         >(
             this.dbType,
-            this.fromSpecs,
             this.asName,
             this.castType,
+            params as AccumulateOrderByParams<TDbType, TParams, TCbResult>,
             {
-                queryType: this.queryType,
-                params: params as AccumulateOrderByParams<TDbType, TParams, TCbResult>,
+                fromSpecs: this.fromSpecs,
                 cteSpecs: this.cteSpecs,
                 joinSpecs: this.joinSpecs,
                 whereComparison: this.whereComparison,
-                selectResult: this.selectResult,
-                selectSpecs: this.selectSpecs,
+                queryResult: this.queryResult,
+                queryResultSpecs: this.queryResultSpecs,
                 groupedColumns: this.groupedColumns,
                 havingSpec: this.havingSpec,
                 orderBySpecs: res,
@@ -1110,17 +1065,16 @@ class QueryBuilder<
 
         return new QueryBuilder<TDbType, any, any, any, any, any, any, any, any>(
             this.dbType,
-            fromResult,
             this.asName,
             this.castType,
+            params,
             {
-                queryType: this.queryType,
-                params: params,
+                fromSpecs: fromResult,
                 cteSpecs: this.cteSpecs,
                 joinSpecs: this.joinSpecs,
                 whereComparison: this.whereComparison,
-                selectResult: this.selectResult,
-                selectSpecs: this.selectSpecs,
+                queryResult: this.queryResult,
+                queryResultSpecs: this.queryResultSpecs,
                 groupedColumns: this.groupedColumns,
                 havingSpec: this.havingSpec,
                 orderBySpecs: this.orderBySpecs,
@@ -1189,18 +1143,18 @@ class QueryBuilder<
         if (columnNames.length === 0) {
             cte = new CTEObject(anchorQb.dbType, anchorQb, cteName, cteTypes.RECURSIVE) as TFinalCTE;
         } else {
-            let selectResult = anchorQb.selectResult;
-            if (selectResult === undefined) {
+            let queryResult = anchorQb.queryResult;
+            if (queryResult === undefined) {
                 throw Error("Column list must match the selected columns.");
             }
 
-            if (selectResult.length !== columnNames.length) {
+            if (queryResult.length !== columnNames.length) {
                 throw Error("Column list must match the selected columns.");
             }
 
             for (let i = 0; i < columnNames.length; i++) {
                 let currName = columnNames[i];
-                let currentExp = selectResult[i];
+                let currentExp = queryResult[i];
 
                 finalCTEentries.push(new CTEObjectEntry(anchorQb.dbType, currentExp, undefined, undefined, cteName, currName));
             }
@@ -1247,16 +1201,16 @@ class QueryBuilder<
             TCastType
         >(
             this.dbType,
-            this.fromSpecs,
             this.asName,
             this.castType,
+            params as TParamsAccumulated,
             {
-                queryType: this.queryType,
-                params: params as TParamsAccumulated,
+                fromSpecs: this.fromSpecs,
                 cteSpecs: finalCTEs as TFinalCTESpecs,
                 joinSpecs: this.joinSpecs,
                 whereComparison: this.whereComparison,
-                selectResult: this.selectResult,
+                queryResult: this.queryResult,
+                queryResultSpecs: this.queryResultSpecs,
                 groupedColumns: this.groupedColumns,
                 havingSpec: this.havingSpec,
                 orderBySpecs: this.orderBySpecs,
@@ -1275,7 +1229,7 @@ class QueryBuilder<
         never {
 
 
-        if (isNullOrUndefined(this?.selectResult)) {
+        if (isNullOrUndefined(this?.queryResult)) {
             return {} as any;
         }
 

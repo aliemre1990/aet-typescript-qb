@@ -37,9 +37,11 @@ function generateCTEFunctionForStandalone(cteType: CTEType) {
             qb.dbType,
             undefined,
             undefined,
-            undefined,
+            params as TParams,
             {
-                params: params as TParams,
+                fromSpecs: undefined,
+                queryResult: undefined,
+                queryResultSpecs: undefined,
                 cteSpecs
             }
         );
@@ -84,7 +86,7 @@ function withRecursiveAs<
     if (columnNames.length === 0) {
         cte = new CTEObject(anchorQb.dbType, anchorQb, cteName, cteTypes.RECURSIVE) as TFinalCTE;
     } else {
-        let selectResult = anchorQb.selectResult;
+        let selectResult = anchorQb.queryResult;
         if (selectResult === undefined) {
             throw Error("Column list must match the selected columns.");
         }
@@ -142,9 +144,11 @@ function withRecursiveAs<
         anchorQb.dbType,
         undefined,
         undefined,
-        undefined,
+        params as TParamsResult,
         {
-            params: params as TParamsResult,
+            fromSpecs: undefined,
+            queryResult: undefined,
+            queryResultSpecs: undefined,
             cteSpecs
         }
     );

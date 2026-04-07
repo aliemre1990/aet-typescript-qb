@@ -107,9 +107,29 @@ class QueryTable<
         cb?: any
     ): any {
         if (cb === undefined) {
-            return new QueryBuilder(this.dbType, [this], undefined, undefined).select()
+            return new QueryBuilder(
+                this.dbType,
+                undefined,
+                undefined,
+                undefined,
+                {
+                    fromSpecs: [this],
+                    queryResult: undefined,
+                    queryResultSpecs: undefined
+                }
+            ).select()
         } else {
-            return new QueryBuilder(this.dbType, [this], undefined, undefined).select(cb);
+            return new QueryBuilder(
+                this.dbType,
+                undefined,
+                undefined,
+                undefined,
+                {
+                    fromSpecs: [this],
+                    queryResult: undefined,
+                    queryResultSpecs: undefined
+                }
+            ).select(cb);
         }
     }
 
@@ -139,7 +159,17 @@ class QueryTable<
             TJoinParamsResult
         > {
 
-        return new QueryBuilder<TDbType, [QueryTable<TDbType, TTableName, TQColumns, TAsName>], undefined, undefined, undefined>(this.dbType, [this], undefined, undefined)
+        return new QueryBuilder<TDbType, [QueryTable<TDbType, TTableName, TQColumns, TAsName>], undefined, undefined, undefined>(
+            this.dbType,
+            undefined,
+            undefined,
+            undefined,
+            {
+                fromSpecs: [this],
+                queryResult: undefined,
+                queryResultSpecs: undefined,
+            }
+        )
             .join(type, tableSelection, cb);
     }
 
@@ -148,7 +178,17 @@ class QueryTable<
             tables: TableToColumnsMap<TDbType, TablesToObject<TDbType, [QueryTable<TDbType, TTableName, TQColumns, TAsName>]>>,
             ops: DbOperations<TDbType>
         ) => TCbResult) {
-        return new QueryBuilder<TDbType, [QueryTable<TDbType, TTableName, TQColumns, TAsName>], undefined, undefined, undefined>(this.dbType, [this], undefined, undefined).where(cb);
+        return new QueryBuilder<TDbType, [QueryTable<TDbType, TTableName, TQColumns, TAsName>], undefined, undefined, undefined>(
+            this.dbType,
+            undefined,
+            undefined,
+            undefined,
+            {
+                fromSpecs: [this],
+                queryResult: undefined,
+                queryResultSpecs: undefined,
+            }
+        ).where(cb);
     }
 
 
@@ -167,7 +207,17 @@ class QueryTable<
         undefined,
         AccumulateColumnParams<undefined, TCbResult>
     > {
-        return new QueryBuilder<TDbType, [QueryTable<TDbType, TTableName, TQColumns, TAsName>], undefined, undefined, undefined>(this.dbType, [this], undefined, undefined).groupBy(cb);
+        return new QueryBuilder<TDbType, [QueryTable<TDbType, TTableName, TQColumns, TAsName>], undefined, undefined, undefined>(
+            this.dbType,
+            undefined,
+            undefined,
+            undefined,
+            {
+                fromSpecs: [this],
+                queryResult: undefined,
+                queryResultSpecs: undefined,
+            }
+        ).groupBy(cb);
     }
 
     orderBy<
@@ -186,24 +236,34 @@ class QueryTable<
             undefined,
             AccumulateOrderByParams<TDbType, undefined, TCbResult>
         > {
-        return new QueryBuilder<TDbType, [QueryTable<TDbType, TTableName, TQColumns, TAsName>], undefined, undefined, undefined>(this.dbType, [this], undefined, undefined).orderBy(cb);
-    }
-
-    delete(): QueryBuilder<
-        TDbType,
-        undefined,
-        undefined,
-        undefined,
-        { table: QueryTable<TDbType, TTableName, TQColumns, TAsName>, values: undefined }
-    > {
-        return new QueryBuilder(
+        return new QueryBuilder<TDbType, [QueryTable<TDbType, TTableName, TQColumns, TAsName>], undefined, undefined, undefined>(
             this.dbType,
             undefined,
             undefined,
             undefined,
-            { queryType: queryTypes.DELETE, dmlSpec: { table: this, values: undefined } }
-        );
+            {
+                fromSpecs: [this],
+                queryResult: undefined,
+                queryResultSpecs: undefined,
+            }
+        ).orderBy(cb);
     }
+
+    // delete(): QueryBuilder<
+    //     TDbType,
+    //     undefined,
+    //     undefined,
+    //     undefined,
+    //     { table: QueryTable<TDbType, TTableName, TQColumns, TAsName>, values: undefined }
+    // > {
+    //     return new QueryBuilder(
+    //         this.dbType,
+    //         undefined,
+    //         undefined,
+    //         undefined,
+    //         { queryType: queryTypes.DELETE, dmlSpec: { table: this, values: undefined } }
+    //     );
+    // }
 
 }
 

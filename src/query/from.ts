@@ -56,7 +56,17 @@ function from<
         undefined,
         undefined,
         AccumulatedParams
-    >(dbType, fromResult, undefined, undefined, { params: params as AccumulatedParams });
+    >(
+        dbType,
+        undefined,
+        undefined,
+        params as AccumulatedParams,
+        {
+            fromSpecs: fromResult,
+            queryResult: undefined,
+            queryResultSpecs: undefined,
+        }
+    );
 }
 
 export default from;
