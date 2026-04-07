@@ -56,12 +56,12 @@ class BaseQueryBuilder<
     constructor(
         dbType: TDbType,
         params: TParams,
-        fieldName: GetFirstDefaultKeyFromResult<TDbType, TResult>,
         asName: TAs,
         castType: TCastType,
         queryResult: TResult,
         queryResultSpecs: QueryResultSpecsType<TDbType> | undefined
     ) {
+        const fieldName = queryResult !== undefined && queryResult.length > 0 ? queryResult[0].asName || queryResult[0].fieldName : "";
         super(dbType, params, fieldName, asName, castType);
 
         this.queryResult = queryResult;

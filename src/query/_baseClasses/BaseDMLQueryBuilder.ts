@@ -36,8 +36,7 @@ class BaseDMLQueryBuilder<
         queryResultSpecs: QueryResultSpecsType<TDbType> | undefined,
         cteSpecs: TCTESpecs
     ) {
-        const fieldName = queryResult !== undefined && queryResult.length > 0 ? queryResult[0].asName || queryResult[0].fieldName : "";
-        super(dbType, params, fieldName, asName, castType, queryResult, queryResultSpecs);
+        super(dbType, params, asName, castType, queryResult, queryResultSpecs);
 
         this.table = table;
         this.cteSpecs = cteSpecs;

@@ -249,8 +249,7 @@ class QueryBuilder<
             combineSpecs?: CombineSpecsType<TDbType>
         }
     ) {
-        const fieldName = data?.queryResult !== undefined && data.queryResult.length > 0 ? data.queryResult[0].asName || data.queryResult[0].fieldName : "";
-        super(dbType, params, fieldName, asName, castType, data.queryResult, data.queryResultSpecs);
+        super(dbType, params, asName, castType, data.queryResult, data.queryResultSpecs);
 
         this.fromSpecs = data.fromSpecs;
         this.joinSpecs = data.joinSpecs;
