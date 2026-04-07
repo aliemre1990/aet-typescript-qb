@@ -11,7 +11,7 @@ const groupBy_SingleTable = customersTable
     .select(cols => [cols.customers.id, cols.customers.name])
     ;
 type typeof_GroupBy_SingleTable = typeof groupBy_SingleTable;
-type typeof_GroupBy_SingleTable_ResultCols = typeof_GroupBy_SingleTable extends QueryBuilder<any, any, any, any, any, infer TResult, any, any, any> ? TResult : never;
+type typeof_GroupBy_SingleTable_ResultCols = typeof_GroupBy_SingleTable extends QueryBuilder<any, any, any, any, infer TResult, any, any, any> ? TResult : never;
 type typeof_GroupBy_SingleTable_ResultType = ColumnsToResultMap<any, typeof_GroupBy_SingleTable_ResultCols>;
 type typeof_GroupBy_SingleTable_ResultType_Expected = { id: number; name: string; }[];
 type groupBy_SingleTable_ResultType_Test = AssertTrue<AssertEqual<typeof_GroupBy_SingleTable_ResultType, typeof_GroupBy_SingleTable_ResultType_Expected>>
@@ -23,7 +23,7 @@ const groupBy_MultipleTable = customersTable
     .groupBy(cols => [cols.customers, cols.users.id, cols.shipments, cols.employees.id])
     .select();
 type typeof_GroupBy_MultipleTable = typeof groupBy_MultipleTable;
-type typeof_GroupBy_MultipleTable_ResultCols = typeof_GroupBy_MultipleTable extends QueryBuilder<any, any, any, any, any, infer TResult, any, any, any> ? TResult : never;
+type typeof_GroupBy_MultipleTable_ResultCols = typeof_GroupBy_MultipleTable extends QueryBuilder<any, any, any, any, infer TResult, any, any, any> ? TResult : never;
 type typeof_GroupBy_MultipleTable_ResultType = ColumnsToResultMap<any, typeof_GroupBy_MultipleTable_ResultCols>;
 type typeof_GroupBy_MultipleTable_ResultType_Expected = {
     id: number;
@@ -49,7 +49,7 @@ const groupBy_Aggregation = customersTable
         sum(cols.shipments.orderId).as("totalOrderId")
     ]);
 type typeof_GroupBy_Aggregation = typeof groupBy_Aggregation;
-type typeof_GroupBy_Aggregation_ResultCols = typeof_GroupBy_Aggregation extends QueryBuilder<any, any, any, any, any, infer TResult, any, any, any> ? TResult : never;
+type typeof_GroupBy_Aggregation_ResultCols = typeof_GroupBy_Aggregation extends QueryBuilder<any, any, any, any, infer TResult, any, any, any> ? TResult : never;
 type typeof_GroupBy_Aggregation_ResultType = ColumnsToResultMap<any, typeof_GroupBy_Aggregation_ResultCols>;
 type typeof_GroupBy_Aggregation_ResultType_Expected = { id: number; totalOrderId: number; }[];
 type groupBy_Aggregation_ResultType_Test = AssertTrue<AssertEqual<typeof_GroupBy_Aggregation_ResultType, typeof_GroupBy_Aggregation_ResultType_Expected>>
@@ -63,9 +63,9 @@ const groupBy_Having = customersTable
     .having((cols, { param, sum, and }) => and(cols.customers.id.eq(param("havingParam")), sum(cols.shipments.id).eq(param("sumParam"))))
     .select();
 type typeof_GroupBy_Having = typeof groupBy_Having;
-type typeof_GroupBy_Having_ResultCols = typeof_GroupBy_Having extends QueryBuilder<any, any, any, any, any, infer TResult, any, any, any> ? TResult : never;
+type typeof_GroupBy_Having_ResultCols = typeof_GroupBy_Having extends QueryBuilder<any, any, any, any, infer TResult, any, any, any> ? TResult : never;
 type typeof_GroupBy_Having_ResultType = ColumnsToResultMap<any, typeof_GroupBy_Having_ResultCols>;
-type typeof_GroupBy_Having_Params = typeof_GroupBy_Having extends QueryBuilder<any, any, any, any, any, any, infer TParams, any, any> ? TParams : never;
+type typeof_GroupBy_Having_Params = typeof_GroupBy_Having extends QueryBuilder<any, any, any, any, any, infer TParams, any, any> ? TParams : never;
 type typeof_GroupBy_Having_Param1Name = typeof_GroupBy_Having_Params[0] extends QueryParam<any, infer TName, any, any, any> ? TName : never;
 type typeof_GroupBy_Having_Param2Name = typeof_GroupBy_Having_Params[1] extends QueryParam<any, infer TName, any, any, any> ? TName : never;
 type typeof_GroupBy_Having_ResultType_Expected = {

@@ -29,6 +29,7 @@ QueryBuilder,
 } from "./queryBuilder.js";
 import type { MapToQueryColumns } from "../table/table.js";
 import type { IQueryTable } from "./_interfaces/IQueryTable.js";
+import DeleteQueryBuilder from "./deleteQueryBuilder.js";
 
 type MapQueryColumnsToRecord<TColumns extends readonly QueryColumn<any, any, any, any, any, any, any>[]> = {
     [C in TColumns[number]as C["fieldName"]]: C
@@ -81,7 +82,6 @@ class QueryTable<
         [QueryTable<TDbType, TTableName, TQColumns, TAsName>],
         undefined,
         undefined,
-        undefined,
         SelectToAllColumnsMapRecursively<TDbType, [QueryTable<TDbType, TTableName, TQColumns, TAsName>], undefined>,
         undefined,
         undefined
@@ -97,7 +97,6 @@ class QueryTable<
     ): QueryBuilder<
         TDbType,
         [QueryTable<TDbType, TTableName, TQColumns, TAsName>],
-        undefined,
         undefined,
         undefined,
         CalculateSelectResult<TDbType, [QueryTable<TDbType, TTableName, TQColumns, TAsName>], undefined, TCbResult, TFinalResult>,
@@ -135,7 +134,7 @@ class QueryTable<
 
     join<
         TJoinType extends JoinType,
-        TJoinTable extends IQueryTable<TDbType, any, any> | Table<TDbType, any, any> | QueryBuilder<TDbType, any, any, any, any, any, any, string, any>,
+        TJoinTable extends IQueryTable<TDbType, any, any> | Table<TDbType, any, any> | QueryBuilder<TDbType, any, any, any, any, any, string, any>,
         TCbResult extends ComparisonType<TDbType>,
         TJoinResult extends JoinSpecsTableType<TDbType> = MapToJoinTableType<TDbType, TJoinTable>,
         TJoinParams extends QueryParam<TDbType, any, any, any, any>[] = AccumulateSubQueryParams<TDbType, [TJoinResult], AccumulateComparisonParams<TCbResult>>,
@@ -155,11 +154,10 @@ class QueryTable<
             TJoinAccumulated,
             undefined,
             undefined,
-            undefined,
             TJoinParamsResult
         > {
 
-        return new QueryBuilder<TDbType, [QueryTable<TDbType, TTableName, TQColumns, TAsName>], undefined, undefined, undefined>(
+        return new QueryBuilder<TDbType, [QueryTable<TDbType, TTableName, TQColumns, TAsName>], undefined, undefined>(
             this.dbType,
             undefined,
             undefined,
@@ -178,7 +176,7 @@ class QueryTable<
             tables: TableToColumnsMap<TDbType, TablesToObject<TDbType, [QueryTable<TDbType, TTableName, TQColumns, TAsName>]>>,
             ops: DbOperations<TDbType>
         ) => TCbResult) {
-        return new QueryBuilder<TDbType, [QueryTable<TDbType, TTableName, TQColumns, TAsName>], undefined, undefined, undefined>(
+        return new QueryBuilder<TDbType, [QueryTable<TDbType, TTableName, TQColumns, TAsName>], undefined, undefined>(
             this.dbType,
             undefined,
             undefined,
@@ -204,10 +202,9 @@ class QueryTable<
         undefined,
         undefined,
         undefined,
-        undefined,
         AccumulateColumnParams<undefined, TCbResult>
     > {
-        return new QueryBuilder<TDbType, [QueryTable<TDbType, TTableName, TQColumns, TAsName>], undefined, undefined, undefined>(
+        return new QueryBuilder<TDbType, [QueryTable<TDbType, TTableName, TQColumns, TAsName>], undefined, undefined>(
             this.dbType,
             undefined,
             undefined,
@@ -233,10 +230,9 @@ class QueryTable<
             undefined,
             undefined,
             undefined,
-            undefined,
             AccumulateOrderByParams<TDbType, undefined, TCbResult>
         > {
-        return new QueryBuilder<TDbType, [QueryTable<TDbType, TTableName, TQColumns, TAsName>], undefined, undefined, undefined>(
+        return new QueryBuilder<TDbType, [QueryTable<TDbType, TTableName, TQColumns, TAsName>], undefined, undefined>(
             this.dbType,
             undefined,
             undefined,
@@ -249,21 +245,34 @@ class QueryTable<
         ).orderBy(cb);
     }
 
-    // delete(): QueryBuilder<
-    //     TDbType,
-    //     undefined,
-    //     undefined,
-    //     undefined,
-    //     { table: QueryTable<TDbType, TTableName, TQColumns, TAsName>, values: undefined }
-    // > {
-    //     return new QueryBuilder(
-    //         this.dbType,
-    //         undefined,
-    //         undefined,
-    //         undefined,
-    //         { queryType: queryTypes.DELETE, dmlSpec: { table: this, values: undefined } }
-    //     );
-    // }
+
+    delete(): DeleteQueryBuilder<
+        TDbType,
+        QueryTable<TDbType, TTableName, TQColumns, TAsName>,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined
+    > {
+        return new DeleteQueryBuilder<
+            TDbType,
+            QueryTable<TDbType, TTableName, TQColumns, TAsName>,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined
+        >(
+            this.dbType,
+            this,
+            undefined,
+            undefined,
+            undefined,
+            { cteSpecs: undefined, queryResult: undefined, queryResultSpecs: undefined, whereComparison: undefined }
+        );
+
+    }
 
 }
 

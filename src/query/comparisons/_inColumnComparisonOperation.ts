@@ -97,7 +97,7 @@ function generateInComparison(operation: InComparisonOperationType) {
     function inComparison<
         TComparing extends IQueryExpression<TDbType, any, any, any, any, any, any>,
         TValueType extends InferValueTypeFromExpression<TDbType, TComparing>,
-        TQb extends QueryBuilder<TDbType, any, any, any, any, any, any, any, any>,
+        TQb extends QueryBuilder<TDbType, any, any, any, any, any, any, any>,
         TDbType extends DbType = TComparing extends IQueryExpression<infer DbType, any, any, any, any, any, any> ? DbType : never
     >(
         this: TComparing,

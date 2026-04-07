@@ -28,8 +28,7 @@ type TablesToObject<
     TDbType extends DbType,
     TFrom extends FromType<TDbType> | undefined,
     TInnerJoinSpecs extends JoinSpecsType<TDbType> | undefined = undefined,
-    TCTESpecs extends CTESpecsType<TDbType> | undefined = undefined,
-    TDMLSpec extends DMLSpecType<TDbType> | undefined = undefined
+    TCTESpecs extends CTESpecsType<TDbType> | undefined = undefined
 > =
     (
         TFrom extends undefined ? {} :
@@ -52,13 +51,6 @@ type TablesToObject<
             ]: T
         }
         : never
-    ) &
-    (
-        TDMLSpec extends undefined ? {} :
-        TDMLSpec extends DMLSpecType<TDbType> ? {
-            [T in TDMLSpec["table"]["name"]]: TDMLSpec["table"]
-        } :
-        never
     );
 
 export type {

@@ -10,24 +10,24 @@ import QueryBuilder, { cteTypes } from "./queryBuilder.js";
 import { extractParams, mapCTESpecsToSelection } from "./utility.js";
 
 type MapToResultQueryBuilder<
-    TQb extends QueryBuilder<any, any, any, any, any, any, any, any, any>,
+    TQb extends QueryBuilder<any, any, any, any, any, any, any, any>,
     TFinalCTESpecs extends CTESpecsType<any>,
     TParamsAccumulated extends readonly QueryParam<any, any, any, any, any>[] | undefined
 > =
-    TQb extends QueryBuilder<infer TDbType, infer TFrom, infer TJoinSpecs, any, infer TDMLSpec, infer TResultShape, any, infer TAs, infer TCastType> ?
-    QueryBuilder<TDbType, TFrom, TJoinSpecs, TFinalCTESpecs, TDMLSpec, TResultShape, TParamsAccumulated, TAs, TCastType> : never;
+    TQb extends QueryBuilder<infer TDbType, infer TFrom, infer TJoinSpecs, any, infer TResultShape, any, infer TAs, infer TCastType> ?
+    QueryBuilder<TDbType, TFrom, TJoinSpecs, TFinalCTESpecs, TResultShape, TParamsAccumulated, TAs, TCastType> : never;
 
 
 function generateCTEFunctionForQb(cteType: CTEType) {
 
     function cteFn<
-        TThis extends QueryBuilder<any, any, any, any, any, any, any, any, any>,
+        TThis extends QueryBuilder<any, any, any, any, any, any, any, any>,
         TCTEName extends string,
-        TQb extends QueryBuilder<TThisDbType, any, any, any, any, any, any, any, any>,
+        TQb extends QueryBuilder<TThisDbType, any, any, any, any, any, any, any>,
 
-        TThisDbType extends DbType = TThis extends QueryBuilder<infer TDbType, any, any, any, any, any, any, any, any> ? TDbType : never,
-        TThisCTESpecs extends CTESpecsType<TThisDbType> | undefined = TThis extends QueryBuilder<any, any, any, infer TCTESpecs, any, any, any, any, any> ? TCTESpecs : never,
-        TThisParams extends readonly QueryParam<TThisDbType, any, any, any, any>[] | undefined = TThis extends QueryBuilder<any, any, any, any, any, any, infer TParams, any, any> ? TParams : never,
+        TThisDbType extends DbType = TThis extends QueryBuilder<infer TDbType, any, any, any, any, any, any, any> ? TDbType : never,
+        TThisCTESpecs extends CTESpecsType<TThisDbType> | undefined = TThis extends QueryBuilder<any, any, any, infer TCTESpecs, any, any, any, any> ? TCTESpecs : never,
+        TThisParams extends readonly QueryParam<TThisDbType, any, any, any, any>[] | undefined = TThis extends QueryBuilder<any, any, any, any, any, infer TParams, any, any> ? TParams : never,
 
         TCTEObject extends CTEObject<TThisDbType, any, any, any, any> = CTEObject<TThisDbType, TCTEName, TQb>,
         TFinalCTESpec extends readonly CTEObject<TThisDbType, any, any, any, any>[] = readonly [...(TThisCTESpecs extends CTESpecsType<TThisDbType> ? TThisCTESpecs : []), TCTEObject],
@@ -43,13 +43,13 @@ function generateCTEFunctionForQb(cteType: CTEType) {
         qb: TQb
     ): MapToResultQueryBuilder<TQb, TFinalCTESpec, TParamsAccumulated>
     function cteFn<
-        TThis extends QueryBuilder<any, any, any, any, any, any, any, any, any>,
+        TThis extends QueryBuilder<any, any, any, any, any, any, any, any>,
         TCTEName extends string,
-        TQb extends QueryBuilder<TThisDbType, any, any, any, any, any, any, any, any>,
+        TQb extends QueryBuilder<TThisDbType, any, any, any, any, any, any, any>,
 
-        TThisDbType extends DbType = TThis extends QueryBuilder<infer TDbType, any, any, any, any, any, any, any, any> ? TDbType : never,
-        TThisCTESpecs extends CTESpecsType<TThisDbType> | undefined = TThis extends QueryBuilder<any, any, any, infer TCTESpecs, any, any, any, any, any> ? TCTESpecs : never,
-        TThisParams extends readonly QueryParam<TThisDbType, any, any, any, any>[] | undefined = TThis extends QueryBuilder<any, any, any, any, any, any, infer TParams, any, any> ? TParams : never,
+        TThisDbType extends DbType = TThis extends QueryBuilder<infer TDbType, any, any, any, any, any, any, any> ? TDbType : never,
+        TThisCTESpecs extends CTESpecsType<TThisDbType> | undefined = TThis extends QueryBuilder<any, any, any, infer TCTESpecs, any, any, any, any> ? TCTESpecs : never,
+        TThisParams extends readonly QueryParam<TThisDbType, any, any, any, any>[] | undefined = TThis extends QueryBuilder<any, any, any, any, any, infer TParams, any, any> ? TParams : never,
 
         TCTEObject extends CTEObject<TThisDbType, any, any, any, any> = CTEObject<TThisDbType, TCTEName, TQb>,
         TFinalCTESpec extends readonly CTEObject<TThisDbType, any, any, any, any>[] = readonly [...(TThisCTESpecs extends CTESpecsType<TThisDbType> ? TThisCTESpecs : []), TCTEObject],
@@ -65,12 +65,12 @@ function generateCTEFunctionForQb(cteType: CTEType) {
         qb: (ctes: MapCtesToSelectionType<TThisDbType, TThisCTESpecs>) => TQb
     ): MapToResultQueryBuilder<TQb, TFinalCTESpec, TParamsAccumulated>
     function cteFn<
-        TThis extends QueryBuilder<any, any, any, any, any, any, any, any, any>,
+        TThis extends QueryBuilder<any, any, any, any, any, any, any, any>,
         TCTEName extends string,
-        TQb extends QueryBuilder<TThisDbType, any, any, any, any, any, any, any, any>,
+        TQb extends QueryBuilder<TThisDbType, any, any, any, any, any, any, any>,
 
-        TThisDbType extends DbType = TThis extends QueryBuilder<infer TDbType, any, any, any, any, any, any, any, any> ? TDbType : never,
-        TThisCTESpecs extends CTESpecsType<TThisDbType> | undefined = TThis extends QueryBuilder<any, any, any, infer TCTESpecs, any, any, any, any, any> ? TCTESpecs : never,
+        TThisDbType extends DbType = TThis extends QueryBuilder<infer TDbType, any, any, any, any, any, any, any> ? TDbType : never,
+        TThisCTESpecs extends CTESpecsType<TThisDbType> | undefined = TThis extends QueryBuilder<any, any, any, infer TCTESpecs, any, any, any, any> ? TCTESpecs : never,
     >(
         this: TThis,
         as: TCTEName,

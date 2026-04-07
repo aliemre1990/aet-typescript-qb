@@ -32,6 +32,7 @@ import type ColumnsSelection from "../query/ColumnsSelection.js";
 import type { IQueryExpression } from "../query/_interfaces/IQueryExpression.js";
 import type { UndefinedIfLengthZero } from "../utility/common.js";
 import type { IQueryTable } from "../query/_interfaces/IQueryTable.js";
+import DeleteQueryBuilder from "../query/deleteQueryBuilder.js";
 
 type TableSpecsType<TTableName extends string = string> = { tableName: TTableName }
 
@@ -99,7 +100,6 @@ class Table<
         [QueryTable<TDbType, TTableName, MapToQueryColumns<TDbType, TTableName, TColumns>, undefined>],
         undefined,
         undefined,
-        undefined,
         SelectToAllColumnsMapRecursively<TDbType, [QueryTable<TDbType, TTableName, MapToQueryColumns<TDbType, TTableName, TColumns>, undefined>], undefined>,
         undefined,
         undefined
@@ -115,7 +115,6 @@ class Table<
     ): QueryBuilder<
         TDbType,
         [QueryTable<TDbType, TTableName, MapToQueryColumns<TDbType, TTableName, TColumns>, undefined>],
-        undefined,
         undefined,
         undefined,
         CalculateSelectResult<TDbType, [QueryTable<TDbType, TTableName, MapToQueryColumns<TDbType, TTableName, TColumns>, undefined>], undefined, TCbResult, TFinalResult>,
@@ -139,7 +138,7 @@ class Table<
 
     join<
         TJoinType extends JoinType,
-        TJoinTable extends IQueryTable<TDbType, any, any> | Table<TDbType, any, any> | QueryBuilder<TDbType, any, any, any, any, any, any, string, any>,
+        TJoinTable extends IQueryTable<TDbType, any, any> | Table<TDbType, any, any> | QueryBuilder<TDbType, any, any, any, any, any, string, any>,
         TCbResult extends ComparisonType<TDbType>,
         TJoinResult extends JoinSpecsTableType<TDbType> = MapToJoinTableType<TDbType, TJoinTable>,
         TJoinParams extends QueryParam<TDbType, any, any, any, any>[] = AccumulateSubQueryParams<TDbType, [TJoinResult], AccumulateComparisonParams<TCbResult>>,
@@ -158,7 +157,6 @@ class Table<
             TDbType,
             [QueryTable<TDbType, TTableName, MapToQueryColumns<TDbType, TTableName, TColumns>, undefined>],
             TJoinAccumulated,
-            undefined,
             undefined,
             undefined,
             TJoinParamsResult
@@ -199,7 +197,6 @@ class Table<
         undefined,
         undefined,
         undefined,
-        undefined,
         AccumulateColumnParams<undefined, TCbResult>
     > {
         const queryColumns = this.columnsList.map((col) => {
@@ -220,7 +217,6 @@ class Table<
             undefined,
             undefined,
             undefined,
-            undefined,
             AccumulateOrderByParams<TDbType, undefined, TCbResult>
         > {
         const queryColumns = this.columnsList.map((col) => {
@@ -232,23 +228,32 @@ class Table<
         return queryTable.orderBy(cb);
     }
 
-    // delete():
-    //     QueryBuilder<
-    //         TDbType,
-    //         undefined,
-    //         undefined,
-    //         undefined,
-    //         { table: QueryTable<TDbType, TTableName, MapToQueryColumns<TDbType, TTableName, TColumns>, undefined>, values: undefined }
-    //     > {
-    //     const queryColumns = this.columnsList.map((col) => {
-    //         return new QueryColumn(this.dbType, col.name, { tableName: this.name, asTableName: undefined }, undefined, undefined);
-    //     }) as MapToQueryColumns<TDbType, TTableName, TColumns>;
+    delete():
+        DeleteQueryBuilder<
+            TDbType,
+            QueryTable<TDbType, TTableName, MapToQueryColumns<TDbType, TTableName, TColumns>, undefined>,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined
+        > {
+        const queryColumns = this.columnsList.map((col) => {
+            return new QueryColumn(this.dbType, col.name, { tableName: this.name, asTableName: undefined }, undefined, undefined);
+        }) as MapToQueryColumns<TDbType, TTableName, TColumns>;
 
-    //     const queryTable = new QueryTable<TDbType, TTableName, MapToQueryColumns<TDbType, TTableName, TColumns>, undefined>(this.dbType, this.name, queryColumns);
+        const queryTable = new QueryTable<TDbType, TTableName, MapToQueryColumns<TDbType, TTableName, TColumns>, undefined>(this.dbType, this.name, queryColumns);
 
-    //     return queryTable.delete();
+        return new DeleteQueryBuilder(
+            this.dbType,
+            queryTable,
+            undefined,
+            undefined,
+            undefined,
+            { cteSpecs: undefined, queryResult: undefined, queryResultSpecs: undefined, whereComparison: undefined }
+        );
 
-    // }
+    }
 }
 
 function pgTable<

@@ -58,9 +58,9 @@ type simpleSQL_WithComparison_Param1Name_Test = AssertTrue<AssertEqual<typeof_Si
 
 const simpleSQL_InSelectQuery = customersTable.select((tbl, { sql, param }) => [sql`Round${param("roundParam")}`.specs<number, 'round'>()]);
 type typeof_SimpleSQL_InSelectQuery = typeof simpleSQL_InSelectQuery;
-type typeof_SimpleSQL_InSelectQuery_ResultCols = typeof_SimpleSQL_InSelectQuery extends QueryBuilder<any, any, any, any, any, infer TResultCols, any, any, any> ? TResultCols : never;
+type typeof_SimpleSQL_InSelectQuery_ResultCols = typeof_SimpleSQL_InSelectQuery extends QueryBuilder<any, any, any, any, infer TResultCols, any, any, any> ? TResultCols : never;
 type typeof_SimpleSQL_InSelectQuery_ResultType = ColumnsToResultMap<any, typeof_SimpleSQL_InSelectQuery_ResultCols>;
-type typeof_SimpleSQL_InSelectQuery_Params = typeof_SimpleSQL_InSelectQuery extends QueryBuilder<any, any, any, any, any, any, infer TParams, any, any> ? TParams : never;
+type typeof_SimpleSQL_InSelectQuery_Params = typeof_SimpleSQL_InSelectQuery extends QueryBuilder<any, any, any, any, any, infer TParams, any, any> ? TParams : never;
 type typeof_SimpleSQL_InSelectQuery_Param1Name = typeof_SimpleSQL_InSelectQuery_Params[0] extends QueryParam<any, infer TName, any, any, any> ? TName : never;
 type simpleSQL_InSelectQuery_ResultType_Expected = { round: number }[];
 type simpleSQL_InSelectQuery_ResultType_Test = AssertTrue<AssertEqual<typeof_SimpleSQL_InSelectQuery_ResultType, simpleSQL_InSelectQuery_ResultType_Expected>>;

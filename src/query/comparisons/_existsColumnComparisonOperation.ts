@@ -10,7 +10,7 @@ import { extractParams } from "../utility.js";
 
 class ExistsColumnComparionOperation<
     TDbType extends DbType,
-    TCompared extends QueryBuilder<TDbType, any, any, any, any, any, any, any, any>,
+    TCompared extends QueryBuilder<TDbType, any, any, any, any, any, any, any>,
     TParams extends readonly QueryParam<TDbType, string, any, any, any>[] | undefined = UndefinedIfLengthZero<ExtractParams<TCompared>>,
     TAs extends string | undefined = undefined,
     TCastType extends GetColumnTypes<TDbType> | undefined = undefined,
@@ -61,7 +61,7 @@ function generateExistsComparison<
     TDbType extends DbType
 >(dbType: TDbType, operation: ExistsComparisonOperationType) {
     function existsComparison<
-        TCompared extends QueryBuilder<TDbType, any, any, any, any, any, any, any, any>,
+        TCompared extends QueryBuilder<TDbType, any, any, any, any, any, any, any>,
     >(subQuery: TCompared): ExistsColumnComparionOperation<
         TDbType,
         TCompared,
