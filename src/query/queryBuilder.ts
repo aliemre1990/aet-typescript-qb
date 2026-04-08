@@ -503,7 +503,8 @@ class QueryBuilder<
     >(
         cb: (
             tables: TableToColumnsMap<TDbType, TablesToObject<TDbType, TFrom, TJoinSpecs>>,
-            ops: DbOperations<TDbType>
+            ops: DbOperations<TDbType>,
+            ctes: MapCtesToSelectionType<TDbType, TCTESpecs>
         ) => TCbResult
     ): QueryBuilder<
         TDbType,
@@ -521,15 +522,17 @@ class QueryBuilder<
     >(
         cb?: (
             tables: TableToColumnsMap<TDbType, TablesToObject<TDbType, TFrom, TJoinSpecs>>,
-            ops: DbOperations<TDbType>
+            ops: DbOperations<TDbType>,
+            ctes: MapCtesToSelectionType<TDbType, TCTESpecs>
         ) => TCbResult
     ): any {
+        let cteSpecs = mapCTESpecsToSelection<TDbType, TCTESpecs>(this.cteSpecs);
 
         let selectRes: readonly (ColumnsSelection<TDbType, any, any> | IQueryExpression<TDbType, any, any, any, any, any, any>)[] = [];
         if (!isNullOrUndefined(cb)) {
             const columnsSelection = this.#getColumnsSelection() as TableToColumnsMap<TDbType, TablesToObject<TDbType, TFrom, TJoinSpecs>>;
             const functions = getDbFunctions(this.dbType);
-            selectRes = cb(columnsSelection, functions);
+            selectRes = cb(columnsSelection, functions, cteSpecs);
         }
 
         let params: readonly QueryParam<TDbType, any, any, any, any>[] | undefined;
@@ -636,17 +639,16 @@ class QueryBuilder<
         tableSelection: TJoinTable | ((ctes: MapCtesToSelectionType<TDbType, TCTESpecs>) => TJoinTable),
         comparisonCb: (
             tables: TableToColumnsMap<TDbType, TablesToObject<TDbType, TFrom, TJoinAccumulated>>,
-            ops: DbOperations<TDbType>
+            ops: DbOperations<TDbType>,
+            ctes: MapCtesToSelectionType<TDbType, TCTESpecs>
         ) => TCbResult
     ): QueryBuilder<TDbType, TFrom, TJoinAccumulated, TCTESpecs, TResult, TJoinParams, TAs, TCastType> {
 
         let table;
 
         if (typeof tableSelection === "function") {
-            let cteSpecs = {} as MapCtesToSelectionType<TDbType, TCTESpecs>;
-            if (this.cteSpecs !== undefined) {
-                cteSpecs = mapCTESpecsToSelection(this.cteSpecs) as MapCtesToSelectionType<TDbType, TCTESpecs>;
-            }
+            let cteSpecs = mapCTESpecsToSelection<TDbType, TCTESpecs>(this.cteSpecs);
+
             table = tableSelection(cteSpecs);
         } else {
             table = tableSelection;
@@ -706,9 +708,17 @@ class QueryBuilder<
 
         const dbOperators = getDbFunctions(this.dbType);
 
+        let cteSpecs: MapCtesToSelectionType<TDbType, TCTESpecs>;
+        if (this.cteSpecs === undefined) {
+            cteSpecs = {} as MapCtesToSelectionType<TDbType, TCTESpecs>;
+        } else {
+            cteSpecs = mapCTESpecsToSelection(this.cteSpecs);
+        }
+
         const comparison = comparisonCb(
             columnsSelection as TableToColumnsMap<TDbType, TablesToObject<TDbType, TFrom, TJoinAccumulated>>,
-            dbOperators
+            dbOperators,
+            cteSpecs
         );
 
         const params = extractParams([comparison, table], this.params);
@@ -746,7 +756,8 @@ class QueryBuilder<
     >(
         cb: (
             tables: TableToColumnsMap<TDbType, TablesToObject<TDbType, TFrom, TJoinSpecs>>,
-            ops: DbOperations<TDbType>
+            ops: DbOperations<TDbType>,
+            ctes: MapCtesToSelectionType<TDbType, TCTESpecs>
         ) => TCbResult
     ):
         QueryBuilder<
@@ -761,8 +772,9 @@ class QueryBuilder<
         > {
         const columnsSelection = this.#getColumnsSelection() as TableToColumnsMap<TDbType, TablesToObject<TDbType, TFrom, TJoinSpecs>>;
         const ops = getDbFunctions(this.dbType);
+        let cteSpecs = mapCTESpecsToSelection<TDbType, TCTESpecs>(this.cteSpecs);
 
-        const comparison = cb(columnsSelection, ops as DbOperations<TDbType>)
+        const comparison = cb(columnsSelection, ops as DbOperations<TDbType>, cteSpecs);
 
         const params = extractParams([comparison], this.params);
 
@@ -798,7 +810,8 @@ class QueryBuilder<
         const TCbResult extends GroupBySpecs<TDbType>
     >(cb: (
         tables: TableToColumnsMap<TDbType, TablesToObject<TDbType, TFrom, TJoinSpecs>>,
-        ops: DbOperations<TDbType>
+        ops: DbOperations<TDbType>,
+        ctes: MapCtesToSelectionType<TDbType, TCTESpecs>
     ) => TCbResult):
         QueryBuilder<
             TDbType,
@@ -813,7 +826,9 @@ class QueryBuilder<
 
         const columnsSelection = this.#getColumnsSelection() as TableToColumnsMap<TDbType, TablesToObject<TDbType, TFrom, TJoinSpecs>>;
         const functions = getDbFunctions(this.dbType);
-        const res = cb(columnsSelection, functions);
+        let cteSpecs = mapCTESpecsToSelection<TDbType, TCTESpecs>(this.cteSpecs);
+
+        const res = cb(columnsSelection, functions, cteSpecs);
 
         const params = extractParams(res, this.params);
 
@@ -850,7 +865,8 @@ class QueryBuilder<
     >(
         cb: (
             tables: TableToColumnsMap<TDbType, TablesToObject<TDbType, TFrom, TJoinSpecs>>,
-            ops: DbOperations<TDbType>
+            ops: DbOperations<TDbType>,
+            ctes: MapCtesToSelectionType<TDbType, TCTESpecs>
         ) => TCbResult
     ): QueryBuilder<
         TDbType,
@@ -864,7 +880,9 @@ class QueryBuilder<
     > {
         const columnsSelection = this.#getColumnsSelection() as TableToColumnsMap<TDbType, TablesToObject<TDbType, TFrom, TJoinSpecs>>;
         const operators = getDbFunctions(this.dbType);
-        const res = cb(columnsSelection, operators);
+        let cteSpecs = mapCTESpecsToSelection<TDbType, TCTESpecs>(this.cteSpecs);
+
+        const res = cb(columnsSelection, operators, cteSpecs);
 
         const params = extractParams([res], this.params);
 
@@ -901,7 +919,8 @@ class QueryBuilder<
     >(
         cb: (
             tables: TableToColumnsMap<TDbType, TablesToObject<TDbType, TFrom, TJoinSpecs>>,
-            ops: DbOperations<TDbType>
+            ops: DbOperations<TDbType>,
+            ctes: MapCtesToSelectionType<TDbType, TCTESpecs>
         ) => TCbResult
     ):
         QueryBuilder<
@@ -916,7 +935,9 @@ class QueryBuilder<
         > {
         const columnsSelection = this.#getColumnsSelection() as TableToColumnsMap<TDbType, TablesToObject<TDbType, TFrom, TJoinSpecs>>;
         const functions = getDbFunctions(this.dbType);
-        const res = cb(columnsSelection, functions);
+        let cteSpecs = mapCTESpecsToSelection<TDbType, TCTESpecs>(this.cteSpecs);
+
+        const res = cb(columnsSelection, functions, cteSpecs);
 
         let orderByExpressions: IQueryExpression<any, any, any, any, any, any, any>[] = res.reduce((acc, it) => {
             if (Array.isArray(it)) {

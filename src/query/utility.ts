@@ -4,7 +4,11 @@ import type CTEObject from "./cteObject.js";
 import QueryParam from "./param.js";
 import type { CTESpecsType } from "./queryBuilder.js";
 
-function mapCTESpecsToSelection<TDbType extends DbType, TCTESpecs extends CTESpecsType<TDbType>>(cteSpecs: TCTESpecs) {
+function mapCTESpecsToSelection<TDbType extends DbType, TCTESpecs extends CTESpecsType<TDbType> | undefined>(cteSpecs: TCTESpecs): MapCtesToSelectionType<TDbType, TCTESpecs> {
+    if (cteSpecs === undefined) {
+        return {} as MapCtesToSelectionType<TDbType, TCTESpecs>;
+    }
+
     const res = cteSpecs.reduce((prev, curr) => {
         prev[curr.name] = curr;
         return prev;
