@@ -7,100 +7,60 @@ import type { ExtractParams } from "./param.js";
 import QueryBuilder, { combineTypes, type CalculateCombineResult, type CombineSpecsType, type CombineType, type CTESpecsType, type DMLSpecType, type FromType, type JoinSpecsType, type MapQueryResultForCombine, type ResultShape } from "./queryBuilder.js";
 import { extractParams, mapCTESpecsToSelection } from "./utility.js";
 
+type MapToResultQueryBuilder<
+    TDbType extends DbType,
+    TThis extends QueryBuilder<any, any, any, any, any, any, any, any>,
+    TTargetQb extends QueryBuilder<any, any, any, any, any, any, any, any>
+> =
+    TThis extends QueryBuilder<TDbType, infer TFrom, infer TJoinSpecs, infer TCTESpecs, infer TResultShape, infer TParams, infer TAs, infer TCastType> ?
+    QueryBuilder<
+        TDbType,
+        TFrom,
+        TJoinSpecs,
+        TCTESpecs,
+        CalculateCombineResult<TTargetQb, TResultShape>,
+        UndefinedIfLengthZero<[...(TParams extends undefined ? [] : TParams), ...(ExtractParams<TTargetQb>)]>,
+        TAs,
+        TCastType
+    > : never;
+
+
+
 function generateCombineFunction(combineType: CombineType) {
     function combine<
         TThis extends QueryBuilder<any, any, any, any, any, any, any, any>,
         TQbResult extends QueryBuilder<TThisDbType, any, any, any, MapQueryResultForCombine<TThisDbType, TThisResult>, any, any, any>,
+
         TThisDbType extends DbType = TThis extends QueryBuilder<infer DbType, any, any, any, any, any, any, any> ? DbType : never,
-        TThisFrom extends FromType<TThisDbType> | undefined = TThis extends QueryBuilder<any, infer TFrom, any, any, any, any, any, any> ? TFrom : never,
-        TThisJoinSpecs extends JoinSpecsType<TThisDbType> | undefined = TThis extends QueryBuilder<any, any, infer TJoinSpecs, any, any, any, any, any> ? TJoinSpecs : never,
         TThisCTESpecs extends CTESpecsType<TThisDbType> = TThis extends QueryBuilder<any, any, any, infer TCTESpecs, any, any, any, any> ? TCTESpecs : never,
         TThisResult extends ResultShape<TThisDbType> = TThis extends QueryBuilder<any, any, any, any, infer TResult, any, any, any> ? TResult : never,
-        TThisParams extends DbType = ExtractParams<TThis>,
-        TThisAs extends string | undefined = TThis extends QueryBuilder<any, any, any, any, any, any, infer TAs, any> ? TAs : never,
-        TThisCastType extends GetColumnTypes<TThisDbType> | undefined = TThis extends QueryBuilder<any, any, any, any, any, any, any, infer TCastType> ? TCastType : never,
-        TCombineParams extends readonly QueryParam<TThisDbType, any, any, any, any>[] | undefined = ExtractParams<TQbResult>,
-        TParamsAccumulated extends readonly QueryParam<TThisDbType, any, any, any, any>[] | undefined = UndefinedIfLengthZero<
-            [
-                ...(TThisParams extends readonly QueryParam<TThisDbType, any, any, any, any>[] ? TThisParams : []),
-                ...(TCombineParams extends readonly QueryParam<TThisDbType, any, any, any, any>[] ? TCombineParams : [])
-            ]
-        >
+
     >(
         this: TThis,
         qbSelectionCb: (ctes: MapCtesToSelectionType<TThisDbType, TThisCTESpecs>) => TQbResult
-    ): QueryBuilder<
-        TThisDbType,
-        TThisFrom,
-        TThisJoinSpecs,
-        TThisCTESpecs,
-        CalculateCombineResult<TQbResult, TThisResult>,
-        TParamsAccumulated,
-        TThisAs,
-        TThisCastType
-    >
+    ): MapToResultQueryBuilder<TThisDbType, TThis, TQbResult>
     function combine<
         TThis extends QueryBuilder<any, any, any, any, any, any, any, any>,
         TQbResult extends QueryBuilder<TThisDbType, any, any, any, MapQueryResultForCombine<TThisDbType, TThisResult>, any, any, any>,
+
         TThisDbType extends DbType = TThis extends QueryBuilder<infer DbType, any, any, any, any, any, any, any> ? DbType : never,
-        TThisFrom extends FromType<TThisDbType> | undefined = TThis extends QueryBuilder<any, infer TFrom, any, any, any, any, any, any> ? TFrom : never,
-        TThisJoinSpecs extends JoinSpecsType<TThisDbType> | undefined = TThis extends QueryBuilder<any, any, infer TJoinSpecs, any, any, any, any, any> ? TJoinSpecs : never,
         TThisCTESpecs extends CTESpecsType<TThisDbType> = TThis extends QueryBuilder<any, any, any, infer TCTESpecs, any, any, any, any> ? TCTESpecs : never,
         TThisResult extends ResultShape<TThisDbType> = TThis extends QueryBuilder<any, any, any, any, infer TResult, any, any, any> ? TResult : never,
-        TThisParams extends DbType = ExtractParams<TThis>,
-        TThisAs extends string | undefined = TThis extends QueryBuilder<any, any, any, any, any, any, infer TAs, any> ? TAs : never,
-        TThisCastType extends GetColumnTypes<TThisDbType> | undefined = TThis extends QueryBuilder<any, any, any, any, any, any, any, infer TCastType> ? TCastType : never,
-        TCombineParams extends readonly QueryParam<TThisDbType, any, any, any, any>[] | undefined = ExtractParams<TQbResult>,
-        TParamsAccumulated extends readonly QueryParam<TThisDbType, any, any, any, any>[] | undefined = UndefinedIfLengthZero<
-            [
-                ...(TThisParams extends readonly QueryParam<TThisDbType, any, any, any, any>[] ? TThisParams : []),
-                ...(TCombineParams extends readonly QueryParam<TThisDbType, any, any, any, any>[] ? TCombineParams : [])
-            ]
-        >
     >(
         this: TThis,
         qbSelectionCb: TQbResult
-    ): QueryBuilder<
-        TThisDbType,
-        TThisFrom,
-        TThisJoinSpecs,
-        TThisCTESpecs,
-        CalculateCombineResult<TQbResult, TThisResult>,
-        TParamsAccumulated,
-        TThisAs,
-        TThisCastType
-    >
+    ): MapToResultQueryBuilder<TThisDbType, TThis, TQbResult>
     function combine<
         TThis extends QueryBuilder<any, any, any, any, any, any, any, any>,
         TQbResult extends QueryBuilder<TThisDbType, any, any, any, MapQueryResultForCombine<TThisDbType, TThisResult>, any, any, any>,
         TThisDbType extends DbType = TThis extends QueryBuilder<infer DbType, any, any, any, any, any, any, any> ? DbType : never,
-        TThisFrom extends FromType<TThisDbType> | undefined = TThis extends QueryBuilder<any, infer TFrom, any, any, any, any, any, any> ? TFrom : never,
-        TThisJoinSpecs extends JoinSpecsType<TThisDbType> | undefined = TThis extends QueryBuilder<any, any, infer TJoinSpecs, any, any, any, any, any> ? TJoinSpecs : never,
         TThisCTESpecs extends CTESpecsType<TThisDbType> = TThis extends QueryBuilder<any, any, any, infer TCTESpecs, any, any, any, any> ? TCTESpecs : never,
         TThisResult extends ResultShape<TThisDbType> = TThis extends QueryBuilder<any, any, any, any, infer TResult, any, any, any> ? TResult : never,
-        TThisParams extends DbType = ExtractParams<TThis>,
-        TThisAs extends string | undefined = TThis extends QueryBuilder<any, any, any, any, any, any, infer TAs, any> ? TAs : never,
-        TThisCastType extends GetColumnTypes<TThisDbType> | undefined = TThis extends QueryBuilder<any, any, any, any, any, any, any, infer TCastType> ? TCastType : never,
-        TCombineParams extends readonly QueryParam<TThisDbType, any, any, any, any>[] | undefined = ExtractParams<TQbResult>,
-        TParamsAccumulated extends readonly QueryParam<TThisDbType, any, any, any, any>[] | undefined = UndefinedIfLengthZero<
-            [
-                ...(TThisParams extends readonly QueryParam<TThisDbType, any, any, any, any>[] ? TThisParams : []),
-                ...(TCombineParams extends readonly QueryParam<TThisDbType, any, any, any, any>[] ? TCombineParams : [])
-            ]
-        >
+
     >(
         this: TThis,
         cteSelectionCb: TQbResult | ((ctes: MapCtesToSelectionType<TThisDbType, TThisCTESpecs>) => TQbResult)
-    ): QueryBuilder<
-        TThisDbType,
-        TThisFrom,
-        TThisJoinSpecs,
-        TThisCTESpecs,
-        CalculateCombineResult<TQbResult, TThisResult>,
-        TParamsAccumulated,
-        TThisAs,
-        TThisCastType
-    > {
+    ): any {
         let res: TQbResult;
         if (typeof cteSelectionCb === "function") {
             let cteSpecs: MapCtesToSelectionType<TThisDbType, TThisCTESpecs>;
@@ -123,26 +83,17 @@ function generateCombineFunction(combineType: CombineType) {
 
         const params = extractParams([res.params], this.params);
 
-        return new QueryBuilder<
-            TThisDbType,
-            TThisFrom,
-            TThisJoinSpecs,
-            TThisCTESpecs,
-            CalculateCombineResult<TQbResult, TThisResult>,
-            TParamsAccumulated,
-            TThisAs,
-            TThisCastType
-        >(
+        return new QueryBuilder(
             this.dbType,
             this.asName,
             this.castType,
-            params as TParamsAccumulated,
+            params,
             {
                 fromSpecs: this.fromSpecs,
                 cteSpecs: this.cteSpecs,
                 joinSpecs: this.joinSpecs,
                 whereComparison: this.whereComparison,
-                queryResult: this.queryResult as CalculateCombineResult<TQbResult, TThisResult>,
+                queryResult: this.queryResult,
                 queryResultSpecs: this.queryResultSpecs,
                 groupedColumns: this.groupedColumns,
                 havingSpec: this.havingSpec,
