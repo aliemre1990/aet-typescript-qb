@@ -215,8 +215,8 @@ class QueryBuilder<
 > extends
     BaseQueryBuilder<
         TDbType,
-        TParams,
         TResult,
+        TParams,
         TAs,
         TCastType
     > {
@@ -744,7 +744,7 @@ class QueryBuilder<
         TCbResult extends ComparisonType<TDbType>
     >(
         cb: (
-            tables: TableToColumnsMap<TDbType, TablesToObject<TDbType, TFrom, TJoinSpecs, TCTESpecs>>,
+            tables: TableToColumnsMap<TDbType, TablesToObject<TDbType, TFrom, TJoinSpecs>>,
             ops: DbOperations<TDbType>
         ) => TCbResult
     ):
@@ -758,7 +758,7 @@ class QueryBuilder<
             TAs,
             TCastType
         > {
-        const columnsSelection = this.#getColumnsSelection() as TableToColumnsMap<TDbType, TablesToObject<TDbType, TFrom, TJoinSpecs, TCTESpecs>>;
+        const columnsSelection = this.#getColumnsSelection() as TableToColumnsMap<TDbType, TablesToObject<TDbType, TFrom, TJoinSpecs>>;
         const ops = getDbFunctions(this.dbType);
 
         const comparison = cb(columnsSelection, ops as DbOperations<TDbType>)
@@ -796,7 +796,7 @@ class QueryBuilder<
     groupBy<
         const TCbResult extends GroupBySpecs<TDbType>
     >(cb: (
-        tables: TableToColumnsMap<TDbType, TablesToObject<TDbType, TFrom, TJoinSpecs, TCTESpecs>>,
+        tables: TableToColumnsMap<TDbType, TablesToObject<TDbType, TFrom, TJoinSpecs>>,
         ops: DbOperations<TDbType>
     ) => TCbResult):
         QueryBuilder<
@@ -810,7 +810,7 @@ class QueryBuilder<
             TCastType
         > {
 
-        const columnsSelection = this.#getColumnsSelection() as TableToColumnsMap<TDbType, TablesToObject<TDbType, TFrom, TJoinSpecs, TCTESpecs>>;
+        const columnsSelection = this.#getColumnsSelection() as TableToColumnsMap<TDbType, TablesToObject<TDbType, TFrom, TJoinSpecs>>;
         const functions = getDbFunctions(this.dbType);
         const res = cb(columnsSelection, functions);
 
@@ -848,7 +848,7 @@ class QueryBuilder<
         TCbResult extends ComparisonType<TDbType>
     >(
         cb: (
-            tables: TableToColumnsMap<TDbType, TablesToObject<TDbType, TFrom, TJoinSpecs, TCTESpecs>>,
+            tables: TableToColumnsMap<TDbType, TablesToObject<TDbType, TFrom, TJoinSpecs>>,
             ops: DbOperations<TDbType>
         ) => TCbResult
     ): QueryBuilder<
@@ -861,7 +861,7 @@ class QueryBuilder<
         TAs,
         TCastType
     > {
-        const columnsSelection = this.#getColumnsSelection() as TableToColumnsMap<TDbType, TablesToObject<TDbType, TFrom, TJoinSpecs, TCTESpecs>>;
+        const columnsSelection = this.#getColumnsSelection() as TableToColumnsMap<TDbType, TablesToObject<TDbType, TFrom, TJoinSpecs>>;
         const operators = getDbFunctions(this.dbType);
         const res = cb(columnsSelection, operators);
 
@@ -899,7 +899,7 @@ class QueryBuilder<
         const TCbResult extends OrderBySpecsType<TDbType>
     >(
         cb: (
-            tables: TableToColumnsMap<TDbType, TablesToObject<TDbType, TFrom, TJoinSpecs, TCTESpecs>>,
+            tables: TableToColumnsMap<TDbType, TablesToObject<TDbType, TFrom, TJoinSpecs>>,
             ops: DbOperations<TDbType>
         ) => TCbResult
     ):
@@ -913,7 +913,7 @@ class QueryBuilder<
             TAs,
             TCastType
         > {
-        const columnsSelection = this.#getColumnsSelection() as TableToColumnsMap<TDbType, TablesToObject<TDbType, TFrom, TJoinSpecs, TCTESpecs>>;
+        const columnsSelection = this.#getColumnsSelection() as TableToColumnsMap<TDbType, TablesToObject<TDbType, TFrom, TJoinSpecs>>;
         const functions = getDbFunctions(this.dbType);
         const res = cb(columnsSelection, functions);
 
@@ -1193,22 +1193,6 @@ class QueryBuilder<
         );
     }
 
-    exec(
-        ...args: TParams extends undefined
-            ? [] | [{ [key: string]: any }]
-            : [{ [key: string]: any } & QueryParamsToObject<TParams>]
-    ):
-        TResult extends ResultShape<TDbType> ?
-        ColumnsToResultMap<TDbType, TResult> :
-        never {
-
-
-        if (isNullOrUndefined(this?.queryResult)) {
-            return {} as any;
-        }
-
-        return "x" as any;
-    }
 }
 
 /**

@@ -24,8 +24,8 @@ class DeleteQueryBuilder<
 > extends BaseDMLQueryBuilder<
     TDbType,
     TTable,
-    TParams,
     TCTESpecs,
+    TParams,
     TResult,
     TAs,
     TCastType
@@ -86,7 +86,7 @@ class DeleteQueryBuilder<
 
     where<TCbResult extends ComparisonType<TDbType>>(
         cb: (
-            tables: TableToColumnsMap<TDbType, TablesToObject<TDbType, [TTable], undefined, TCTESpecs>>,
+            tables: TableToColumnsMap<TDbType, TablesToObject<TDbType, [TTable], undefined>>,
             ops: DbOperations<TDbType>
         ) => TCbResult
     ):
@@ -99,7 +99,7 @@ class DeleteQueryBuilder<
             TAs,
             TCastType
         > {
-        const columnsSelection = this.#getColumnsSelection() as TableToColumnsMap<TDbType, TablesToObject<TDbType, [TTable], undefined, TCTESpecs>>;
+        const columnsSelection = this.#getColumnsSelection() as TableToColumnsMap<TDbType, TablesToObject<TDbType, [TTable], undefined>>;
         const ops = getDbFunctions(this.dbType);
 
         const comparison = cb(columnsSelection, ops as DbOperations<TDbType>)

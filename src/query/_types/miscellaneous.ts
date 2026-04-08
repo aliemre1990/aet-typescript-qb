@@ -27,8 +27,7 @@ type TableToColumnsMap<
 type TablesToObject<
     TDbType extends DbType,
     TFrom extends FromType<TDbType> | undefined,
-    TInnerJoinSpecs extends JoinSpecsType<TDbType> | undefined = undefined,
-    TCTESpecs extends CTESpecsType<TDbType> | undefined = undefined
+    TInnerJoinSpecs extends JoinSpecsType<TDbType> | undefined = undefined
 > =
     (
         TFrom extends undefined ? {} :
@@ -39,16 +38,6 @@ type TablesToObject<
         TInnerJoinSpecs extends JoinSpecsType<TDbType> ?
         {
             [T in TInnerJoinSpecs[number]as T["table"]["name"]]: T["table"]
-        }
-        : never
-    ) &
-    (
-        TCTESpecs extends undefined ? {} :
-        TCTESpecs extends CTESpecsType<TDbType> ?
-        {
-            [
-            T in TCTESpecs[number]as T["name"]
-            ]: T
         }
         : never
     );

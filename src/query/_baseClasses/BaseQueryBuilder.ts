@@ -4,6 +4,8 @@ import type ColumnsSelection from "../ColumnsSelection.js";
 import type QueryParam from "../param.js";
 import type { DetermineFinalValueType, DetermineValueType, IQueryExpression } from "../_interfaces/IQueryExpression.js";
 import BaseQueryExpression from "./BaseQueryExpression.js";
+import type { ColumnsToResultMap, QueryParamsToObject } from "../_types/result.js";
+import { isNullOrUndefined } from "../../utility/guards.js";
 
 type ResultShapeItem<TDbType extends DbType> = IQueryExpression<TDbType, any, any, any, any, any, any>;
 type ResultShape<TDbType extends DbType> = readonly ResultShapeItem<TDbType>[];
@@ -37,8 +39,8 @@ type QueryResultSpecsType<TDbType extends DbType> = "*" | readonly (ColumnsSelec
 
 class BaseQueryBuilder<
     TDbType extends DbType,
-    TParams extends readonly QueryParam<TDbType, any, any, any, any>[] | undefined,
     TResult extends ResultShape<TDbType> | undefined,
+    TParams extends readonly QueryParam<TDbType, any, any, any, any>[] | undefined,
     TAs extends string | undefined,
     TCastType extends GetColumnTypes<TDbType> | undefined
 > extends BaseQueryExpression<
@@ -66,6 +68,23 @@ class BaseQueryBuilder<
 
         this.queryResult = queryResult;
         this.queryResultSpecs = queryResultSpecs;
+    }
+
+    exec(
+        ...args: TParams extends undefined
+            ? [] | [{ [key: string]: any }]
+            : [{ [key: string]: any } & QueryParamsToObject<TParams>]
+    ):
+        TResult extends ResultShape<TDbType> ?
+        ColumnsToResultMap<TDbType, TResult> :
+        never {
+
+
+        if (isNullOrUndefined(this?.queryResult)) {
+            return {} as any;
+        }
+
+        return "x" as any;
     }
 }
 
