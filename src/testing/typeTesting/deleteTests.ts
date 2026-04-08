@@ -1,7 +1,7 @@
-import type BaseQueryBuilder from "../../query/_baseClasses/BaseQueryBuilder";
-import type { ColumnsToResultMap } from "../../query/_types/result";
-import { customersTable } from "../_tables";
-import type { AssertEqual, AssertTrue } from "../_typeTestingUtilities";
+import type BaseQueryBuilder from "../../query/_baseClasses/BaseQueryBuilder.js";
+import type { ColumnsToResultMap } from "../../query/_types/result.js";
+import { customersTable } from "../_tables.js";
+import type { AssertEqual, AssertTrue } from "../_typeTestingUtilities.js";
 
 const deleteReturning_All = customersTable.delete().returning();
 type typeof_DeleteReturning_All = typeof deleteReturning_All;
