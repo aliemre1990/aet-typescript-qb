@@ -55,6 +55,11 @@ type MapToColumnsRecord<TColumns extends readonly Column<any, any, any, any, any
     [C in TColumns[number]as C["name"]]: C
 }
 
+type MapToQueryTable<TTable> =
+    TTable extends Table<infer TDbType, infer TColumns, infer TTableName> ?
+    QueryTable<TDbType, TTableName, MapToQueryColumns<TDbType, TTableName, TColumns>, undefined> :
+    TTable;
+
 class Table<
     TDbType extends DbType,
     TColumns extends readonly Column<TDbType, any, any, any, any, any, any>[],
@@ -309,5 +314,6 @@ export {
 
 export type {
     TableSpecsType,
-    MapToQueryColumns
+    MapToQueryColumns,
+    MapToQueryTable
 }

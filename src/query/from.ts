@@ -64,6 +64,7 @@ function from<
             fromSpecs: fromResult,
             queryResult: undefined,
             queryResultSpecs: undefined,
+            cteSpecs: undefined
         }
     );
 }

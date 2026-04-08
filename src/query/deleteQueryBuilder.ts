@@ -3,22 +3,22 @@ import type { GetColumnTypes } from "../table/column.js";
 import BaseDMLQueryBuilder from "./_baseClasses/BaseDMLQueryBuilder.js";
 import type { QueryResultSpecsType } from "./_baseClasses/BaseQueryBuilder.js";
 import { queryBuilderContextFactory, type QueryBuilderContext } from "./_interfaces/IQueryExpression.js";
-import type { TablesToObject, TableToColumnsMap } from "./_types/miscellaneous.js";
+import type { MapCtesToSelectionType, TablesToObject, TableToColumnsMap } from "./_types/miscellaneous.js";
 import type { DbOperations } from "./_types/ops.js";
 import type { AccumulateComparisonParams } from "./_types/paramAccumulationComparison.js";
 import { columnsSelectionFactory } from "./ColumnsSelection.js";
 import type QueryParam from "./param.js";
 import type { ColumnsSelectionListType, ComparisonType, CTESpecsType, ResultShape } from "./queryBuilder.js";
 import type QueryTable from "./queryTable.js";
-import { extractParams } from "./utility.js";
+import { extractParams, mapCTESpecsToSelection } from "./utility.js";
 import { getDbFunctions } from "./utility/dbOperations.js";
 
 class DeleteQueryBuilder<
     TDbType extends DbType,
     TTable extends QueryTable<TDbType, any, any, any>,
     TCTESpecs extends CTESpecsType<TDbType> | undefined,
-    TParams extends readonly QueryParam<TDbType, any, any, any, any>[] | undefined,
     TResult extends ResultShape<TDbType> | undefined,
+    TParams extends readonly QueryParam<TDbType, any, any, any, any>[] | undefined,
     TAs extends string | undefined,
     TCastType extends GetColumnTypes<TDbType> | undefined
 > extends BaseDMLQueryBuilder<
@@ -64,6 +64,32 @@ class DeleteQueryBuilder<
             result = `${result} WHERE ${whereClause}`;
         }
 
+        let cteClause;
+        if (this.cteSpecs !== undefined) {
+            const cteItems = this.cteSpecs.map(cte => {
+                let qbResult = cte.buildSQL(context);
+                let result = `${cte.cteType.name === 'RECURSIVE' ? 'RECURSIVE ' : ''}`;
+                if (cte.cteType.name === 'RECURSIVE') {
+
+                }
+
+                result = `${result}"${cte.cteName}"`;
+                if (cte.isColumnListPresent === true) {
+                    const columnList = `(${cte.columnsList.map(ent => `"${ent.fieldName}"`).join(', ')})`;
+                    result = `${result}${columnList}`
+                }
+
+                result = `${result} AS`;
+                result = `${result} ${cte.cteType.name === "MATERIALIZED" || cte.cteType.name === "NOT_MATERIALIZED" ? cte.cteType.query : ''}`;
+                result = `${result}(${qbResult.query})`
+
+                return result;
+            }).join(', ');
+            cteClause = `WITH ${cteItems}`
+        }
+
+        result = `${cteClause ? `${cteClause} ` : ''}${result}`;
+
         return { query: result, params: [...(context?.params || [])] };
     }
 
@@ -87,22 +113,30 @@ class DeleteQueryBuilder<
     where<TCbResult extends ComparisonType<TDbType>>(
         cb: (
             tables: TableToColumnsMap<TDbType, TablesToObject<TDbType, [TTable], undefined>>,
-            ops: DbOperations<TDbType>
+            ops: DbOperations<TDbType>,
+            ctes: MapCtesToSelectionType<TDbType, TCTESpecs>
         ) => TCbResult
     ):
         DeleteQueryBuilder<
             TDbType,
             TTable,
             TCTESpecs,
-            AccumulateComparisonParams<TCbResult, TParams>,
             TResult,
+            AccumulateComparisonParams<TCbResult, TParams>,
             TAs,
             TCastType
         > {
         const columnsSelection = this.#getColumnsSelection() as TableToColumnsMap<TDbType, TablesToObject<TDbType, [TTable], undefined>>;
         const ops = getDbFunctions(this.dbType);
 
-        const comparison = cb(columnsSelection, ops as DbOperations<TDbType>)
+        let cteSpecs: MapCtesToSelectionType<TDbType, TCTESpecs>;
+        if (this.cteSpecs === undefined) {
+            cteSpecs = {} as MapCtesToSelectionType<TDbType, TCTESpecs>;
+        } else {
+            cteSpecs = mapCTESpecsToSelection(this.cteSpecs);
+        }
+
+        const comparison = cb(columnsSelection, ops as DbOperations<TDbType>, cteSpecs)
 
         const params = extractParams([comparison], this.params);
 
@@ -110,8 +144,8 @@ class DeleteQueryBuilder<
             TDbType,
             TTable,
             TCTESpecs,
-            AccumulateComparisonParams<TCbResult, TParams>,
             TResult,
+            AccumulateComparisonParams<TCbResult, TParams>,
             TAs,
             TCastType
         >(

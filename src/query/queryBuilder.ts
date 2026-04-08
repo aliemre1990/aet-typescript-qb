@@ -1,6 +1,6 @@
 import { DbType } from "../db.js";
 import QueryColumn from "./queryColumn.js";
-import Table, { type MapToQueryColumns } from "../table/table.js";
+import Table, { type MapToQueryColumns, type MapToQueryTable } from "../table/table.js";
 import { isNullOrUndefined } from "../utility/guards.js";
 import type ColumnLogicalOperation from "./logicalOperations.js";
 import type { MapCtesToSelectionType, TablesToObject, TableToColumnsMap } from "./_types/miscellaneous.js";
@@ -32,6 +32,7 @@ import type { IQueryValue } from "./_interfaces/IQueryValue.js";
 import type { IQueryTable } from "./_interfaces/IQueryTable.js";
 import type { GetFirstDefaultKeyFromResult, GetFirstFinalTypeFromResult, GetFirstTypeFromResult, QueryResultSpecsType, ResultShape, ResultShapeItem } from "./_baseClasses/BaseQueryBuilder.js";
 import BaseQueryBuilder from "./_baseClasses/BaseQueryBuilder.js";
+import DeleteQueryBuilder from "./deleteQueryBuilder.js";
 
 type CombineExpressions<
     TLeft extends ResultShapeItem<any>,
@@ -222,8 +223,8 @@ class QueryBuilder<
     > {
 
     fromSpecs: TFrom;
+    cteSpecs: TCTESpecs;
 
-    cteSpecs?: TCTESpecs;
     joinSpecs?: TJoinSpecs;
     whereComparison?: ComparisonType<TDbType>;
     groupedColumns?: GroupBySpecs<TDbType>;
@@ -241,7 +242,7 @@ class QueryBuilder<
             queryResult: TResult,
             queryResultSpecs: QueryResultSpecsType<TDbType> | undefined,
             joinSpecs?: TJoinSpecs,
-            cteSpecs?: TCTESpecs,
+            cteSpecs: TCTESpecs,
             whereComparison?: ComparisonType<TDbType>,
             groupedColumns?: GroupBySpecs<TDbType>,
             havingSpec?: ComparisonType<TDbType>,
@@ -1191,6 +1192,49 @@ class QueryBuilder<
                 combineSpecs: this.combineSpecs
             }
         );
+    }
+
+    delete<
+        TTable extends Table<TDbType, any, any> | QueryTable<TDbType, any, any, any>,
+        TTableResult extends QueryTable<TDbType, any, any, any> = MapToQueryTable<TTable>
+    >(table: TTable)
+        : DeleteQueryBuilder<
+            TDbType,
+            TTableResult,
+            TCTESpecs,
+            undefined,
+            TParams,
+            TAs,
+            TCastType
+        > {
+        let queryTable: QueryTable<TDbType, any, any, any>;
+        if (table instanceof Table) {
+            const queryColumns = table.columnsList.map((col: Column<any, any, any, any, any, any, any>) => {
+                return new QueryColumn(table.dbType, col.name, { tableName: table.name, asTableName: undefined }, undefined, undefined);
+            });
+
+            queryTable = new QueryTable(this.dbType, table.name, queryColumns);
+        } else {
+            queryTable = table;
+        }
+
+        return new DeleteQueryBuilder<
+            TDbType,
+            TTableResult,
+            TCTESpecs,
+            undefined,
+            TParams,
+            TAs,
+            TCastType
+        >(
+            this.dbType,
+            queryTable as TTableResult,
+            this.params,
+            this.asName,
+            this.castType,
+            { cteSpecs: this.cteSpecs, queryResult: undefined, queryResultSpecs: undefined, whereComparison: undefined }
+        )
+
     }
 
 }

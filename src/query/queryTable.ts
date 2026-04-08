@@ -114,7 +114,8 @@ class QueryTable<
                 {
                     fromSpecs: [this],
                     queryResult: undefined,
-                    queryResultSpecs: undefined
+                    queryResultSpecs: undefined,
+                    cteSpecs: undefined
                 }
             ).select()
         } else {
@@ -126,7 +127,8 @@ class QueryTable<
                 {
                     fromSpecs: [this],
                     queryResult: undefined,
-                    queryResultSpecs: undefined
+                    queryResultSpecs: undefined,
+                    cteSpecs: undefined
                 }
             ).select(cb);
         }
@@ -166,6 +168,7 @@ class QueryTable<
                 fromSpecs: [this],
                 queryResult: undefined,
                 queryResultSpecs: undefined,
+                cteSpecs: undefined
             }
         )
             .join(type, tableSelection, cb);
@@ -185,6 +188,7 @@ class QueryTable<
                 fromSpecs: [this],
                 queryResult: undefined,
                 queryResultSpecs: undefined,
+                cteSpecs: undefined
             }
         ).where(cb);
     }
@@ -213,6 +217,7 @@ class QueryTable<
                 fromSpecs: [this],
                 queryResult: undefined,
                 queryResultSpecs: undefined,
+                cteSpecs: undefined
             }
         ).groupBy(cb);
     }
@@ -241,6 +246,7 @@ class QueryTable<
                 fromSpecs: [this],
                 queryResult: undefined,
                 queryResultSpecs: undefined,
+                cteSpecs: undefined
             }
         ).orderBy(cb);
     }

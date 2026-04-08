@@ -3,7 +3,9 @@ import '../../moduleInitialization.js';
 import test from "node:test";
 import assert from "node:assert";
 
-import { customersTable } from "../_tables.js";
+import { customersTable, ordersTable } from "../_tables.js";
+import { withAs } from "../../query/withAs.js";
+import { default as from } from "../../query/from.js";
 
 test.suite("DELETE QUERY", () => {
     test("Basic delete query.", () => {
@@ -35,5 +37,19 @@ test.suite("DELETE QUERY", () => {
 
         assert.equal(query, expected);
     });
+
+    test("Delete using cte.", () => {
+        const qb = withAs("ordersCTE", ordersTable.select((tables) => [tables.orders.customerId]))
+            .delete(customersTable)
+            .where((tables, ops, ctes) => tables.customers.id.sqlIn(from(ctes.ordersCTE).select((tables) => [tables.ordersCTE.customerId])));
+        const buildRes = qb.buildSQL();
+        const query = buildRes.query;
+
+        let expected = `WITH "ordersCTE" AS `;
+        expected = `${expected}(SELECT "orders"."customerId" FROM "orders") `;
+        expected = `${expected}DELETE FROM "customers" WHERE "customers"."id" IN (SELECT "ordersCTE"."customerId" FROM "ordersCTE")`;
+
+        assert.equal(query, expected);
+    })
 
 });
