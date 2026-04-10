@@ -20,8 +20,8 @@ type MapResultToCTEObjectEntry<TDbType extends DbType, TExpressions extends Resu
 class CTEObjectEntry<
     TDbType extends DbType,
     TExpression extends IQueryExpression<TDbType, any, any, any, any, any, any>,
-    TValueType extends DbValueTypes = TExpression extends IQueryExpression<TDbType, any, infer TValType, any, any, any, any> ? TValType : never,
-    TFinalValueType extends TValueType | null = TExpression extends IQueryExpression<TDbType, any, any, infer TFinalType, any, any, any> ? TFinalType : never,
+    TValueType extends DbValueTypes | null = TExpression extends IQueryExpression<TDbType, any, infer TValType, any, any, any, any> ? TValType : never,
+    TFinalValueType extends DbValueTypes | null = TExpression extends IQueryExpression<TDbType, any, any, infer TFinalType, any, any, any> ? TFinalType : never,
     TFieldName extends string = TExpression extends IQueryExpression<TDbType, any, any, any, infer TName, infer TAs, any> ? TAs extends undefined ? TName : TAs : never,
     TAsName extends string | undefined = undefined,
     TCastType extends GetColumnTypes<TDbType> | undefined = undefined

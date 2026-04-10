@@ -1,6 +1,6 @@
 import type { DbType } from "../../db.js";
 import type { IQueryExpression } from "../_interfaces/IQueryExpression.js";
-import type { MapResultToCTEObjectEntry } from "../cteObject.js";
+import type { CTEObjectEntry, MapResultToCTEObjectEntry } from "../cteObject.js";
 import type CTEObject from "../cteObject.js";
 import type { CTEType, ResultShape } from "../queryBuilder.js";
 import type QueryBuilder from "../queryBuilder.js";
@@ -27,21 +27,11 @@ type MapToColumnMatch<
     TDbType extends DbType,
     TColumns extends readonly IQueryExpression<TDbType, any, any, any, any, any, any>[],
     TColumnNames extends readonly string[]
-> =
-    TColumnNames extends readonly [infer TFirstName, ...infer TRestNames] ?
-    TColumns extends readonly [infer TFirstCol, ...infer TRestCols] ?
-    TFirstName extends string ?
-    TFirstCol extends IQueryExpression<TDbType, any, infer TValueType, infer TFinalValueType, any, any, any> ?
-    TRestNames extends readonly [string, ...string[]] ?
-    TRestCols extends readonly [any, ...any[]] ?
-    [IQueryExpression<TDbType, undefined, TValueType, TFinalValueType, TFirstName, undefined, undefined>, ...MapToColumnMatch<TDbType, TRestCols, TRestNames>] :
-    [IQueryExpression<TDbType, undefined, TValueType, TFinalValueType, TFirstName, undefined, undefined>] :
-    [IQueryExpression<TDbType, undefined, TValueType, TFinalValueType, TFirstName, undefined, undefined>] :
-    never :
-    never :
-    [] :
-    []
-    ;
+> = {
+        readonly [K in keyof TColumnNames]: K extends keyof TColumns ? TColumns[K] extends
+        IQueryExpression<TDbType, any, infer TValueType, infer TFinalValueType, any, infer TAsName, infer TCastType> ?
+        CTEObjectEntry<TDbType, TColumns[K], TValueType, TFinalValueType, TColumnNames[K], TAsName, TCastType> : never : never;
+    };
 
 
 
