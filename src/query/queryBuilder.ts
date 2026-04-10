@@ -160,7 +160,7 @@ type CTESpecsType<TDbType extends DbType> = readonly CTEObject<
     TDbType,
     string,
     QueryBuilder<TDbType, any, any, any, any, QueryParam<TDbType, any, any, any, any>[] | undefined, any, any>,
-    readonly CTEObjectEntry<TDbType, any, any, any, string, string | undefined, any>[],
+    readonly CTEObjectEntry<TDbType, any, any, any, any, string, string | undefined, any>[],
     any
 >[];
 
@@ -1136,7 +1136,7 @@ class QueryBuilder<
         }
 
         let cte: TFinalCTE;
-        let finalCTEentries: CTEObjectEntry<TDbType, any, any, any, any, any, any>[] = [];
+        let finalCTEentries: CTEObjectEntry<TDbType, any, any, any, any, any, any, any>[] = [];
         if (columnNames.length === 0) {
             cte = new CTEObject(anchorQb.dbType, anchorQb, cteName, cteTypes.RECURSIVE) as TFinalCTE;
         } else {

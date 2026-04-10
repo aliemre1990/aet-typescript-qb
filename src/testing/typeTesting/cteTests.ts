@@ -1,10 +1,11 @@
 import type { ColumnsToResultMap } from "../../query/_types/result.js";
+import type { CTEObjectEntry } from "../../query/cteObject.js";
 import from from "../../query/from.js";
 import type QueryParam from "../../query/param.js";
 import QueryBuilder from "../../query/queryBuilder.js";
 import { withAs, withRecursiveAs } from "../../query/withAs.js";
 import { customersTable, employeesTable, ordersTable } from "../_tables.js";
-import type { AssertEqual, AssertTrue } from "../_typeTestingUtilities.js";
+import type { AssertEqual, AssertExtends, AssertTrue } from "../_typeTestingUtilities.js";
 
 const cteValid_UsingFrom = withAs("customerCte", customersTable.select((tables) => [tables.customers.id]))
     .from((cteSpecs) => [cteSpecs.customerCte])
@@ -78,3 +79,19 @@ type recursiveCTEValid_Chained_ParamsLength_Test = AssertTrue<AssertEqual<typeof
 type recursiveCTEValid_Chained_Param1_Name_Test = AssertTrue<AssertEqual<typeof_RecursiveCTEValid_Chained_Param1_Name, "employeeId">>;
 type recursiveCTEValid_Chained_Param2_Name_Test = AssertTrue<AssertEqual<typeof_RecursiveCTEValid_Chained_Param2_Name, "employeeId2">>;
 type recursiveCTEValid_Chained_ResultType_Test = AssertTrue<AssertEqual<typeof_RecursiveCTEValid_Chained_ResultType, typeof_RecursiveCTEValid_Chained_ResultType_Expected>>;
+
+
+const cte_ForOwnerName_Test = withAs("cte1", customersTable.select((tbl) => [tbl.customers.id.as("customerId")]));
+type typeof_CTE_ForOwnerName_Test = typeof cte_ForOwnerName_Test;
+type typeof_CTE_ForOwnerName_Test_CTESpecs = typeof_CTE_ForOwnerName_Test extends QueryBuilder<any, any, any, infer TSpecs, any, any, any, any> ? TSpecs : never;
+type typeof_CTE_ForOwnerName_Test_CTESpecEntries = typeof_CTE_ForOwnerName_Test_CTESpecs[0] extends { columnsList: infer TEntries } ? TEntries : never;
+type typeof_CTE_ForOwnerName_Test_CTEEntry_OwnerName = typeof_CTE_ForOwnerName_Test_CTESpecEntries[0] extends CTEObjectEntry<any, any, infer TOwnerName, any, any, any, any, any> ? TOwnerName : never;
+type cte_ForOwnerName_Test_OwnerName_Test = AssertTrue<AssertEqual<typeof_CTE_ForOwnerName_Test_CTEEntry_OwnerName, "cte1">>;
+type cte_ForOnwerName_Test_AssertExtends_CTEEntry = AssertTrue<AssertExtends<typeof_CTE_ForOwnerName_Test_CTESpecEntries[0], CTEObjectEntry<any, any, any, any, any, any, any, any>>>;
+
+const cte_ForOwnerName_Test_WithAlias = cte_ForOwnerName_Test.from((ctes) => [ctes.cte1.as("cte1Alias")]);
+type typeof_CTE_ForOwnerName_Test_WithAlias = typeof cte_ForOwnerName_Test_WithAlias;
+type typeof_CTE_ForOwnerName_Test_WithAlias_FromSpecs = typeof_CTE_ForOwnerName_Test_WithAlias extends QueryBuilder<any, infer TSpecs, any, any, any, any, any, any> ? TSpecs : never;
+type typeof_CTE_ForOwnerName_Test_WithAlias_FromSpecs_Entries = typeof_CTE_ForOwnerName_Test_WithAlias_FromSpecs[0] extends { columnsList: infer TEntries } ? TEntries : never;
+type typeof_CTE_ForOwnerName_Test_WithAlias_OwnerName = typeof_CTE_ForOwnerName_Test_WithAlias_FromSpecs_Entries[0] extends CTEObjectEntry<any, any, infer TOwnerName, any, any, any, any, any> ? TOwnerName : never;
+type cte_ForOwnerName_Test_WithAlias_OwnerName_Test = AssertTrue<AssertEqual<typeof_CTE_ForOwnerName_Test_WithAlias_OwnerName, "cte1Alias">>;

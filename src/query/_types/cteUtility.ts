@@ -18,7 +18,7 @@ type MapToCTEObjectForRecursive<
     MapToCTEObject<TDbType, TCTEName, T> :
     T extends QueryBuilder<TDbType, any, any, any, infer TRes, any, any, any> ?
     TRes extends readonly IQueryExpression<TDbType, any, any, any, any, any, any>[] ?
-    CTEObject<TDbType, TCTEName, T, MapToColumnMatch<TDbType, TRes, TColumnNames>, undefined> :
+    CTEObject<TDbType, TCTEName, T, MapToColumnMatch<TDbType, TRes, TColumnNames, TCTEName>, undefined> :
     never :
     never :
     never;
@@ -26,18 +26,19 @@ type MapToCTEObjectForRecursive<
 type MapToColumnMatch<
     TDbType extends DbType,
     TColumns extends readonly IQueryExpression<TDbType, any, any, any, any, any, any>[],
-    TColumnNames extends readonly string[]
+    TColumnNames extends readonly string[],
+    TCTEName extends string
 > = {
-        readonly [K in keyof TColumnNames]: K extends keyof TColumns ? TColumns[K] extends
+        readonly [K in keyof TColumns]: K extends keyof TColumnNames ? TColumns[K] extends
         IQueryExpression<TDbType, any, infer TValueType, infer TFinalValueType, any, infer TAsName, infer TCastType> ?
-        CTEObjectEntry<TDbType, TColumns[K], TValueType, TFinalValueType, TColumnNames[K], TAsName, TCastType> : never : never;
+        CTEObjectEntry<TDbType, TColumns[K], TCTEName, TValueType, TFinalValueType, TColumnNames[K], TAsName, TCastType> : never : never;
     };
 
 
 
 type MapToCTEObject<TDbType extends DbType, TCTEName extends string, T> =
     T extends QueryBuilder<TDbType, any, any, any, infer TRes extends ResultShape<TDbType>, any, any, any> ?
-    CTEObject<TDbType, TCTEName, T, MapResultToCTEObjectEntry<TDbType, TRes>, undefined> : never
+    CTEObject<TDbType, TCTEName, T, MapResultToCTEObjectEntry<TDbType, TRes, TCTEName>, undefined> : never
     ;
 
 

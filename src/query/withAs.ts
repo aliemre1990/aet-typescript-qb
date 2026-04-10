@@ -80,7 +80,7 @@ function withRecursiveAs<
     // Map anchorqb to cte object with name TCTEName and columns are TColumnsList if specified, else TAnchorQb columns
     // Pass the cte object to recursive part
     let cte: TFinalCTE;
-    let finalCTEentries: CTEObjectEntry<TDbType, any, any, any, any, any, any>[] = [];
+    let finalCTEentries: CTEObjectEntry<TDbType, any, any, any, any, any, any, any>[] = [];
     if (columnNames.length === 0) {
         cte = new CTEObject(anchorQb.dbType, anchorQb, cteName, cteTypes.RECURSIVE) as TFinalCTE;
     } else {
