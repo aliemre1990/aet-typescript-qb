@@ -7,15 +7,9 @@ import type { ResultShape } from "./queryBuilder.js";
 import type QueryBuilder from "./queryBuilder.js";
 import type { IQueryTable } from "./_interfaces/IQueryTable.js";
 
-type MapResultToSubQueryEntry<TDbType extends DbType, TExpressions extends ResultShape<TDbType>> =
-    TExpressions extends readonly [infer First, ...infer Rest] ?
-    First extends IQueryExpression<TDbType, any, any, any, any, any, any> ?
-    Rest extends ResultShape<TDbType> ?
-    [SubQueryEntry<TDbType, First>, ...MapResultToSubQueryEntry<TDbType, Rest>] :
-    [SubQueryEntry<TDbType, First>] :
-    [] :
-    []
-    ;
+type MapResultToSubQueryEntry<TDbType extends DbType, TExpressions extends ResultShape<TDbType>> = {
+    readonly [K in keyof TExpressions]: SubQueryEntry<TDbType, TExpressions[K]>;
+}
 
 class SubQueryEntry<
     TDbType extends DbType,
